@@ -1,0 +1,35 @@
+{
+  "name": "SweetPetsFactory",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Shared": { "$path": "src/shared" }
+    },
+    "ServerScriptService": {
+      "GameServer": { "$path": "src/server" }
+    },
+    "StarterPlayer": {
+      "$properties": { "CameraMaxZoomDistance": 90, "CharacterWalkSpeed": 22 },
+      "StarterPlayerScripts": {
+        "Client": { "$path": "src/client" }
+      }
+    },
+    "Lighting": {
+      "$properties": { "ClockTime": 14, "Brightness": 2.5, "GlobalShadows": true, "OutdoorAmbient": [180, 170, 190] }
+    },
+    "Workspace": {
+      "SpawnLocation": {
+        "$className": "SpawnLocation",
+        "$properties": {
+          "Anchored": true,
+          "Size": [10, 1, 10],
+          "Position": [0, 0.5, 30],
+          "Neutral": true,
+          "Transparency": 1,
+          "CanCollide": true,
+          "Duration": 0
+        }
+      }
+    }
+  }
+}
