@@ -1,20 +1,13 @@
 # Sweet Pets Factory - anubis
-newmtl Mat_2A2230
-Kd 0.0232 0.0160 0.0296
+newmtl Mat_4A3A50
+Kd 0.0685 0.0423 0.0802
 Ka 0 0 0
 Ke 0.0000 0.0000 0.0000
 d 1.000
 illum 2
 
-newmtl Mat_2B1B3A
-Kd 0.0242 0.0110 0.0423
-Ka 0 0 0
-Ke 0.0000 0.0000 0.0000
-d 1.000
-illum 2
-
-newmtl Gold_F2C14E
-Kd 0.8879 0.5333 0.0762
+newmtl Gold_E8B64A
+Kd 0.8070 0.4678 0.0685
 Ka 0 0 0
 Ke 0.0000 0.0000 0.0000
 d 1.000
@@ -27,15 +20,64 @@ Ke 1.0000 0.6654 0.0685
 d 1.000
 illum 2
 
-newmtl Neon_F2C14E
-Kd 0.8879 0.5333 0.0762
+newmtl Mat_C2304A
+Kd 0.5395 0.0296 0.0685
 Ka 0 0 0
-Ke 0.8879 0.5333 0.0762
+Ke 0.0000 0.0000 0.0000
 d 1.000
 illum 2
 
-newmtl Mat_2C5DAA
-Kd 0.0252 0.1095 0.4020
+newmtl Mat_2A2230
+Kd 0.0232 0.0160 0.0296
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_1A1420
+Kd 0.0103 0.0070 0.0144
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_120D16
+Kd 0.0060 0.0040 0.0080
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_E8B64A
+Kd 0.8070 0.4678 0.0685
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FFFFFF
+Kd 1.0000 1.0000 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_2E5FB8
+Kd 0.0273 0.1144 0.4793
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_2FA8A0
+Kd 0.0284 0.3916 0.3515
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_F2EEE6
+Kd 0.8879 0.8550 0.7913
 Ka 0 0 0
 Ke 0.0000 0.0000 0.0000
 d 1.000

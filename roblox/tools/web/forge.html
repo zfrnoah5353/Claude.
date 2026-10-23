@@ -1,0 +1,52 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#f4f2f8}canvas{display:block}#i{position:fixed;left:8px;top:6px;font:14px sans-serif;color:#333}</style>
+<script type="importmap">{"imports":{"three":"./three.module.js"}}</script></head><body><div id="i"></div>
+<script type="module">
+import * as THREE from 'three';
+import { build, clips, triCount } from './forge.js';
+const q = new URLSearchParams(location.search);
+const ids = (q.get('pets') || 'kraken').split(',');
+const W = +(q.get('w') || 900), H = +(q.get('h') || 700);
+const tile = ids.length > 1 ? +(q.get('tile') || 420) : 0;
+const cols = ids.length > 1 ? Math.min(ids.length, +(q.get('cols') || 4)) : 1;
+const rows = Math.ceil(ids.length / cols);
+const R = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+R.setPixelRatio(1);
+const cw = tile ? tile * cols : W, ch = tile ? tile * rows : H;
+R.setSize(cw, ch); R.shadowMap.enabled = true; R.shadowMap.type = THREE.PCFSoftShadowMap;
+R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = 1.05;
+document.body.appendChild(R.domElement);
+R.setScissorTest(true);
+const info = [];
+let k = 0;
+for (const id of ids) {
+  const F = (await import(`./pets/${id}.js?${Date.now()}`)).default();
+  const rig = build(F);
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#f4f2f8');
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a7fa0, 1.6));
+  const sun = new THREE.DirectionalLight(0xffffff, 2.2); sun.position.set(-6, 12, -8); sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048); Object.assign(sun.shadow.camera, { left: -10, right: 10, top: 10, bottom: -10 }); scene.add(sun);
+  const fill = new THREE.DirectionalLight(0xcfe8ff, 0.6); fill.position.set(8, 4, 6); scene.add(fill);
+  const ground = new THREE.Mesh(new THREE.CircleGeometry(12, 48), new THREE.ShadowMaterial({ opacity: 0.18 }));
+  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+  rig.root.traverse(o => { if (o.isMesh) { o.castShadow = true; } });
+  scene.add(rig.root);
+  const cl = clips(F, rig);
+  const clip = q.get('clip');
+  if (clip) { const mx = new THREE.AnimationMixer(rig.root); mx.clipAction(cl.find(c => c.name === clip)).play(); mx.update(+(q.get('t') || 0.5)); }
+  rig.root.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(rig.root), c = box.getCenter(new THREE.Vector3()), s = box.getSize(new THREE.Vector3());
+  const cam = new THREE.PerspectiveCamera(32, tile ? 1 : W / H, 0.1, 200);
+  const yaw = THREE.MathUtils.degToRad(+(q.get('yaw') || 30)), pitch = THREE.MathUtils.degToRad(+(q.get('pitch') || 22));
+  const d = Math.max(s.x, s.y, s.z) * 1.75 * +(q.get('zoom') || 1);
+  cam.position.set(c.x + Math.sin(yaw) * Math.cos(pitch) * d, c.y + Math.sin(pitch) * d, c.z - Math.cos(yaw) * Math.cos(pitch) * d);
+  cam.lookAt(c);
+  const x = tile ? (k % cols) * tile : 0, y = tile ? (rows - 1 - Math.floor(k / cols)) * tile : 0;
+  R.setViewport(x, y, tile || W, tile || H); R.setScissor(x, y, tile || W, tile || H);
+  R.render(scene, cam);
+  info.push(`${id}: ${triCount(rig)} tris, ${F.bones.length} os`);
+  k++;
+}
+document.getElementById('i').textContent = info.join(' | ');
+console.log(info.join('\n'));
+document.title = 'done';
+</script></body></html>

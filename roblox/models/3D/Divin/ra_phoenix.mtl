@@ -1,25 +1,4 @@
 # Sweet Pets Factory - ra_phoenix
-newmtl Neon_FFD23F
-Kd 1.0000 0.6445 0.0497
-Ka 0 0 0
-Ke 1.0000 0.6445 0.0497
-d 1.000
-illum 2
-
-newmtl Neon_FF7A1F
-Kd 1.0000 0.1946 0.0137
-Ka 0 0 0
-Ke 1.0000 0.1946 0.0137
-d 1.000
-illum 2
-
-newmtl Mat_D8241F
-Kd 0.6867 0.0176 0.0137
-Ka 0 0 0
-Ke 0.0000 0.0000 0.0000
-d 1.000
-illum 2
-
 newmtl Mat_FF5A1F
 Kd 1.0000 0.1022 0.0137
 Ka 0 0 0
@@ -27,52 +6,10 @@ Ke 0.0000 0.0000 0.0000
 d 1.000
 illum 2
 
-newmtl Mat_FF8A1F
-Kd 1.0000 0.2542 0.0137
+newmtl Mat_FF8A2A
+Kd 1.0000 0.2542 0.0232
 Ka 0 0 0
 Ke 0.0000 0.0000 0.0000
-d 1.000
-illum 2
-
-newmtl Neon_FFB020
-Kd 1.0000 0.4342 0.0144
-Ka 0 0 0
-Ke 1.0000 0.4342 0.0144
-d 1.000
-illum 2
-
-newmtl Neon_FFE27A
-Kd 1.0000 0.7605 0.1946
-Ka 0 0 0
-Ke 1.0000 0.7605 0.1946
-d 1.000
-illum 2
-
-newmtl Neon_FF5A1F
-Kd 1.0000 0.1022 0.0137
-Ka 0 0 0
-Ke 1.0000 0.1022 0.0137
-d 1.000
-illum 2
-
-newmtl Neon_FF8A1F
-Kd 1.0000 0.2542 0.0137
-Ka 0 0 0
-Ke 1.0000 0.2542 0.0137
-d 1.000
-illum 2
-
-newmtl Mat_FFE27A
-Kd 1.0000 0.7605 0.1946
-Ka 0 0 0
-Ke 0.0000 0.0000 0.0000
-d 1.000
-illum 2
-
-newmtl Neon_FFC93C
-Kd 1.0000 0.5841 0.0452
-Ka 0 0 0
-Ke 1.0000 0.5841 0.0452
 d 1.000
 illum 2
 
@@ -83,8 +20,22 @@ Ke 0.0000 0.0000 0.0000
 d 1.000
 illum 2
 
-newmtl Gold_F2C14E
-Kd 0.8879 0.5333 0.0762
+newmtl Mat_FFB23F
+Kd 1.0000 0.4452 0.0497
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Gold_E8B64A
+Kd 0.8070 0.4678 0.0685
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Gold_d2a542
+Kd 0.6445 0.3763 0.0545
 Ka 0 0 0
 Ke 0.0000 0.0000 0.0000
 d 1.000
@@ -97,10 +48,52 @@ Ke 1.0000 0.8963 0.4793
 d 1.000
 illum 2
 
-newmtl Mat_2B1B3A
-Kd 0.0242 0.0110 0.0423
+newmtl Mat_120D16
+Kd 0.0060 0.0040 0.0080
 Ka 0 0 0
 Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_B8321A
+Kd 0.4793 0.0319 0.0103
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_2E5FB8
+Kd 0.0273 0.1144 0.4793
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Neon_FF5A1F
+Kd 1.0000 0.1022 0.0137
+Ka 0 0 0
+Ke 1.0000 0.1022 0.0137
+d 1.000
+illum 2
+
+newmtl Neon_FF8A2A
+Kd 1.0000 0.2542 0.0232
+Ka 0 0 0
+Ke 1.0000 0.2542 0.0232
+d 1.000
+illum 2
+
+newmtl Neon_FFB23F
+Kd 1.0000 0.4452 0.0497
+Ka 0 0 0
+Ke 1.0000 0.4452 0.0497
+d 1.000
+illum 2
+
+newmtl Neon_FFD23F
+Kd 1.0000 0.6445 0.0497
+Ka 0 0 0
+Ke 1.0000 0.6445 0.0497
 d 1.000
 illum 2
 

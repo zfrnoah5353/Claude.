@@ -81,7 +81,9 @@ export function buildRig(m) {
   }
   let i = 0;
   for (const { node, p, geos } of buckets.values()) {
-    const mesh = new THREE.Mesh(mergeGeometries(geos), material(p.color, p.mat, p.alpha));
+    const merged = mergeGeometries(geos.map((g) => { g.deleteAttribute('normal'); g.deleteAttribute('uv'); return g; }));
+    merged.computeVertexNormals(); // normales plates : facettes nettes
+    const mesh = new THREE.Mesh(merged, material(p.color, p.mat, p.alpha));
     mesh.name = `${node.name}_mesh${++i}`;
     node.add(mesh);
   }

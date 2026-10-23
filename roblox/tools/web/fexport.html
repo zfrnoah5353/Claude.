@@ -1,0 +1,28 @@
+<!doctype html><html><head><meta charset="utf-8">
+<script type="importmap">{"imports":{"three":"./three.module.js"}}</script></head><body>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFExporter } from './jsm/exporters/GLTFExporter.js';
+import { build, clips, triCount } from './forge.js';
+import { toOBJ } from './rig.js';
+window.exportOne = async (id) => {
+  const F = (await import(`./pets/${id}.js`)).default();
+  const rig = build(F);
+  const cl = clips(F, rig);
+  const scene = new THREE.Scene(); scene.add(rig.root);
+  const glb = await new GLTFExporter().parseAsync(scene, { binary: true, animations: cl });
+  const bytes = new Uint8Array(glb); let bin = '';
+  for (let k = 0; k < bytes.length; k += 32768) bin += String.fromCharCode.apply(null, bytes.subarray(k, k + 32768));
+  scene.remove(rig.root);
+  const { obj, mtl } = toOBJ(build(F), id);
+  let meshes = 0; rig.root.traverse(o => { if (o.isMesh) meshes++; });
+  rig.root.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(rig.root);
+  const rigInfo = {
+    bones: F.bones.map((b, i) => ({ name: i ? `${b.name}_${i}` : F.name, parent: b.parent, pivot: [b.pivot.x, b.pivot.y, b.pivot.z].map(v => +v.toFixed(4)), spin: b.spin || null })),
+    anims: F.anims, bobs: F.bobs || null, height: +(box.max.y - box.min.y).toFixed(4), minY: +box.min.y.toFixed(4),
+  };
+  return { glb: btoa(bin), obj, mtl, tris: triCount(rig), meshes, rig: rigInfo };
+};
+document.title = 'ready';
+</script></body></html>

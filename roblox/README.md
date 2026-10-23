@@ -42,7 +42,9 @@ Pour importer un modèle dans Studio : clic droit sur Workspace › **Insert fro
 - **`.glb`** : modèle en couleurs, avec ses animations `idle`, `move` et `ability` (boucles de 2 s). Il s'ouvre dans Blender, dans la Visionneuse 3D de Windows ou dans n'importe quel moteur.
 - **`.obj` + `.mtl`** : modèle statique en couleurs, le format le plus compatible.
 
-Pour les mettre dans Roblox : onglet Accueil › **Import 3D** (3D Importer), puis choisis le `.glb` ou le `.obj`. Chaque modèle fait moins de 8 000 triangles, bien en dessous de la limite de 20 000 par maillage.
+Les 13 Mythiques et Divins sont des modèles détaillés à facettes, de 3 000 à 22 000 triangles : fourrure en éclats, piques de cristal, écailles, objets qui flottent autour (lune de sang, engrenages, colonnes, épaves). Leurs fichiers sources sont dans `tools/web/pets/`.
+
+Pour les mettre dans Roblox : onglet Accueil › **Import 3D** (3D Importer), puis choisis le `.glb` ou le `.obj`. Chaque maillage reste sous la limite de 20 000 triangles. Dans le jeu, les pets restent construits en pièces Roblox, plus simples que ces fichiers.
 
 ## Animations
 
@@ -56,7 +58,7 @@ Les pets rares ont un squelette : ailes, têtes, mâchoires, queues, pattes, ten
 
 Les animations passent en douceur d'un état à l'autre. Les auréoles, les engrenages, les piliers et le soleil de Ra tournent en permanence. Quand tu fais éclore un pet rare, il joue son animation d'attaque pendant la révélation.
 
-Sont animés : les dragons, licornes, rois et fantômes (Légendaires), et tous les Mythiques et Divins. Des aperçus animés sont dans `models/gifs/`.
+Sont animés : les dragons, licornes, rois et fantômes (Légendaires), et tous les Mythiques et Divins.
 
 ## Robux (optionnel)
 
@@ -80,4 +82,4 @@ Le projet suit le format [Rojo](https://rojo.space) : `rojo build default.projec
 Outils fournis :
 - `tools/export_models.luau` et `tools/make_rbxmx.py` : régénèrent les fichiers `.rbxmx` à partir des plans ;
 - `tools/gen.sh` : prépare une copie de `Config` utilisable hors de Roblox ;
-- `tools/web/` : l'exporteur `.glb`/`.obj` (three.js), à lancer avec Node et Playwright.
+- `tools/web/` : l'atelier de modélisation (`forge.js`, `parts.js`, un fichier par créature dans `pets/`) et les exporteurs `.glb`/`.obj` (three.js, à lancer avec Node et Playwright).
