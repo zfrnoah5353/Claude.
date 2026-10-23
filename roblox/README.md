@@ -44,7 +44,9 @@ Pour importer un modèle dans Studio : clic droit sur Workspace › **Insert fro
 
 Les 13 Mythiques et Divins sont des modèles détaillés à facettes, de 3 000 à 22 000 triangles : fourrure en éclats, piques de cristal, écailles, objets qui flottent autour (lune de sang, engrenages, colonnes, épaves). Les 40 autres pets (Commun → Légendaire) sont plus simples : 10 espèces mignonnes, décorées selon leur monde (bonbons, baies, chocolat, café, glace, sundae, planètes, étoiles). Plus un pet est rare, plus il a d'accessoires : décoration sur la tête dès Peu commun, collier dès Rare, objets en orbite dès Épique, auréole dorée pour les Légendaires. Les fichiers sources sont dans `tools/web/pets/`.
 
-Pour les mettre dans Roblox : onglet Accueil › **Import 3D** (3D Importer), puis choisis le `.glb` ou le `.obj`. Chaque maillage reste sous la limite de 20 000 triangles. Dans le jeu, les pets restent construits en pièces Roblox, plus simples que ces fichiers.
+**Dans le jeu, rien à importer :** les nouveaux modèles sont déjà dans `SweetPetsFactory.rbxlx`, convertis en pièces Roblox (blocs, boules, cylindres et coins). Leurs plans sont dans `src/shared/PetPlans/`, un par pet. Les pièces trop petites sont retirées pour garder le jeu fluide : jusqu'à 150 à 240 pièces pour les pets communs, 650 pour les Mythiques et 900 pour les Divins. Les vignettes de l'interface n'en gardent que les 120 plus grandes.
+
+Pour utiliser les fichiers 3D ailleurs dans Studio : onglet Accueil › **Import 3D** (3D Importer), puis choisis le `.glb` ou le `.obj`. Chaque maillage reste sous la limite de 20 000 triangles.
 
 ## Animations
 
@@ -82,4 +84,5 @@ Le projet suit le format [Rojo](https://rojo.space) : `rojo build default.projec
 Outils fournis :
 - `tools/export_models.luau` et `tools/make_rbxmx.py` : régénèrent les fichiers `.rbxmx` à partir des plans ;
 - `tools/gen.sh` : prépare une copie de `Config` utilisable hors de Roblox ;
+- `tools/web/rbxexport.js` : régénère `src/shared/PetPlans/` à partir des modèles (`roblox.js` fait la conversion en pièces) ;
 - `tools/web/` : l'atelier de modélisation (`forge.js`, `parts.js`, un fichier par créature dans `pets/`) et les exporteurs `.glb`/`.obj` (three.js, à lancer avec Node et Playwright).

@@ -4,6 +4,8 @@
 import * as THREE from 'three';
 import { build, clips, triCount } from './forge.js';
 import { loadPet } from './load.js';
+import { toRoblox } from './roblox.js';
+import { rbxGroup } from './rbxview.js';
 const q = new URLSearchParams(location.search);
 const ids = (q.get('pets') || 'kraken').split(',');
 const W = +(q.get('w') || 900), H = +(q.get('h') || 700);
@@ -21,7 +23,12 @@ const info = [];
 let k = 0;
 for (const id of ids) {
   const F = await loadPet(id);
-  const rig = build(F);
+  let rig = build(F);
+  if (q.get('rbx')) {
+    const plan = toRoblox(F, { budget: +q.get('rbx'), target: +(q.get('target') || 4), body: F.pieces[0].color });
+    rig = { root: rbxGroup(plan), nodes: [] };
+    info.push(`${id}: ${plan.parts.length}/${plan.total} pièces`);
+  }
   const scene = new THREE.Scene(); scene.background = new THREE.Color('#f4f2f8');
   scene.add(new THREE.HemisphereLight(0xffffff, 0x8a7fa0, 1.6));
   const sun = new THREE.DirectionalLight(0xffffff, 2.2); sun.position.set(-6, 12, -8); sun.castShadow = true;
@@ -31,8 +38,8 @@ for (const id of ids) {
   ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
   rig.root.traverse(o => { if (o.isMesh) { o.castShadow = true; } });
   scene.add(rig.root);
-  const cl = clips(F, rig);
   const clip = q.get('clip');
+  const cl = clip ? clips(F, rig) : [];
   if (clip) { const mx = new THREE.AnimationMixer(rig.root); mx.clipAction(cl.find(c => c.name === clip)).play(); mx.update(+(q.get('t') || 0.5)); }
   rig.root.updateMatrixWorld(true);
   const box = new THREE.Box3().setFromObject(rig.root), c = box.getCenter(new THREE.Vector3()), s = box.getSize(new THREE.Vector3());

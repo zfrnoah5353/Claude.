@@ -16,6 +16,7 @@ local player = Players.LocalPlayer
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Config = require(Shared:WaitForChild("Config"))
 local PetModels = require(Shared:WaitForChild("PetModels"))
+local THUMB = 120 -- pièces max par vignette 3D de l'interface
 local UI = require(script:WaitForChild("UI"))
 local Remotes = ReplicatedStorage:WaitForChild("Remotes")
 local Action = Remotes:WaitForChild("Action") :: RemoteEvent
@@ -386,7 +387,7 @@ local function petCell(parent: Instance, p: any, size: number, onClick: () -> ()
 	local b = UI.new("TextButton", { Text = "", AutoButtonColor = true, BackgroundColor3 = UI.lighten(def.body, 0.75), Size = UDim2.fromOffset(size, size), Parent = parent })
 	UI.corner(b, 16)
 	UI.stroke(b, if selected then 6 else 3.5, rc)
-	UI.viewport(b, PetModels.build(p.def, p.tier, p.shiny, 1), {})
+	UI.viewport(b, PetModels.build(p.def, p.tier, p.shiny, 1, false, THUMB), {})
 	UI.text(b, { Text = "Nv " .. p.lvl, TextSize = 14, Color = UI.WHITE, Outline = 2, AlignX = L, Size = UDim2.fromOffset(60, 18), Position = UDim2.new(0, 6, 1, -20) })
 	if p.eq then
 		UI.text(b, { Text = "✅", TextSize = 18, Size = UDim2.fromOffset(24, 24), Position = UDim2.fromOffset(4, 4) })
@@ -469,7 +470,7 @@ panels.pets = {
 		local p = selPet
 		local def = Config.Pets[p.def]
 		local rar = Config.Rarities[def.rarity]
-		UI.viewport(det, PetModels.build(p.def, p.tier, p.shiny, 1), { Size = UDim2.fromOffset(170, 150), Position = UDim2.new(0.5, -85, 0, 6) })
+		UI.viewport(det, PetModels.build(p.def, p.tier, p.shiny, 1, false, THUMB * 2), { Size = UDim2.fromOffset(170, 150), Position = UDim2.new(0.5, -85, 0, 6) })
 		UI.text(det, { Text = def.name, TextSize = 22, Size = UDim2.new(1, 0, 0, 26), Position = UDim2.fromOffset(0, 156) })
 		local tags = rar.name
 		if p.tier > 0 then
@@ -571,7 +572,7 @@ panels.index = {
 				local card = UI.new("Frame", { BackgroundColor3 = if found then UI.lighten(def.body, 0.75) else Color3.fromHex("EDEAF6"), Size = UDim2.fromOffset(138, 160), Position = UDim2.fromOffset((i - 1) * 146, y + 28), Parent = c })
 				UI.corner(card, 18)
 				UI.stroke(card, if def.rarity >= Config.MYTHIC then 5 else 3.5, rc)
-				UI.viewport(card, PetModels.build(id, 0, false, 1, not found), { Size = UDim2.new(1, 0, 0, 106) })
+				UI.viewport(card, PetModels.build(id, 0, false, 1, not found, THUMB), { Size = UDim2.new(1, 0, 0, 106) })
 				UI.text(card, { Text = if found then def.name else "???", TextSize = 13, Wrap = true, Size = UDim2.new(1, -8, 0, 30), Position = UDim2.fromOffset(4, 104) })
 				local ch = if g.egg then Config.fmtChance(realChance(g.egg, id)) else "1re victoire"
 				UI.text(card, { Text = Config.Rarities[def.rarity].name .. " · " .. ch, TextSize = 12, Color = UI.darken(rc, 0.2), Size = UDim2.new(1, -8, 0, 18), Position = UDim2.fromOffset(4, 136) })
@@ -1279,7 +1280,7 @@ local function refreshEquippedBar()
 		UI.corner(f, 14)
 		UI.stroke(f, 3, if p then Config.Rarities[Config.Pets[p.def].rarity].color else UI.MUTED)
 		if p then
-			UI.viewport(f, PetModels.build(p.def, p.tier, p.shiny, 1), {})
+			UI.viewport(f, PetModels.build(p.def, p.tier, p.shiny, 1, false, THUMB), {})
 		else
 			UI.text(f, { Text = "+", TextSize = 28, Color = UI.MUTED })
 		end

@@ -41,6 +41,7 @@ export class Forge {
     this.cur = 0;
     this.anims = { idle: [], move: [], ability: [] };
     this.r = rng(seed);
+    this.prims = []; // description des primitives (pour la conversion en pièces Roblox)
   }
   rand(a = 0, b = 1) { return a + (b - a) * this.r(); }
   bone(name, pivot, parent = this.cur, extra = {}) {
@@ -54,18 +55,21 @@ export class Forge {
     this.pieces.push({ g, color, mat, bone });
     return this;
   }
+  rec(p) { if (!this.noRec) this.prims.push({ ...p, bone: this.cur }); }
   // --- primitives (toutes en coordonnées monde) ---
-  box(size, pos, quat, color, mat) { return this.add(place(new THREE.BoxGeometry(size.x, size.y, size.z), pos, quat), color, mat); }
-  ell(size, pos, quat, color, mat, detail = 1) { return this.add(place(new THREE.IcosahedronGeometry(1, detail), pos, quat, size), color, mat); }
+  box(size, pos, quat, color, mat) { this.rec({ t: 'box', size: size.clone(), pos: pos.clone(), quat: quat ? quat.clone() : new THREE.Quaternion(), color, mat }); return this.add(place(new THREE.BoxGeometry(size.x, size.y, size.z), pos, quat), color, mat); }
+  ell(size, pos, quat, color, mat, detail = 1) { this.rec({ t: 'ell', size: size.clone(), pos: pos.clone(), quat: quat ? quat.clone() : new THREE.Quaternion(), color, mat }); return this.add(place(new THREE.IcosahedronGeometry(1, detail), pos, quat, size), color, mat); }
   // cylindre / cône de a vers b (rayons ra, rb), facettes = segs
   seg(a, b, ra, rb, color, mat, segs = 6, roll = 0) {
     const d = b.clone().sub(a), h = d.length();
+    this.rec({ t: 'seg', a: a.clone(), b: b.clone(), ra, rb, color, mat });
     const g = new THREE.CylinderGeometry(rb, ra, h, segs, 1);
     g.translate(0, h / 2, 0);
     return this.add(place(g, a, aim(d, roll)), color, mat);
   }
   // pique de cristal : diamant allongé posé en pos, pointé vers dir
   spike(pos, dir, len, w, color, mat, sides = 4) {
+    this.rec({ t: 'spike', pos: pos.clone(), dir: dir.clone().normalize(), len, w, color, mat });
     const g = new THREE.ConeGeometry(w, len, sides, 1);
     g.translate(0, len / 2, 0);
     const base = new THREE.ConeGeometry(w, len * 0.18, sides, 1);
@@ -75,6 +79,7 @@ export class Forge {
   }
   // éclat triangulaire plat (poils, plumes, écailles)
   shard(pos, dir, len, w, color, mat, normal) {
+    this.rec({ t: 'shard', pos: pos.clone(), dir: dir.clone().normalize(), len, w, normal: normal ? normal.clone() : null, color, mat });
     const g = new THREE.ConeGeometry(w, len, 3, 1);
     g.scale(1, 1, 0.35);
     g.translate(0, len / 2, 0);
@@ -87,10 +92,12 @@ export class Forge {
     return this.add(place(g, pos, q), color, mat);
   }
   ring(R, r, pos, quat, color, mat, segs = 32, tube = 5, arc = Math.PI * 2) {
+    this.rec({ t: 'ring', R, r, pos: pos.clone(), quat: quat ? quat.clone() : new THREE.Quaternion(), arc, color, mat });
     return this.add(place(new THREE.TorusGeometry(R, r, tube, segs, arc), pos, quat), color, mat);
   }
   // engrenage extrudé, axe = Z local
   gear(R, teeth, thick, pos, quat, color, mat, hole = 0.35) {
+    this.rec({ t: 'gear', R, teeth, thick, pos: pos.clone(), quat: quat ? quat.clone() : new THREE.Quaternion(), color, mat });
     const s = new THREE.Shape();
     const n = teeth * 4;
     for (let i = 0; i <= n; i++) {

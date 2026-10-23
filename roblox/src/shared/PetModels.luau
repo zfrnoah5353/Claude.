@@ -8,10 +8,10 @@ local PetModels = {}
 
 local DARK = Color3.fromHex("3A3358")
 
-type Shape = "ellipsoid" | "ball" | "block" | "cyl"
+type Shape = "ellipsoid" | "ball" | "block" | "cyl" | "wedge"
 
-local function makePart(parent: Instance, name: string, size: Vector3, cf: CFrame, color: Color3, shape: Shape): Part
-	local p = Instance.new("Part")
+local function makePart(parent: Instance, name: string, size: Vector3, cf: CFrame, color: Color3, shape: Shape): BasePart
+	local p: BasePart = if shape == "wedge" then Instance.new("WedgePart") else Instance.new("Part")
 	p.Name = name
 	p.Size = size
 	p.Color = color
@@ -28,9 +28,9 @@ local function makePart(parent: Instance, name: string, size: Vector3, cf: CFram
 		m.MeshType = Enum.MeshType.Sphere
 		m.Parent = p
 	elseif shape == "ball" then
-		p.Shape = Enum.PartType.Ball
+		(p :: Part).Shape = Enum.PartType.Ball
 	elseif shape == "cyl" then
-		p.Shape = Enum.PartType.Cylinder
+		(p :: Part).Shape = Enum.PartType.Cylinder
 	end
 	p.CFrame = cf
 	p.Parent = parent
@@ -38,6 +38,9 @@ local function makePart(parent: Instance, name: string, size: Vector3, cf: CFram
 end
 
 local PetShapes = require(script.Parent.PetShapes)
+local HttpService = game:GetService("HttpService")
+-- Plans détaillés générés par tools/web (un module JSON par pet). Sans plan, on retombe sur PetShapes.
+local PlanFolder = script.Parent:FindFirstChild("PetPlans")
 
 local GOLD_HEX = "F2C14E"
 local plans: { [string]: any } = {}
@@ -54,6 +57,21 @@ function PetModels.plan(defId: string): { any }
 		return cached
 	end
 	local def = Config.Pets[defId] or Config.Pets.gumdrop_bunny
+	local mod = PlanFolder and PlanFolder:FindFirstChild(def.id)
+	if mod and mod:IsA("ModuleScript") then
+		local data = HttpService:JSONDecode((require :: any)(mod))
+		local clips = {}
+		for state, list in data.anims do
+			local out = {}
+			for _, t in list do
+				table.insert(out, { bone = t.bone, axis = t.axis, amp = t.amp, freq = t.freq, phase = t.phase, base = t.base })
+			end
+			clips[state] = out
+		end
+		plans[defId] = data.parts
+		rigs[defId] = { bones = data.bones, clips = clips }
+		return data.parts
+	end
 	local colors = {
 		body = def.body:ToHex(),
 		belly = def.belly:ToHex(),
@@ -80,11 +98,35 @@ local MATERIAL = {
 	glass = Enum.Material.Glass,
 }
 
--- build(defId, tier, shiny, scale, locked) -> Model centré sur l'origine, face vers -Z.
+-- Les plus grandes pièces d'un plan (vignettes : on garde les maxParts plus grosses)
+local thumbs: { [string]: { any } } = {}
+local function biggest(defId: string, maxParts: number): { any }
+	local key = defId .. ":" .. maxParts
+	if thumbs[key] then
+		return thumbs[key]
+	end
+	local list = table.clone(PetModels.plan(defId))
+	if #list > maxParts then
+		local function vol(sp: any): number
+			return sp.size[1] * sp.size[2] * sp.size[3]
+		end
+		table.sort(list, function(a, b)
+			return vol(a) > vol(b)
+		end)
+		local cut = table.create(maxParts)
+		table.move(list, 1, maxParts, 1, cut)
+		list = cut
+	end
+	thumbs[key] = list
+	return list
+end
+
+-- build(defId, tier, shiny, scale, locked, maxParts) -> Model centré sur l'origine, face vers -Z.
 -- tier : 0 normal, 1 doré, 2 arc-en-ciel. locked : silhouette sombre (index).
+-- maxParts : limite le nombre de pièces (vignettes de l'interface).
 -- Les pièces marquées « Spin » (attribut Spin = "Y" ou "Z") tournent autour du pet ;
 -- leur position de départ par rapport au pet est gardée dans l'attribut Offset.
-function PetModels.build(defId: string, tier: number, shiny: boolean, scale: number, locked: boolean?): Model
+function PetModels.build(defId: string, tier: number, shiny: boolean, scale: number, locked: boolean?, maxParts: number?): Model
 	local def = Config.Pets[defId] or Config.Pets.gumdrop_bunny
 	local s = scale
 	local model = Instance.new("Model")
@@ -95,7 +137,8 @@ function PetModels.build(defId: string, tier: number, shiny: boolean, scale: num
 
 	local gold = Color3.fromHex("FFD23F")
 	local firstBody: BasePart? = nil
-	for _, sp in PetModels.plan(defId) do
+	local list: { any } = if maxParts then biggest(defId, maxParts) else PetModels.plan(defId)
+	for _, sp in list do
 		local color = Color3.fromHex(sp.color)
 		local isBody = sp.name == "Body"
 		if locked then
@@ -107,7 +150,7 @@ function PetModels.build(defId: string, tier: number, shiny: boolean, scale: num
 		end
 		local r = sp.rot
 		local cf = CFrame.new(sp.pos[1] * s, sp.pos[2] * s, sp.pos[3] * s, r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[8], r[9])
-		local shape: Shape = if sp.shape == "cyl" then "cyl" elseif sp.shape == "ball" then "ball" elseif sp.shape == "ellipsoid" then "ellipsoid" else "block"
+		local shape: Shape = if sp.shape == "cyl" then "cyl" elseif sp.shape == "ball" then "ball" elseif sp.shape == "ellipsoid" then "ellipsoid" elseif sp.shape == "wedge" then "wedge" else "block"
 		local size = Vector3.new(sp.size[1], sp.size[2], sp.size[3]) * s
 		local p = makePart(model, if isBody then "Body" else "Part", size, cf, color, shape)
 		if not locked then
@@ -116,7 +159,7 @@ function PetModels.build(defId: string, tier: number, shiny: boolean, scale: num
 				p.Reflectance = 0.2
 			end
 		end
-		p.Transparency = sp.alpha
+		p.Transparency = sp.alpha or 0
 		if sp.bone and sp.bone > 0 then
 			p:SetAttribute("Bone", sp.bone)
 		end
@@ -177,6 +220,11 @@ function PetModels.animator(model: Model): any
 	local rig = PetModels.rig(defId)
 	local recs = {}
 	local animated = false
+	for _, b in rig.bones do
+		if b.spin then
+			animated = true
+		end
+	end
 	for _, p in model:GetChildren() do
 		if p:IsA("BasePart") then
 			local bone = (p:GetAttribute("Bone") :: number?) or 0
@@ -192,13 +240,27 @@ function PetModels.animator(model: Model): any
 	end
 	local bones = {}
 	for i, b in rig.bones do
-		bones[i] = { parent = b.parent, pivot = Vector3.new(b.pivot[1], b.pivot[2], b.pivot[3]) * s, cur = CFrame.identity }
+		local spin = nil
+		if b.spin then
+			spin = { axis = Vector3.new(b.spin.axis[1], b.spin.axis[2], b.spin.axis[3]).Unit, speed = b.spin.speed * math.pi }
+		end
+		bones[i] = { parent = b.parent, pivot = Vector3.new(b.pivot[1], b.pivot[2], b.pivot[3]) * s, cur = CFrame.identity, spin = spin }
 	end
 	local parts = table.create(#recs)
 	for i, r in recs do
 		parts[i] = r.part
 	end
-	return { recs = recs, parts = parts, cfs = table.create(#recs), bones = bones, clips = rig.clips, G = {} }
+	-- pistes rangées par état puis par os (évite de parcourir toutes les pistes pour chaque os)
+	local byBone = {}
+	for state, list in rig.clips or {} do
+		local m = {}
+		for _, tr in list do
+			m[tr.bone] = m[tr.bone] or {}
+			table.insert(m[tr.bone], tr)
+		end
+		byBone[state] = m
+	end
+	return { recs = recs, parts = parts, cfs = table.create(#recs), bones = bones, clips = byBone, G = {} }
 end
 
 -- Pose le modèle à « pivot » pour l'état idle / move / ability à l'instant t.
@@ -210,15 +272,18 @@ function PetModels.pose(anim: any, pivot: CFrame, state: string, t: number, dt: 
 	local k = 1 - math.exp(-10 * dt)
 	for i, b in anim.bones do
 		local target = CFrame.identity
-		if tracks then
-			for _, tr in tracks do
-				if tr.bone == i then
-					local ang = math.rad(tr.base + tr.amp * math.sin(2 * math.pi * tr.freq * t + tr.phase))
-					target *= CFrame.fromAxisAngle(Vector3.new(tr.axis[1], tr.axis[2], tr.axis[3]), ang)
-				end
+		local mine = tracks and tracks[i]
+		if mine then
+			for _, tr in mine do
+				local ang = math.rad(tr.base + tr.amp * math.sin(2 * math.pi * tr.freq * t + tr.phase))
+				target *= CFrame.fromAxisAngle(Vector3.new(tr.axis[1], tr.axis[2], tr.axis[3]), ang)
 			end
 		end
-		b.cur = b.cur:Lerp(target, k)
+		if b.spin then
+			b.cur = CFrame.fromAxisAngle(b.spin.axis, b.spin.speed * t) -- rotation continue (auréoles, engrenages)
+		else
+			b.cur = b.cur:Lerp(target, k)
+		end
 		G[i] = G[b.parent] * CFrame.new(b.pivot) * b.cur * CFrame.new(-b.pivot)
 	end
 	local cfs = anim.cfs

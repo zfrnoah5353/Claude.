@@ -1,0 +1,36 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0}</style>
+<script type="importmap">{"imports":{"three":"./three.module.js"}}</script></head><body>
+<script type="module">
+// Rejoue la logique de PetModels.pose (Luau) sur le plan JSON, pour vérifier os et pivots.
+import * as THREE from 'three';
+import { rbxGroup } from './rbxview.js';
+const q = new URLSearchParams(location.search);
+const ids = q.get('pets').split(','), state = q.get('state') || 'ability', t = +(q.get('t') || 0.3);
+const R = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); R.setSize(400 * ids.length, 400); R.setScissorTest(true);
+R.outputColorSpace = THREE.SRGBColorSpace; document.body.appendChild(R.domElement);
+let k = 0;
+for (const id of ids) {
+  const src = await (await fetch(`pr/${id}.luau`)).text();
+  const d = JSON.parse(src.slice(src.indexOf('[==[') + 4, src.indexOf(']==]')));
+  const G = [new THREE.Matrix4()];
+  d.bones.forEach((b, j) => {
+    const i = j + 1;
+    let rot = new THREE.Matrix4();
+    if (b.spin) rot.makeRotationAxis(new THREE.Vector3(...b.spin.axis).normalize(), b.spin.speed * Math.PI * t);
+    else for (const tr of d.anims[state] || []) if (tr.bone === i) {
+      const ang = THREE.MathUtils.degToRad(tr.base + tr.amp * Math.sin(2 * Math.PI * tr.freq * t + tr.phase));
+      rot.multiply(new THREE.Matrix4().makeRotationAxis(new THREE.Vector3(...tr.axis).normalize(), ang));
+    }
+    const p = new THREE.Vector3(...b.pivot);
+    G[i] = G[b.parent].clone().multiply(new THREE.Matrix4().makeTranslation(p.x, p.y, p.z)).multiply(rot).multiply(new THREE.Matrix4().makeTranslation(-p.x, -p.y, -p.z));
+  });
+  const g = rbxGroup(d);
+  g.children.forEach((m, n) => { m.matrix.premultiply(G[d.parts[n].bone || 0]); });
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#f4f2f8');
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a7fa0, 1.8)); const sun = new THREE.DirectionalLight(0xffffff, 2); sun.position.set(-5, 10, -8); scene.add(sun);
+  scene.add(g);
+  const cam = new THREE.PerspectiveCamera(35, 1, 0.1, 100); cam.position.set(4, 4, -8); cam.lookAt(0, 1, 0);
+  R.setViewport(k * 400, 0, 400, 400); R.setScissor(k * 400, 0, 400, 400); R.render(scene, cam); k++;
+}
+document.title = 'done';
+</script></body></html>

@@ -1,0 +1,13 @@
+<!doctype html><html><head><meta charset="utf-8">
+<script type="importmap">{"imports":{"three":"./three.module.js"}}</script></head><body>
+<script type="module">
+import { loadPet } from './load.js';
+import { toRoblox } from './roblox.js';
+const BUDGET = [0, 150, 150, 160, 190, 240, 650, 900];
+window.plan = async (id, rarity, body) => {
+  const F = await loadPet(id);
+  const p = toRoblox(F, { budget: BUDGET[rarity], target: rarity >= 6 ? 4.4 : 3.4, body });
+  return JSON.stringify({ parts: p.parts, bones: p.bones, anims: p.anims, total: p.total });
+};
+document.title = 'ready';
+</script></body></html>

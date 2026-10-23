@@ -28,7 +28,7 @@ def part(p, s, idx):
         "TopSurface": "Smooth",
         "BottomSurface": "Smooth",
     }
-    if p["alpha"] > 0:
+    if p.get("alpha", 0) > 0:
         props["Transparency"] = p["alpha"]
     if p["mat"] == "metal":
         props["Reflectance"] = 0.2
@@ -36,7 +36,10 @@ def part(p, s, idx):
         props["Shape"] = "Ball"
     elif shape == "cyl":
         props["Shape"] = "Cylinder"
-    node = {"name": p["name"] if p["name"] == "Body" else f"Part{idx}", "className": "Part", "properties": props, "children": []}
+    if shape == "wedge":
+        props.pop("TopSurface"); props.pop("BottomSurface")
+    cls = "WedgePart" if shape == "wedge" else "Part"
+    node = {"name": "Body" if p.get("name") == "Body" else f"Part{idx}", "className": cls, "properties": props, "children": []}
     if shape == "ellipsoid":
         node["children"].append({"name": "Mesh", "className": "SpecialMesh", "properties": {"MeshType": "Sphere"}})
     return node
