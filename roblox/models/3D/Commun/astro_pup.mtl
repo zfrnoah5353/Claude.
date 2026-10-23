@@ -1,0 +1,50 @@
+# Sweet Pets Factory - astro_pup
+newmtl Mat_E0E6FF
+Kd 0.7454 0.7913 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FFFFFF
+Kd 1.0000 1.0000 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_9AA6E0
+Kd 0.3231 0.3813 0.7454
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_2B1B3A
+Kd 0.0242 0.0110 0.0423
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FF5A6E
+Kd 1.0000 0.1022 0.1559
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Gold_F2C14E
+Kd 0.8879 0.5333 0.0762
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FF8FB0
+Kd 1.0000 0.2747 0.4342
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 0.850
+illum 2
+

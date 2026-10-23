@@ -1,0 +1,24 @@
+<!doctype html><html><head><meta charset="utf-8">
+<script type="importmap">{"imports":{"three":"./three.module.js"}}</script></head><body>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFExporter } from './jsm/exporters/GLTFExporter.js';
+import { buildRig, makeClips, toOBJ } from './rig.js';
+const models = await (await fetch('allpets.json')).json();
+window.exportOne = async (i) => {
+  const m = models[i];
+  const rig = buildRig(m);
+  const clips = makeClips(m, rig);
+  const scene = new THREE.Scene(); scene.add(rig.root);
+  const glb = await new GLTFExporter().parseAsync(scene, { binary: true, animations: clips });
+  const bytes = new Uint8Array(glb); let bin = '';
+  for (let k = 0; k < bytes.length; k += 32768) bin += String.fromCharCode.apply(null, bytes.subarray(k, k + 32768));
+  scene.remove(rig.root);
+  const { obj, mtl } = toOBJ(buildRig(m), m.name);
+  let tris = 0; rig.root.traverse(o => { if (o.isMesh) tris += o.geometry.attributes.position.count / 3; });
+  let meshes = 0; rig.root.traverse(o => { if (o.isMesh) meshes++; });
+  return { name: m.name, rarity: m.rarityName, glb: btoa(bin), obj, mtl, tris, meshes };
+};
+window.count = models.length;
+document.title = 'ready';
+</script></body></html>

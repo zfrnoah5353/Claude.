@@ -1,0 +1,36 @@
+# Sweet Pets Factory - choco_phantom
+newmtl Mat_3A2418
+Kd 0.0423 0.0176 0.0091
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 0.880
+illum 2
+
+newmtl Neon_FFE27A
+Kd 1.0000 0.7605 0.1946
+Ka 0 0 0
+Ke 1.0000 0.7605 0.1946
+d 1.000
+illum 2
+
+newmtl Neon_FFC97A
+Kd 1.0000 0.5841 0.1946
+Ka 0 0 0
+Ke 1.0000 0.5841 0.1946
+d 1.000
+illum 2
+
+newmtl Mat_FF8FB0
+Kd 1.0000 0.2747 0.4342
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 0.850
+illum 2
+
+newmtl Mat_2B1B3A
+Kd 0.0242 0.0110 0.0423
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+

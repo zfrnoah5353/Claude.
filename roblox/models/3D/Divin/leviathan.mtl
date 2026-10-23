@@ -1,0 +1,71 @@
+# Sweet Pets Factory - leviathan
+newmtl Mat_B8F5EE
+Kd 0.4793 0.9131 0.8550
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_2E9AA0
+Kd 0.0273 0.3231 0.3515
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FFFFFF
+Kd 1.0000 1.0000 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Neon_FFE27A
+Kd 1.0000 0.7605 0.1946
+Ka 0 0 0
+Ke 1.0000 0.7605 0.1946
+d 1.000
+illum 2
+
+newmtl Mat_2B1B3A
+Kd 0.0242 0.0110 0.0423
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_1E5C66
+Kd 0.0130 0.1070 0.1329
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Gold_F2C14E
+Kd 0.8879 0.5333 0.0762
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_E8E0C8
+Kd 0.8070 0.7454 0.5776
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Neon_9FF2EA
+Kd 0.3467 0.8879 0.8228
+Ka 0 0 0
+Ke 0.3467 0.8879 0.8228
+d 0.600
+illum 2
+
+newmtl Mat_9FF2EA
+Kd 0.3467 0.8879 0.8228
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+

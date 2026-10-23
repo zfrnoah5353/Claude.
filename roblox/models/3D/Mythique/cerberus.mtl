@@ -1,0 +1,50 @@
+# Sweet Pets Factory - cerberus
+newmtl Mat_F5E6FF
+Kd 0.9131 0.7913 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_B69CFF
+Kd 0.4678 0.3325 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FFFFFF
+Kd 1.0000 1.0000 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_2B1B3A
+Kd 0.0242 0.0110 0.0423
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Neon_FF4FD8
+Kd 1.0000 0.0782 0.6867
+Ka 0 0 0
+Ke 1.0000 0.0782 0.6867
+d 1.000
+illum 2
+
+newmtl Mat_3B2A5A
+Kd 0.0437 0.0232 0.1022
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Gold_F2C14E
+Kd 0.8879 0.5333 0.0762
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+

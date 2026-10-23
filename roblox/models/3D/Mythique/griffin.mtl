@@ -1,0 +1,57 @@
+# Sweet Pets Factory - griffin
+newmtl Mat_FFFFFF
+Kd 1.0000 1.0000 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Gold_F2C14E
+Kd 0.8879 0.5333 0.0762
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Neon_7FD6FF
+Kd 0.2122 0.6724 1.0000
+Ka 0 0 0
+Ke 0.2122 0.6724 1.0000
+d 1.000
+illum 2
+
+newmtl Mat_2B1B3A
+Kd 0.0242 0.0110 0.0423
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_C89A50
+Kd 0.5776 0.3231 0.0802
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_8C7BFF
+Kd 0.2623 0.1981 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_4B3A8C
+Kd 0.0704 0.0423 0.2623
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Neon_FFF3B8
+Kd 1.0000 0.8963 0.4793
+Ka 0 0 0
+Ke 1.0000 0.8963 0.4793
+d 1.000
+illum 2
+

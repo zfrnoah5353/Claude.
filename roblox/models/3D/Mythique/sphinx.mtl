@@ -1,0 +1,43 @@
+# Sweet Pets Factory - sphinx
+newmtl Mat_F0C890
+Kd 0.8714 0.5776 0.2789
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Gold_F2C14E
+Kd 0.8879 0.5333 0.0762
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_2C5DAA
+Kd 0.0252 0.1095 0.4020
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Neon_5BE7FF
+Kd 0.1046 0.7991 1.0000
+Ka 0 0 0
+Ke 0.1046 0.7991 1.0000
+d 1.000
+illum 2
+
+newmtl Mat_2B1B3A
+Kd 0.0242 0.0110 0.0423
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_D9A066
+Kd 0.6939 0.3515 0.1329
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+

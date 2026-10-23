@@ -1,0 +1,50 @@
+# Sweet Pets Factory - brownie_dragon
+newmtl Mat_2A1810
+Kd 0.0232 0.0091 0.0052
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_9C6E52
+Kd 0.3325 0.1559 0.0844
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 0.950
+illum 2
+
+newmtl Mat_4A2C20
+Kd 0.0685 0.0252 0.0144
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FFD23F
+Kd 1.0000 0.6445 0.0497
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_2B1B3A
+Kd 0.0242 0.0110 0.0423
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FFFFFF
+Kd 1.0000 1.0000 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FF8FB0
+Kd 1.0000 0.2747 0.4342
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 0.850
+illum 2
+

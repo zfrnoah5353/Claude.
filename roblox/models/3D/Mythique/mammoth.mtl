@@ -1,0 +1,43 @@
+# Sweet Pets Factory - mammoth
+newmtl Mat_4A2A14
+Kd 0.0685 0.0232 0.0070
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_7A4A2A
+Kd 0.1946 0.0685 0.0232
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Gold_F2C14E
+Kd 0.8879 0.5333 0.0762
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_EEE6D0
+Kd 0.8550 0.7913 0.6308
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Neon_FFE27A
+Kd 1.0000 0.7605 0.1946
+Ka 0 0 0
+Ke 1.0000 0.7605 0.1946
+d 1.000
+illum 2
+
+newmtl Gold_C9932E
+Kd 0.5841 0.2918 0.0273
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+

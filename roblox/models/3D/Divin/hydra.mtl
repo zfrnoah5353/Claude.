@@ -1,0 +1,57 @@
+# Sweet Pets Factory - hydra
+newmtl Mat_6B3FA0
+Kd 0.1470 0.0497 0.3515
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_C6FF4F
+Kd 0.5647 1.0000 0.0782
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_C9A6FF
+Kd 0.5841 0.3813 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Neon_C6FF4F
+Kd 0.5647 1.0000 0.0782
+Ka 0 0 0
+Ke 0.5647 1.0000 0.0782
+d 1.000
+illum 2
+
+newmtl Mat_2B1B3A
+Kd 0.0242 0.0110 0.0423
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Gold_F2C14E
+Kd 0.8879 0.5333 0.0762
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Neon_F2C14E
+Kd 0.8879 0.5333 0.0762
+Ka 0 0 0
+Ke 0.8879 0.5333 0.0762
+d 1.000
+illum 2
+
+newmtl Neon_7EE0A0
+Kd 0.2086 0.7454 0.3515
+Ka 0 0 0
+Ke 0.2086 0.7454 0.3515
+d 1.000
+illum 2
+

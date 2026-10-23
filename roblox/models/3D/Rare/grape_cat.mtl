@@ -1,0 +1,43 @@
+# Sweet Pets Factory - grape_cat
+newmtl Mat_8E6BE8
+Kd 0.2705 0.1470 0.8070
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_E2D8FF
+Kd 0.7605 0.6867 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FFB3CF
+Kd 1.0000 0.4508 0.6240
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_2B1B3A
+Kd 0.0242 0.0110 0.0423
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FFFFFF
+Kd 1.0000 1.0000 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FF8FB0
+Kd 1.0000 0.2747 0.4342
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 0.850
+illum 2
+

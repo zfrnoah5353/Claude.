@@ -1,0 +1,50 @@
+# Sweet Pets Factory - popsicle_dragon
+newmtl Mat_C4621A
+Kd 0.5520 0.1221 0.0103
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FFE0B8
+Kd 1.0000 0.7454 0.4793
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 0.950
+illum 2
+
+newmtl Mat_FF9A3C
+Kd 1.0000 0.3231 0.0452
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_7FD6FF
+Kd 0.2122 0.6724 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_2B1B3A
+Kd 0.0242 0.0110 0.0423
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FFFFFF
+Kd 1.0000 1.0000 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FF8FB0
+Kd 1.0000 0.2747 0.4342
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 0.850
+illum 2
+

@@ -920,13 +920,14 @@ panels.settings = {
 -- Animation d'éclosion
 ---------------------------------------------------------------------------
 local hatchHost = UI.new("TextButton", { Name = "Hatch", Text = "", AutoButtonColor = false, BackgroundColor3 = Color3.fromHex("1B1030"), BackgroundTransparency = 0.4, Size = UDim2.fromScale(1, 1), Visible = false, ZIndex = 8, Parent = gui })
-local hatchState = { t0 = 0, auto = false, eggs = {} :: { Model }, open = false, revealed = false }
+local hatchState = { t0 = 0, auto = false, eggs = {} :: { Model }, anims = {} :: { any }, open = false, revealed = false }
 
 local function closeHatch()
 	hatchState.open = false
 	hatchHost.Visible = false
 	hatchHost:ClearAllChildren()
 	hatchState.eggs = {}
+	hatchState.anims = {}
 end
 
 hatchHost.Activated:Connect(function()
@@ -973,7 +974,12 @@ local function showHatch(data)
 			UI.corner(glow, 140)
 			local vpHolder = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.fromOffset(340, 300), Parent = slot })
 			local sc = UI.new("UIScale", { Scale = 0.2, Parent = vpHolder })
-			UI.viewport(vpHolder, PetModels.build(r.def, 0, r.shiny, 1), { Zoom = 0.85 })
+			local revealed = PetModels.build(r.def, 0, r.shiny, 1)
+			UI.viewport(vpHolder, revealed, { Zoom = 0.85 })
+			local anim = PetModels.animator(revealed)
+			if anim then
+				table.insert(hatchState.anims, { anim = anim, pivot = revealed:GetPivot() })
+			end
 			TweenService:Create(sc, TweenInfo.new(0.45, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
 			UI.text(slot, { Text = def.name, TextSize = 32, Color = UI.WHITE, Outline = 3.5, Size = UDim2.new(1, 0, 0, 40), Position = UDim2.fromOffset(0, 300) })
 			local chip = UI.box(slot, { Size = UDim2.fromOffset((utf8.len(rar.name) or #rar.name) * 12 + 40, 36), Position = UDim2.new(0.5, 0, 0, 346), AnchorPoint = Vector2.new(0.5, 0), Color = rar.color, Radius = 16 })
@@ -1092,8 +1098,7 @@ local petFolder = UI.new("Folder", { Name = "ClientPets", Parent = workspace })
 local pileFolder = workspace:WaitForChild("Piles")
 local map = workspace:WaitForChild("Map")
 
-type Spin = { part: BasePart, axis: string, off: CFrame, center: Vector3 }
-type PetView = { model: Model, pos: Vector3, rainbow: { BasePart }, spin: { Spin }, scale: number }
+type PetView = { model: Model, pos: Vector3, rainbow: { BasePart }, anim: any, scale: number }
 type View = { sig: string, pets: { PetView } }
 local views: { [Player]: View } = {}
 
@@ -1116,20 +1121,15 @@ local function buildView(plr: Player, sig: string, start: Vector3): View
 			local t = tonumber(tier) or 0
 			local sc = Config.Pets[def].scale
 			local model = PetModels.build(def, t, shiny == "1", sc)
-			local rainbow, spin = {}, {}
+			local rainbow = {}
 			for _, d in model:GetChildren() do
-				if d:IsA("BasePart") then
-					if t == 2 and d.Name == "Body" then
-						table.insert(rainbow, d)
-					end
-					local axis = d:GetAttribute("Spin")
-					if axis then
-						table.insert(spin, { part = d, axis = axis, off = d:GetAttribute("Offset"), center = d:GetAttribute("Center") or Vector3.zero })
-					end
+				if d:IsA("BasePart") and t == 2 and d.Name == "Body" then
+					table.insert(rainbow, d)
 				end
 			end
+			local anim = PetModels.animator(model)
 			model.Parent = petFolder
-			table.insert(v.pets, { model = model, pos = start, rainbow = rainbow, spin = spin, scale = sc })
+			table.insert(v.pets, { model = model, pos = start, rainbow = rainbow, anim = anim, scale = sc })
 		end
 	end
 	views[plr] = v
@@ -1221,13 +1221,13 @@ local function updatePets(dt: number)
 			local dir = Vector3.new(look.X - pv.pos.X, 0, look.Z - pv.pos.Z)
 			local p = pv.pos + Vector3.new(0, hop, 0)
 			local pivot = if dir.Magnitude > 0.1 then CFrame.lookAt(p, p + dir) else pv.model:GetPivot().Rotation + p
-			pv.model:PivotTo(pivot)
-			for _, sp in pv.spin do
-				if sp.axis == "Z" then
-					sp.part.CFrame = pivot * CFrame.new(sp.center) * CFrame.Angles(0, 0, now * 0.6) * CFrame.new(-sp.center) * sp.off
-				else
-					sp.part.CFrame = pivot * CFrame.Angles(0, now * 0.9, 0) * sp.off
-				end
+			if pv.anim then
+				-- pets rares : animation des os selon ce que fait le pet
+				local state = if attacking and dist < 1.5 then "ability" elseif dist > 0.5 then "move" else "idle"
+				PetModels.pose(pv.anim, pivot, state, now + i * 0.37, dt)
+				pv.model.WorldPivot = pivot
+			else
+				pv.model:PivotTo(pivot)
 			end
 			for k, part in pv.rainbow do
 				part.Color = Color3.fromHSV((now * 0.25 + i * 0.1 + k * 0.05) % 1, 0.45, 1)
@@ -1505,6 +1505,11 @@ RunService.RenderStepped:Connect(function(dt)
 				(ch :: Frame).Rotation += dt * 25
 			end
 		end
+	end
+
+	-- pets rares révélés : ils jouent leur animation d'attaque
+	for _, h in hatchState.anims do
+		PetModels.pose(h.anim, h.pivot, "ability", os.clock(), dt)
 	end
 
 	-- œufs qui oscillent pendant l'éclosion

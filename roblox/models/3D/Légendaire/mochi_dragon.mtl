@@ -1,0 +1,50 @@
+# Sweet Pets Factory - mochi_dragon
+newmtl Mat_6B5BD6
+Kd 0.1470 0.1046 0.6724
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_EBE2FF
+Kd 0.8308 0.7605 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 0.950
+illum 2
+
+newmtl Mat_B69CFF
+Kd 0.4678 0.3325 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FFD23F
+Kd 1.0000 0.6445 0.0497
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_2B1B3A
+Kd 0.0242 0.0110 0.0423
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FFFFFF
+Kd 1.0000 1.0000 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FF8FB0
+Kd 1.0000 0.2747 0.4342
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 0.850
+illum 2
+

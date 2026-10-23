@@ -41,6 +41,7 @@ local PetShapes = require(script.Parent.PetShapes)
 
 local GOLD_HEX = "F2C14E"
 local plans: { [string]: any } = {}
+local rigs: { [string]: any } = {}
 
 local function toHex(c: Color3?): string?
 	return if c then c:ToHex() else nil
@@ -60,9 +61,16 @@ function PetModels.plan(defId: string): { any }
 		accent = toHex(def.accent) or GOLD_HEX,
 		glow = toHex(def.glow),
 	}
-	local parts = PetShapes.build(def.species, colors)
+	local parts, bones = PetShapes.build(def.species, colors)
 	plans[defId] = parts
+	rigs[defId] = { bones = bones, clips = PetShapes.bindAnims(def.species, bones) }
 	return parts
+end
+
+-- Os et animations d'un pet (nil si le pet n'est pas animé)
+function PetModels.rig(defId: string): any
+	PetModels.plan(defId)
+	return rigs[defId]
 end
 
 local MATERIAL = {
@@ -109,9 +117,11 @@ function PetModels.build(defId: string, tier: number, shiny: boolean, scale: num
 			end
 		end
 		p.Transparency = sp.alpha
+		if sp.bone and sp.bone > 0 then
+			p:SetAttribute("Bone", sp.bone)
+		end
 		if sp.tag == "SpinY" or sp.tag == "SpinZ" then
 			p:SetAttribute("Spin", if sp.tag == "SpinY" then "Y" else "Z")
-			p:SetAttribute("Offset", cf)
 			if sp.pivot then
 				p:SetAttribute("Center", Vector3.new(sp.pivot[1], sp.pivot[2], sp.pivot[3]) * s)
 			end
@@ -127,6 +137,8 @@ function PetModels.build(defId: string, tier: number, shiny: boolean, scale: num
 	if tier == 2 and not locked then
 		model:SetAttribute("Rainbow", true)
 	end
+	model:SetAttribute("Def", defId)
+	model:SetAttribute("Scale", s)
 	local anchorPart = firstBody or root
 	if shiny and not locked then
 		local sp = Instance.new("Sparkles")
@@ -157,20 +169,69 @@ function PetModels.build(defId: string, tier: number, shiny: boolean, scale: num
 	return model
 end
 
--- Fait tourner les pièces « Spin » autour du pet (appelé chaque image côté joueur)
-function PetModels.animate(model: Model, pivot: CFrame, t: number)
+-- Prépare l'animation d'un modèle construit par build() (pose de repos à l'origine).
+-- Renvoie nil si le pet n'a ni os ni pièces qui tournent.
+function PetModels.animator(model: Model): any
+	local defId = model:GetAttribute("Def") :: string
+	local s = (model:GetAttribute("Scale") :: number?) or 1
+	local rig = PetModels.rig(defId)
+	local recs = {}
+	local animated = false
 	for _, p in model:GetChildren() do
-		local axis = p:GetAttribute("Spin")
-		if axis and p:IsA("BasePart") then
-			local off = p:GetAttribute("Offset") :: CFrame
-			if axis == "Z" then
-				local c = (p:GetAttribute("Center") :: Vector3?) or Vector3.zero
-				p.CFrame = pivot * CFrame.new(c) * CFrame.Angles(0, 0, t * 0.6) * CFrame.new(-c) * off
-			else
-				p.CFrame = pivot * CFrame.Angles(0, t * 0.9, 0) * off
+		if p:IsA("BasePart") then
+			local bone = (p:GetAttribute("Bone") :: number?) or 0
+			local spin = p:GetAttribute("Spin") :: string?
+			if bone > 0 or spin then
+				animated = true
 			end
+			table.insert(recs, { part = p, offset = p.CFrame, bone = bone, spin = spin, center = (p:GetAttribute("Center") :: Vector3?) or Vector3.zero })
 		end
 	end
+	if not animated then
+		return nil
+	end
+	local bones = {}
+	for i, b in rig.bones do
+		bones[i] = { parent = b.parent, pivot = Vector3.new(b.pivot[1], b.pivot[2], b.pivot[3]) * s, cur = CFrame.identity }
+	end
+	local parts = table.create(#recs)
+	for i, r in recs do
+		parts[i] = r.part
+	end
+	return { recs = recs, parts = parts, cfs = table.create(#recs), bones = bones, clips = rig.clips, G = {} }
+end
+
+-- Pose le modèle à « pivot » pour l'état idle / move / ability à l'instant t.
+-- Les os passent en douceur d'un état à l'autre (dt = temps écoulé).
+function PetModels.pose(anim: any, pivot: CFrame, state: string, t: number, dt: number)
+	local G = anim.G
+	G[0] = CFrame.identity
+	local tracks = anim.clips and anim.clips[state]
+	local k = 1 - math.exp(-10 * dt)
+	for i, b in anim.bones do
+		local target = CFrame.identity
+		if tracks then
+			for _, tr in tracks do
+				if tr.bone == i then
+					local ang = math.rad(tr.base + tr.amp * math.sin(2 * math.pi * tr.freq * t + tr.phase))
+					target *= CFrame.fromAxisAngle(Vector3.new(tr.axis[1], tr.axis[2], tr.axis[3]), ang)
+				end
+			end
+		end
+		b.cur = b.cur:Lerp(target, k)
+		G[i] = G[b.parent] * CFrame.new(b.pivot) * b.cur * CFrame.new(-b.pivot)
+	end
+	local cfs = anim.cfs
+	for i, r in anim.recs do
+		local m = pivot * G[r.bone]
+		if r.spin == "Y" then
+			m = m * CFrame.new(r.center) * CFrame.Angles(0, t * 0.9, 0) * CFrame.new(-r.center)
+		elseif r.spin == "Z" then
+			m = m * CFrame.new(r.center) * CFrame.Angles(0, 0, t * 0.6) * CFrame.new(-r.center)
+		end
+		cfs[i] = m * r.offset
+	end
+	workspace:BulkMoveTo(anim.parts, cfs, Enum.BulkMoveMode.FireCFrameChanged)
 end
 
 -- Œuf décoratif (socles et animation d'éclosion)

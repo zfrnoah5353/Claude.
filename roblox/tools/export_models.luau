@@ -21,14 +21,17 @@ for _, id in Config.PetOrder do
 			accent = if def.accent then def.accent:ToHex() else "F2C14E",
 			glow = if def.glow then def.glow:ToHex() else nil,
 		}
+		local parts, bones = Shapes.build(def.species, colors)
 		table.insert(out, {
+			bones = bones,
+			anims = Shapes.bindAnims(def.species, bones),
 			name = id,
 			label = def.name,
 			rarity = def.rarity,
 			rarityName = Config.Rarities[def.rarity].name,
 			scale = def.scale,
 			glow = colors.glow or Config.Rarities[def.rarity].color:ToHex(),
-			parts = Shapes.build(def.species, colors),
+			parts = parts,
 		})
 	end
 end

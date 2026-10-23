@@ -1,0 +1,106 @@
+# Sweet Pets Factory - ra_phoenix
+newmtl Neon_FFD23F
+Kd 1.0000 0.6445 0.0497
+Ka 0 0 0
+Ke 1.0000 0.6445 0.0497
+d 1.000
+illum 2
+
+newmtl Neon_FF7A1F
+Kd 1.0000 0.1946 0.0137
+Ka 0 0 0
+Ke 1.0000 0.1946 0.0137
+d 1.000
+illum 2
+
+newmtl Mat_D8241F
+Kd 0.6867 0.0176 0.0137
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FF5A1F
+Kd 1.0000 0.1022 0.0137
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FF8A1F
+Kd 1.0000 0.2542 0.0137
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Neon_FFB020
+Kd 1.0000 0.4342 0.0144
+Ka 0 0 0
+Ke 1.0000 0.4342 0.0144
+d 1.000
+illum 2
+
+newmtl Neon_FFE27A
+Kd 1.0000 0.7605 0.1946
+Ka 0 0 0
+Ke 1.0000 0.7605 0.1946
+d 1.000
+illum 2
+
+newmtl Neon_FF5A1F
+Kd 1.0000 0.1022 0.0137
+Ka 0 0 0
+Ke 1.0000 0.1022 0.0137
+d 1.000
+illum 2
+
+newmtl Neon_FF8A1F
+Kd 1.0000 0.2542 0.0137
+Ka 0 0 0
+Ke 1.0000 0.2542 0.0137
+d 1.000
+illum 2
+
+newmtl Mat_FFE27A
+Kd 1.0000 0.7605 0.1946
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Neon_FFC93C
+Kd 1.0000 0.5841 0.0452
+Ka 0 0 0
+Ke 1.0000 0.5841 0.0452
+d 1.000
+illum 2
+
+newmtl Mat_FFD23F
+Kd 1.0000 0.6445 0.0497
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Gold_F2C14E
+Kd 0.8879 0.5333 0.0762
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Neon_FFF3B8
+Kd 1.0000 0.8963 0.4793
+Ka 0 0 0
+Ke 1.0000 0.8963 0.4793
+d 1.000
+illum 2
+
+newmtl Mat_2B1B3A
+Kd 0.0242 0.0110 0.0423
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+

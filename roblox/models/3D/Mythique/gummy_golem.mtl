@@ -1,0 +1,36 @@
+# Sweet Pets Factory - gummy_golem
+newmtl Mat_6FD66F
+Kd 0.1590 0.6724 0.1590
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_3FA34F
+Kd 0.0497 0.3663 0.0782
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_CFF7CF
+Kd 0.6240 0.9301 0.6240
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Neon_FFE27A
+Kd 1.0000 0.7605 0.1946
+Ka 0 0 0
+Ke 1.0000 0.7605 0.1946
+d 1.000
+illum 2
+
+newmtl Mat_2B1B3A
+Kd 0.0242 0.0110 0.0423
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+

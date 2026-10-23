@@ -545,266 +545,6 @@
         <bool name="Anchored">true</bool>
         <token name="BottomSurface">0</token>
         <CoordinateFrame name="CFrame">
-          <X>-1.629585</X>
-          <Y>1.74501</Y>
-          <Z>-0.135</Z>
-          <R00>0.76604</R00>
-          <R01>-0.64279</R01>
-          <R02>0</R02>
-          <R10>0.64279</R10>
-          <R11>0.76604</R11>
-          <R12>0</R12>
-          <R20>0</R20>
-          <R21>0</R21>
-          <R22>1</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">16777215</Color3uint8>
-        <token name="Material">272</token>
-        <Vector3 name="size">
-          <X>0.351</X>
-          <Y>3.105</Y>
-          <Z>0.7425</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-      <Item class="SpecialMesh" referent="21">
-        <Properties>
-          <string name="Name">Mesh</string>
-          <token name="MeshType">3</token>
-        </Properties>
-      </Item>
-    </Item>
-    <Item class="Part" referent="22">
-      <Properties>
-        <string name="Name">Part17</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>-1.56006</X>
-          <Y>1.66239</Y>
-          <Z>0.324</Z>
-          <R00>0.76604</R00>
-          <R01>-0.63098</R01>
-          <R02>-0.12265</R02>
-          <R10>0.64279</R10>
-          <R11>0.75197</R11>
-          <R12>0.14617</R12>
-          <R20>0</R20>
-          <R21>-0.19081</R21>
-          <R22>0.98163</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">16766700</Color3uint8>
-        <token name="Material">272</token>
-        <Vector3 name="size">
-          <X>0.351</X>
-          <Y>2.7675</Y>
-          <Z>0.7425</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-      <Item class="SpecialMesh" referent="23">
-        <Properties>
-          <string name="Name">Mesh</string>
-          <token name="MeshType">3</token>
-        </Properties>
-      </Item>
-    </Item>
-    <Item class="Part" referent="24">
-      <Properties>
-        <string name="Name">Part18</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>-1.49067</X>
-          <Y>1.579635</Y>
-          <Z>0.783</Z>
-          <R00>0.76604</R00>
-          <R01>-0.59598</R01>
-          <R02>-0.24079</R02>
-          <R10>0.64279</R10>
-          <R11>0.71026</R11>
-          <R12>0.28697</R12>
-          <R20>0</R20>
-          <R21>-0.37461</R21>
-          <R22>0.92718</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">16777215</Color3uint8>
-        <token name="Material">272</token>
-        <Vector3 name="size">
-          <X>0.351</X>
-          <Y>2.43</Y>
-          <Z>0.7425</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-      <Item class="SpecialMesh" referent="25">
-        <Properties>
-          <string name="Name">Mesh</string>
-          <token name="MeshType">3</token>
-        </Properties>
-      </Item>
-    </Item>
-    <Item class="Part" referent="26">
-      <Properties>
-        <string name="Name">Part19</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>-1.42128</X>
-          <Y>1.49688</Y>
-          <Z>1.242</Z>
-          <R00>0.76604</R00>
-          <R01>-0.53909</R01>
-          <R02>-0.35009</R02>
-          <R10>0.64279</R10>
-          <R11>0.64246</R11>
-          <R12>0.41722</R12>
-          <R20>0</R20>
-          <R21>-0.54464</R21>
-          <R22>0.83867</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">16766700</Color3uint8>
-        <token name="Material">272</token>
-        <Vector3 name="size">
-          <X>0.351</X>
-          <Y>2.0925</Y>
-          <Z>0.7425</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-      <Item class="SpecialMesh" referent="27">
-        <Properties>
-          <string name="Name">Mesh</string>
-          <token name="MeshType">3</token>
-        </Properties>
-      </Item>
-    </Item>
-    <Item class="Part" referent="28">
-      <Properties>
-        <string name="Name">Part20</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>-1.35189</X>
-          <Y>1.414125</Y>
-          <Z>1.701</Z>
-          <R00>0.76604</R00>
-          <R01>-0.46238</R01>
-          <R02>-0.44652</R02>
-          <R10>0.64279</R10>
-          <R11>0.55105</R11>
-          <R12>0.53214</R12>
-          <R20>0</R20>
-          <R21>-0.69466</R21>
-          <R22>0.71934</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">16777215</Color3uint8>
-        <token name="Material">272</token>
-        <Vector3 name="size">
-          <X>0.351</X>
-          <Y>1.755</Y>
-          <Z>0.7425</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-      <Item class="SpecialMesh" referent="29">
-        <Properties>
-          <string name="Name">Mesh</string>
-          <token name="MeshType">3</token>
-        </Properties>
-      </Item>
-    </Item>
-    <Item class="Part" referent="30">
-      <Properties>
-        <string name="Name">Part21</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>-1.2824326</X>
-          <Y>1.3314105</Y>
-          <Z>2.16</Z>
-          <R00>0.76604</R00>
-          <R01>-0.36869</R01>
-          <R02>-0.52654</R02>
-          <R10>0.64279</R10>
-          <R11>0.43939</R11>
-          <R12>0.62751</R12>
-          <R20>0</R20>
-          <R21>-0.81915</R21>
-          <R22>0.57358</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">16766700</Color3uint8>
-        <token name="Material">272</token>
-        <Vector3 name="size">
-          <X>0.351</X>
-          <Y>1.4175</Y>
-          <Z>0.7425</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-      <Item class="SpecialMesh" referent="31">
-        <Properties>
-          <string name="Name">Mesh</string>
-          <token name="MeshType">3</token>
-        </Properties>
-      </Item>
-    </Item>
-    <Item class="Part" referent="32">
-      <Properties>
-        <string name="Name">Part22</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>-2.41056</X>
-          <Y>2.675835</Y>
-          <Z>-0.2025</Z>
-          <R00>0.76604</R00>
-          <R01>-0.62874</R01>
-          <R02>0.13364</R02>
-          <R10>0.64279</R10>
-          <R11>0.7493</R11>
-          <R12>-0.15927</R12>
-          <R20>0</R20>
-          <R21>0.20791</R21>
-          <R22>0.97815</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">16748472</Color3uint8>
-        <token name="Material">288</token>
-        <Vector3 name="size">
-          <X>0.27</X>
-          <Y>1.62</Y>
-          <Z>0.54</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-        <float name="Transparency">0.3</float>
-      </Properties>
-      <Item class="SpecialMesh" referent="33">
-        <Properties>
-          <string name="Name">Mesh</string>
-          <token name="MeshType">3</token>
-        </Properties>
-      </Item>
-    </Item>
-    <Item class="Part" referent="34">
-      <Properties>
-        <string name="Name">Part23</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
           <X>0.27</X>
           <Y>2.295</Y>
           <Z>-1.35</Z>
@@ -830,9 +570,9 @@
         <token name="TopSurface">0</token>
       </Properties>
     </Item>
-    <Item class="Part" referent="35">
+    <Item class="Part" referent="21">
       <Properties>
-        <string name="Name">Part24</string>
+        <string name="Name">Part17</string>
         <bool name="Anchored">true</bool>
         <token name="BottomSurface">0</token>
         <CoordinateFrame name="CFrame">
@@ -861,9 +601,9 @@
         <token name="TopSurface">0</token>
       </Properties>
     </Item>
-    <Item class="Part" referent="36">
+    <Item class="Part" referent="22">
       <Properties>
-        <string name="Name">Part25</string>
+        <string name="Name">Part18</string>
         <bool name="Anchored">true</bool>
         <token name="BottomSurface">0</token>
         <CoordinateFrame name="CFrame">
@@ -892,9 +632,9 @@
         <token name="TopSurface">0</token>
       </Properties>
     </Item>
-    <Item class="Part" referent="37">
+    <Item class="Part" referent="23">
       <Properties>
-        <string name="Name">Part26</string>
+        <string name="Name">Part19</string>
         <bool name="Anchored">true</bool>
         <token name="BottomSurface">0</token>
         <CoordinateFrame name="CFrame">
@@ -923,269 +663,9 @@
         <token name="TopSurface">0</token>
       </Properties>
     </Item>
-    <Item class="Part" referent="38">
+    <Item class="Part" referent="24">
       <Properties>
-        <string name="Name">Part27</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>1.629585</X>
-          <Y>1.74501</Y>
-          <Z>-0.135</Z>
-          <R00>0.76604</R00>
-          <R01>0.64279</R01>
-          <R02>0</R02>
-          <R10>-0.64279</R10>
-          <R11>0.76604</R11>
-          <R12>0</R12>
-          <R20>0</R20>
-          <R21>0</R21>
-          <R22>1</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">16777215</Color3uint8>
-        <token name="Material">272</token>
-        <Vector3 name="size">
-          <X>0.351</X>
-          <Y>3.105</Y>
-          <Z>0.7425</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-      <Item class="SpecialMesh" referent="39">
-        <Properties>
-          <string name="Name">Mesh</string>
-          <token name="MeshType">3</token>
-        </Properties>
-      </Item>
-    </Item>
-    <Item class="Part" referent="40">
-      <Properties>
-        <string name="Name">Part28</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>1.56006</X>
-          <Y>1.66239</Y>
-          <Z>0.324</Z>
-          <R00>0.76604</R00>
-          <R01>0.63098</R01>
-          <R02>0.12265</R02>
-          <R10>-0.64279</R10>
-          <R11>0.75197</R11>
-          <R12>0.14617</R12>
-          <R20>0</R20>
-          <R21>-0.19081</R21>
-          <R22>0.98163</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">16766700</Color3uint8>
-        <token name="Material">272</token>
-        <Vector3 name="size">
-          <X>0.351</X>
-          <Y>2.7675</Y>
-          <Z>0.7425</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-      <Item class="SpecialMesh" referent="41">
-        <Properties>
-          <string name="Name">Mesh</string>
-          <token name="MeshType">3</token>
-        </Properties>
-      </Item>
-    </Item>
-    <Item class="Part" referent="42">
-      <Properties>
-        <string name="Name">Part29</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>1.49067</X>
-          <Y>1.579635</Y>
-          <Z>0.783</Z>
-          <R00>0.76604</R00>
-          <R01>0.59598</R01>
-          <R02>0.24079</R02>
-          <R10>-0.64279</R10>
-          <R11>0.71026</R11>
-          <R12>0.28697</R12>
-          <R20>0</R20>
-          <R21>-0.37461</R21>
-          <R22>0.92718</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">16777215</Color3uint8>
-        <token name="Material">272</token>
-        <Vector3 name="size">
-          <X>0.351</X>
-          <Y>2.43</Y>
-          <Z>0.7425</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-      <Item class="SpecialMesh" referent="43">
-        <Properties>
-          <string name="Name">Mesh</string>
-          <token name="MeshType">3</token>
-        </Properties>
-      </Item>
-    </Item>
-    <Item class="Part" referent="44">
-      <Properties>
-        <string name="Name">Part30</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>1.42128</X>
-          <Y>1.49688</Y>
-          <Z>1.242</Z>
-          <R00>0.76604</R00>
-          <R01>0.53909</R01>
-          <R02>0.35009</R02>
-          <R10>-0.64279</R10>
-          <R11>0.64246</R11>
-          <R12>0.41722</R12>
-          <R20>0</R20>
-          <R21>-0.54464</R21>
-          <R22>0.83867</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">16766700</Color3uint8>
-        <token name="Material">272</token>
-        <Vector3 name="size">
-          <X>0.351</X>
-          <Y>2.0925</Y>
-          <Z>0.7425</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-      <Item class="SpecialMesh" referent="45">
-        <Properties>
-          <string name="Name">Mesh</string>
-          <token name="MeshType">3</token>
-        </Properties>
-      </Item>
-    </Item>
-    <Item class="Part" referent="46">
-      <Properties>
-        <string name="Name">Part31</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>1.35189</X>
-          <Y>1.414125</Y>
-          <Z>1.701</Z>
-          <R00>0.76604</R00>
-          <R01>0.46238</R01>
-          <R02>0.44652</R02>
-          <R10>-0.64279</R10>
-          <R11>0.55105</R11>
-          <R12>0.53214</R12>
-          <R20>0</R20>
-          <R21>-0.69466</R21>
-          <R22>0.71934</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">16777215</Color3uint8>
-        <token name="Material">272</token>
-        <Vector3 name="size">
-          <X>0.351</X>
-          <Y>1.755</Y>
-          <Z>0.7425</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-      <Item class="SpecialMesh" referent="47">
-        <Properties>
-          <string name="Name">Mesh</string>
-          <token name="MeshType">3</token>
-        </Properties>
-      </Item>
-    </Item>
-    <Item class="Part" referent="48">
-      <Properties>
-        <string name="Name">Part32</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>1.2824326</X>
-          <Y>1.3314105</Y>
-          <Z>2.16</Z>
-          <R00>0.76604</R00>
-          <R01>0.36869</R01>
-          <R02>0.52654</R02>
-          <R10>-0.64279</R10>
-          <R11>0.43939</R11>
-          <R12>0.62751</R12>
-          <R20>0</R20>
-          <R21>-0.81915</R21>
-          <R22>0.57358</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">16766700</Color3uint8>
-        <token name="Material">272</token>
-        <Vector3 name="size">
-          <X>0.351</X>
-          <Y>1.4175</Y>
-          <Z>0.7425</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-      <Item class="SpecialMesh" referent="49">
-        <Properties>
-          <string name="Name">Mesh</string>
-          <token name="MeshType">3</token>
-        </Properties>
-      </Item>
-    </Item>
-    <Item class="Part" referent="50">
-      <Properties>
-        <string name="Name">Part33</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>2.41056</X>
-          <Y>2.675835</Y>
-          <Z>-0.2025</Z>
-          <R00>0.76604</R00>
-          <R01>0.62874</R01>
-          <R02>-0.13364</R02>
-          <R10>-0.64279</R10>
-          <R11>0.7493</R11>
-          <R12>-0.15927</R12>
-          <R20>0</R20>
-          <R21>0.20791</R21>
-          <R22>0.97815</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">16748472</Color3uint8>
-        <token name="Material">288</token>
-        <Vector3 name="size">
-          <X>0.27</X>
-          <Y>1.62</Y>
-          <Z>0.54</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-        <float name="Transparency">0.3</float>
-      </Properties>
-      <Item class="SpecialMesh" referent="51">
-        <Properties>
-          <string name="Name">Mesh</string>
-          <token name="MeshType">3</token>
-        </Properties>
-      </Item>
-    </Item>
-    <Item class="Part" referent="52">
-      <Properties>
-        <string name="Name">Part34</string>
+        <string name="Name">Part20</string>
         <bool name="Anchored">true</bool>
         <token name="BottomSurface">0</token>
         <CoordinateFrame name="CFrame">
@@ -1215,9 +695,9 @@
         <token name="TopSurface">0</token>
       </Properties>
     </Item>
-    <Item class="Part" referent="53">
+    <Item class="Part" referent="25">
       <Properties>
-        <string name="Name">Part35</string>
+        <string name="Name">Part21</string>
         <bool name="Anchored">true</bool>
         <token name="BottomSurface">0</token>
         <CoordinateFrame name="CFrame">
@@ -1247,9 +727,9 @@
         <token name="TopSurface">0</token>
       </Properties>
     </Item>
-    <Item class="Part" referent="54">
+    <Item class="Part" referent="26">
       <Properties>
-        <string name="Name">Part36</string>
+        <string name="Name">Part22</string>
         <bool name="Anchored">true</bool>
         <token name="BottomSurface">0</token>
         <CoordinateFrame name="CFrame">
@@ -1279,9 +759,9 @@
         <token name="TopSurface">0</token>
       </Properties>
     </Item>
-    <Item class="Part" referent="55">
+    <Item class="Part" referent="27">
       <Properties>
-        <string name="Name">Part37</string>
+        <string name="Name">Part23</string>
         <bool name="Anchored">true</bool>
         <token name="BottomSurface">0</token>
         <CoordinateFrame name="CFrame">
@@ -1311,9 +791,9 @@
         <token name="TopSurface">0</token>
       </Properties>
     </Item>
-    <Item class="Part" referent="56">
+    <Item class="Part" referent="28">
       <Properties>
-        <string name="Name">Part38</string>
+        <string name="Name">Part24</string>
         <bool name="Anchored">true</bool>
         <token name="BottomSurface">0</token>
         <CoordinateFrame name="CFrame">
@@ -1343,9 +823,9 @@
         <token name="TopSurface">0</token>
       </Properties>
     </Item>
-    <Item class="Part" referent="57">
+    <Item class="Part" referent="29">
       <Properties>
-        <string name="Name">Part39</string>
+        <string name="Name">Part25</string>
         <bool name="Anchored">true</bool>
         <token name="BottomSurface">0</token>
         <CoordinateFrame name="CFrame">
@@ -1375,9 +855,901 @@
         <token name="TopSurface">0</token>
       </Properties>
     </Item>
-    <Item class="Part" referent="58">
+    <Item class="Part" referent="30">
+      <Properties>
+        <string name="Name">Part26</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>0.567</X>
+          <Y>2.7</Y>
+          <Z>-1.4175</Z>
+          <R00>0.000000000000000061232</R00>
+          <R01>0</R01>
+          <R02>1</R02>
+          <R10>0.17365</R10>
+          <R11>0.98481</R11>
+          <R12>-0.000000000000000010633</R12>
+          <R20>-0.98481</R20>
+          <R21>0.17365</R21>
+          <R22>0.000000000000000060302</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
+        <token name="Material">288</token>
+        <Vector3 name="size">
+          <X>0.320625</X>
+          <Y>0.108</Y>
+          <Z>0.135</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+    </Item>
+    <Item class="Part" referent="31">
+      <Properties>
+        <string name="Name">Part27</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>0.4910355</X>
+          <Y>2.650725</Y>
+          <Z>-1.1383065</Z>
+          <R00>0.5</R00>
+          <R01>0</R01>
+          <R02>0.86603</R02>
+          <R10>0.15038</R10>
+          <R11>0.98481</R11>
+          <R12>-0.086824</R12>
+          <R20>-0.85287</R20>
+          <R21>0.17365</R21>
+          <R22>0.4924</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
+        <token name="Material">288</token>
+        <Vector3 name="size">
+          <X>0.320625</X>
+          <Y>0.108</Y>
+          <Z>0.135</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+    </Item>
+    <Item class="Part" referent="32">
+      <Properties>
+        <string name="Name">Part28</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>0.2835</X>
+          <Y>2.61468</Y>
+          <Z>-0.93393</Z>
+          <R00>0.86603</R00>
+          <R01>0</R01>
+          <R02>0.5</R02>
+          <R10>0.086824</R10>
+          <R11>0.98481</R11>
+          <R12>-0.15038</R12>
+          <R20>-0.4924</R20>
+          <R21>0.17365</R21>
+          <R22>0.85287</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
+        <token name="Material">288</token>
+        <Vector3 name="size">
+          <X>0.320625</X>
+          <Y>0.108</Y>
+          <Z>0.135</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+    </Item>
+    <Item class="Part" referent="33">
+      <Properties>
+        <string name="Name">Part29</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>0.0000000000000000347193</X>
+          <Y>2.601585</Y>
+          <Z>-0.859113</Z>
+          <R00>1</R00>
+          <R01>0</R01>
+          <R02>0</R02>
+          <R10>0</R10>
+          <R11>0.98481</R11>
+          <R12>-0.17365</R12>
+          <R20>0</R20>
+          <R21>0.17365</R21>
+          <R22>0.98481</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
+        <token name="Material">288</token>
+        <Vector3 name="size">
+          <X>0.320625</X>
+          <Y>0.108</Y>
+          <Z>0.135</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+    </Item>
+    <Item class="Part" referent="34">
+      <Properties>
+        <string name="Name">Part30</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>-0.2835</X>
+          <Y>2.61468</Y>
+          <Z>-0.93393</Z>
+          <R00>0.86603</R00>
+          <R01>0</R01>
+          <R02>-0.5</R02>
+          <R10>-0.086824</R10>
+          <R11>0.98481</R11>
+          <R12>-0.15038</R12>
+          <R20>0.4924</R20>
+          <R21>0.17365</R21>
+          <R22>0.85287</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
+        <token name="Material">288</token>
+        <Vector3 name="size">
+          <X>0.320625</X>
+          <Y>0.108</Y>
+          <Z>0.135</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+    </Item>
+    <Item class="Part" referent="35">
+      <Properties>
+        <string name="Name">Part31</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>-0.4910355</X>
+          <Y>2.650725</Y>
+          <Z>-1.1383065</Z>
+          <R00>0.5</R00>
+          <R01>0</R01>
+          <R02>-0.86603</R02>
+          <R10>-0.15038</R10>
+          <R11>0.98481</R11>
+          <R12>-0.086824</R12>
+          <R20>0.85287</R20>
+          <R21>0.17365</R21>
+          <R22>0.4924</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
+        <token name="Material">288</token>
+        <Vector3 name="size">
+          <X>0.320625</X>
+          <Y>0.108</Y>
+          <Z>0.135</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+    </Item>
+    <Item class="Part" referent="36">
+      <Properties>
+        <string name="Name">Part32</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>-0.567</X>
+          <Y>2.7</Y>
+          <Z>-1.4175</Z>
+          <R00>0.000000000000000061232</R00>
+          <R01>0</R01>
+          <R02>-1</R02>
+          <R10>-0.17365</R10>
+          <R11>0.98481</R11>
+          <R12>-0.000000000000000010633</R12>
+          <R20>0.98481</R20>
+          <R21>0.17365</R21>
+          <R22>0.000000000000000060302</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
+        <token name="Material">288</token>
+        <Vector3 name="size">
+          <X>0.320625</X>
+          <Y>0.108</Y>
+          <Z>0.135</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+    </Item>
+    <Item class="Part" referent="37">
+      <Properties>
+        <string name="Name">Part33</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>-0.4910355</X>
+          <Y>2.749275</Y>
+          <Z>-1.69668</Z>
+          <R00>-0.5</R00>
+          <R01>0</R01>
+          <R02>-0.86603</R02>
+          <R10>-0.15038</R10>
+          <R11>0.98481</R11>
+          <R12>0.086824</R12>
+          <R20>0.85287</R20>
+          <R21>0.17365</R21>
+          <R22>-0.4924</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
+        <token name="Material">288</token>
+        <Vector3 name="size">
+          <X>0.320625</X>
+          <Y>0.108</Y>
+          <Z>0.135</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+    </Item>
+    <Item class="Part" referent="38">
+      <Properties>
+        <string name="Name">Part34</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>-0.2835</X>
+          <Y>2.78532</Y>
+          <Z>-1.90107</Z>
+          <R00>-0.86603</R00>
+          <R01>0</R01>
+          <R02>-0.5</R02>
+          <R10>-0.086824</R10>
+          <R11>0.98481</R11>
+          <R12>0.15038</R12>
+          <R20>0.4924</R20>
+          <R21>0.17365</R21>
+          <R22>-0.85287</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
+        <token name="Material">288</token>
+        <Vector3 name="size">
+          <X>0.320625</X>
+          <Y>0.108</Y>
+          <Z>0.135</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+    </Item>
+    <Item class="Part" referent="39">
+      <Properties>
+        <string name="Name">Part35</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>-0.00000000000000010415655</X>
+          <Y>2.798415</Y>
+          <Z>-1.97586</Z>
+          <R00>-1</R00>
+          <R01>0</R01>
+          <R02>-0.00000000000000012246</R02>
+          <R10>-0.000000000000000021266</R10>
+          <R11>0.98481</R11>
+          <R12>0.17365</R12>
+          <R20>0.0000000000000001206</R20>
+          <R21>0.17365</R21>
+          <R22>-0.98481</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
+        <token name="Material">288</token>
+        <Vector3 name="size">
+          <X>0.320625</X>
+          <Y>0.108</Y>
+          <Z>0.135</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+    </Item>
+    <Item class="Part" referent="40">
+      <Properties>
+        <string name="Name">Part36</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>0.2835</X>
+          <Y>2.78532</Y>
+          <Z>-1.90107</Z>
+          <R00>-0.86603</R00>
+          <R01>0</R01>
+          <R02>0.5</R02>
+          <R10>0.086824</R10>
+          <R11>0.98481</R11>
+          <R12>0.15038</R12>
+          <R20>-0.4924</R20>
+          <R21>0.17365</R21>
+          <R22>-0.85287</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
+        <token name="Material">288</token>
+        <Vector3 name="size">
+          <X>0.320625</X>
+          <Y>0.108</Y>
+          <Z>0.135</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+    </Item>
+    <Item class="Part" referent="41">
+      <Properties>
+        <string name="Name">Part37</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>0.4910355</X>
+          <Y>2.749275</Y>
+          <Z>-1.69668</Z>
+          <R00>-0.5</R00>
+          <R01>0</R01>
+          <R02>0.86603</R02>
+          <R10>0.15038</R10>
+          <R11>0.98481</R11>
+          <R12>0.086824</R12>
+          <R20>-0.85287</R20>
+          <R21>0.17365</R21>
+          <R22>-0.4924</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
+        <token name="Material">288</token>
+        <Vector3 name="size">
+          <X>0.320625</X>
+          <Y>0.108</Y>
+          <Z>0.135</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+    </Item>
+    <Item class="Part" referent="42">
+      <Properties>
+        <string name="Name">Part38</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>-1.629585</X>
+          <Y>1.74501</Y>
+          <Z>-0.135</Z>
+          <R00>0.76604</R00>
+          <R01>-0.64279</R01>
+          <R02>0</R02>
+          <R10>0.64279</R10>
+          <R11>0.76604</R11>
+          <R12>0</R12>
+          <R20>0</R20>
+          <R21>0</R21>
+          <R22>1</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">16777215</Color3uint8>
+        <token name="Material">272</token>
+        <Vector3 name="size">
+          <X>0.351</X>
+          <Y>3.105</Y>
+          <Z>0.7425</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+      <Item class="SpecialMesh" referent="43">
+        <Properties>
+          <string name="Name">Mesh</string>
+          <token name="MeshType">3</token>
+        </Properties>
+      </Item>
+    </Item>
+    <Item class="Part" referent="44">
+      <Properties>
+        <string name="Name">Part39</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>-1.56006</X>
+          <Y>1.66239</Y>
+          <Z>0.324</Z>
+          <R00>0.76604</R00>
+          <R01>-0.63098</R01>
+          <R02>-0.12265</R02>
+          <R10>0.64279</R10>
+          <R11>0.75197</R11>
+          <R12>0.14617</R12>
+          <R20>0</R20>
+          <R21>-0.19081</R21>
+          <R22>0.98163</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">16766700</Color3uint8>
+        <token name="Material">272</token>
+        <Vector3 name="size">
+          <X>0.351</X>
+          <Y>2.7675</Y>
+          <Z>0.7425</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+      <Item class="SpecialMesh" referent="45">
+        <Properties>
+          <string name="Name">Mesh</string>
+          <token name="MeshType">3</token>
+        </Properties>
+      </Item>
+    </Item>
+    <Item class="Part" referent="46">
       <Properties>
         <string name="Name">Part40</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>-1.49067</X>
+          <Y>1.579635</Y>
+          <Z>0.783</Z>
+          <R00>0.76604</R00>
+          <R01>-0.59598</R01>
+          <R02>-0.24079</R02>
+          <R10>0.64279</R10>
+          <R11>0.71026</R11>
+          <R12>0.28697</R12>
+          <R20>0</R20>
+          <R21>-0.37461</R21>
+          <R22>0.92718</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">16777215</Color3uint8>
+        <token name="Material">272</token>
+        <Vector3 name="size">
+          <X>0.351</X>
+          <Y>2.43</Y>
+          <Z>0.7425</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+      <Item class="SpecialMesh" referent="47">
+        <Properties>
+          <string name="Name">Mesh</string>
+          <token name="MeshType">3</token>
+        </Properties>
+      </Item>
+    </Item>
+    <Item class="Part" referent="48">
+      <Properties>
+        <string name="Name">Part41</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>-1.42128</X>
+          <Y>1.49688</Y>
+          <Z>1.242</Z>
+          <R00>0.76604</R00>
+          <R01>-0.53909</R01>
+          <R02>-0.35009</R02>
+          <R10>0.64279</R10>
+          <R11>0.64246</R11>
+          <R12>0.41722</R12>
+          <R20>0</R20>
+          <R21>-0.54464</R21>
+          <R22>0.83867</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">16766700</Color3uint8>
+        <token name="Material">272</token>
+        <Vector3 name="size">
+          <X>0.351</X>
+          <Y>2.0925</Y>
+          <Z>0.7425</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+      <Item class="SpecialMesh" referent="49">
+        <Properties>
+          <string name="Name">Mesh</string>
+          <token name="MeshType">3</token>
+        </Properties>
+      </Item>
+    </Item>
+    <Item class="Part" referent="50">
+      <Properties>
+        <string name="Name">Part42</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>-1.35189</X>
+          <Y>1.414125</Y>
+          <Z>1.701</Z>
+          <R00>0.76604</R00>
+          <R01>-0.46238</R01>
+          <R02>-0.44652</R02>
+          <R10>0.64279</R10>
+          <R11>0.55105</R11>
+          <R12>0.53214</R12>
+          <R20>0</R20>
+          <R21>-0.69466</R21>
+          <R22>0.71934</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">16777215</Color3uint8>
+        <token name="Material">272</token>
+        <Vector3 name="size">
+          <X>0.351</X>
+          <Y>1.755</Y>
+          <Z>0.7425</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+      <Item class="SpecialMesh" referent="51">
+        <Properties>
+          <string name="Name">Mesh</string>
+          <token name="MeshType">3</token>
+        </Properties>
+      </Item>
+    </Item>
+    <Item class="Part" referent="52">
+      <Properties>
+        <string name="Name">Part43</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>-1.2824326</X>
+          <Y>1.3314105</Y>
+          <Z>2.16</Z>
+          <R00>0.76604</R00>
+          <R01>-0.36869</R01>
+          <R02>-0.52654</R02>
+          <R10>0.64279</R10>
+          <R11>0.43939</R11>
+          <R12>0.62751</R12>
+          <R20>0</R20>
+          <R21>-0.81915</R21>
+          <R22>0.57358</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">16766700</Color3uint8>
+        <token name="Material">272</token>
+        <Vector3 name="size">
+          <X>0.351</X>
+          <Y>1.4175</Y>
+          <Z>0.7425</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+      <Item class="SpecialMesh" referent="53">
+        <Properties>
+          <string name="Name">Mesh</string>
+          <token name="MeshType">3</token>
+        </Properties>
+      </Item>
+    </Item>
+    <Item class="Part" referent="54">
+      <Properties>
+        <string name="Name">Part44</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>-2.41056</X>
+          <Y>2.675835</Y>
+          <Z>-0.2025</Z>
+          <R00>0.76604</R00>
+          <R01>-0.62874</R01>
+          <R02>0.13364</R02>
+          <R10>0.64279</R10>
+          <R11>0.7493</R11>
+          <R12>-0.15927</R12>
+          <R20>0</R20>
+          <R21>0.20791</R21>
+          <R22>0.97815</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">16748472</Color3uint8>
+        <token name="Material">288</token>
+        <Vector3 name="size">
+          <X>0.27</X>
+          <Y>1.62</Y>
+          <Z>0.54</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+        <float name="Transparency">0.3</float>
+      </Properties>
+      <Item class="SpecialMesh" referent="55">
+        <Properties>
+          <string name="Name">Mesh</string>
+          <token name="MeshType">3</token>
+        </Properties>
+      </Item>
+    </Item>
+    <Item class="Part" referent="56">
+      <Properties>
+        <string name="Name">Part45</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>1.629585</X>
+          <Y>1.74501</Y>
+          <Z>-0.135</Z>
+          <R00>0.76604</R00>
+          <R01>0.64279</R01>
+          <R02>0</R02>
+          <R10>-0.64279</R10>
+          <R11>0.76604</R11>
+          <R12>0</R12>
+          <R20>0</R20>
+          <R21>0</R21>
+          <R22>1</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">16777215</Color3uint8>
+        <token name="Material">272</token>
+        <Vector3 name="size">
+          <X>0.351</X>
+          <Y>3.105</Y>
+          <Z>0.7425</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+      <Item class="SpecialMesh" referent="57">
+        <Properties>
+          <string name="Name">Mesh</string>
+          <token name="MeshType">3</token>
+        </Properties>
+      </Item>
+    </Item>
+    <Item class="Part" referent="58">
+      <Properties>
+        <string name="Name">Part46</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>1.56006</X>
+          <Y>1.66239</Y>
+          <Z>0.324</Z>
+          <R00>0.76604</R00>
+          <R01>0.63098</R01>
+          <R02>0.12265</R02>
+          <R10>-0.64279</R10>
+          <R11>0.75197</R11>
+          <R12>0.14617</R12>
+          <R20>0</R20>
+          <R21>-0.19081</R21>
+          <R22>0.98163</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">16766700</Color3uint8>
+        <token name="Material">272</token>
+        <Vector3 name="size">
+          <X>0.351</X>
+          <Y>2.7675</Y>
+          <Z>0.7425</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+      <Item class="SpecialMesh" referent="59">
+        <Properties>
+          <string name="Name">Mesh</string>
+          <token name="MeshType">3</token>
+        </Properties>
+      </Item>
+    </Item>
+    <Item class="Part" referent="60">
+      <Properties>
+        <string name="Name">Part47</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>1.49067</X>
+          <Y>1.579635</Y>
+          <Z>0.783</Z>
+          <R00>0.76604</R00>
+          <R01>0.59598</R01>
+          <R02>0.24079</R02>
+          <R10>-0.64279</R10>
+          <R11>0.71026</R11>
+          <R12>0.28697</R12>
+          <R20>0</R20>
+          <R21>-0.37461</R21>
+          <R22>0.92718</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">16777215</Color3uint8>
+        <token name="Material">272</token>
+        <Vector3 name="size">
+          <X>0.351</X>
+          <Y>2.43</Y>
+          <Z>0.7425</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+      <Item class="SpecialMesh" referent="61">
+        <Properties>
+          <string name="Name">Mesh</string>
+          <token name="MeshType">3</token>
+        </Properties>
+      </Item>
+    </Item>
+    <Item class="Part" referent="62">
+      <Properties>
+        <string name="Name">Part48</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>1.42128</X>
+          <Y>1.49688</Y>
+          <Z>1.242</Z>
+          <R00>0.76604</R00>
+          <R01>0.53909</R01>
+          <R02>0.35009</R02>
+          <R10>-0.64279</R10>
+          <R11>0.64246</R11>
+          <R12>0.41722</R12>
+          <R20>0</R20>
+          <R21>-0.54464</R21>
+          <R22>0.83867</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">16766700</Color3uint8>
+        <token name="Material">272</token>
+        <Vector3 name="size">
+          <X>0.351</X>
+          <Y>2.0925</Y>
+          <Z>0.7425</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+      <Item class="SpecialMesh" referent="63">
+        <Properties>
+          <string name="Name">Mesh</string>
+          <token name="MeshType">3</token>
+        </Properties>
+      </Item>
+    </Item>
+    <Item class="Part" referent="64">
+      <Properties>
+        <string name="Name">Part49</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>1.35189</X>
+          <Y>1.414125</Y>
+          <Z>1.701</Z>
+          <R00>0.76604</R00>
+          <R01>0.46238</R01>
+          <R02>0.44652</R02>
+          <R10>-0.64279</R10>
+          <R11>0.55105</R11>
+          <R12>0.53214</R12>
+          <R20>0</R20>
+          <R21>-0.69466</R21>
+          <R22>0.71934</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">16777215</Color3uint8>
+        <token name="Material">272</token>
+        <Vector3 name="size">
+          <X>0.351</X>
+          <Y>1.755</Y>
+          <Z>0.7425</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+      <Item class="SpecialMesh" referent="65">
+        <Properties>
+          <string name="Name">Mesh</string>
+          <token name="MeshType">3</token>
+        </Properties>
+      </Item>
+    </Item>
+    <Item class="Part" referent="66">
+      <Properties>
+        <string name="Name">Part50</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>1.2824326</X>
+          <Y>1.3314105</Y>
+          <Z>2.16</Z>
+          <R00>0.76604</R00>
+          <R01>0.36869</R01>
+          <R02>0.52654</R02>
+          <R10>-0.64279</R10>
+          <R11>0.43939</R11>
+          <R12>0.62751</R12>
+          <R20>0</R20>
+          <R21>-0.81915</R21>
+          <R22>0.57358</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">16766700</Color3uint8>
+        <token name="Material">272</token>
+        <Vector3 name="size">
+          <X>0.351</X>
+          <Y>1.4175</Y>
+          <Z>0.7425</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+      </Properties>
+      <Item class="SpecialMesh" referent="67">
+        <Properties>
+          <string name="Name">Mesh</string>
+          <token name="MeshType">3</token>
+        </Properties>
+      </Item>
+    </Item>
+    <Item class="Part" referent="68">
+      <Properties>
+        <string name="Name">Part51</string>
+        <bool name="Anchored">true</bool>
+        <token name="BottomSurface">0</token>
+        <CoordinateFrame name="CFrame">
+          <X>2.41056</X>
+          <Y>2.675835</Y>
+          <Z>-0.2025</Z>
+          <R00>0.76604</R00>
+          <R01>0.62874</R01>
+          <R02>-0.13364</R02>
+          <R10>-0.64279</R10>
+          <R11>0.7493</R11>
+          <R12>-0.15927</R12>
+          <R20>0</R20>
+          <R21>0.20791</R21>
+          <R22>0.97815</R22>
+        </CoordinateFrame>
+        <bool name="CanCollide">false</bool>
+        <bool name="CastShadow">false</bool>
+        <Color3uint8 name="Color3uint8">16748472</Color3uint8>
+        <token name="Material">288</token>
+        <Vector3 name="size">
+          <X>0.27</X>
+          <Y>1.62</Y>
+          <Z>0.54</Z>
+        </Vector3>
+        <token name="TopSurface">0</token>
+        <float name="Transparency">0.3</float>
+      </Properties>
+      <Item class="SpecialMesh" referent="69">
+        <Properties>
+          <string name="Name">Mesh</string>
+          <token name="MeshType">3</token>
+        </Properties>
+      </Item>
+    </Item>
+    <Item class="Part" referent="70">
+      <Properties>
+        <string name="Name">Part52</string>
         <bool name="Anchored">true</bool>
         <token name="BottomSurface">0</token>
         <CoordinateFrame name="CFrame">
@@ -1407,9 +1779,9 @@
         <token name="TopSurface">0</token>
       </Properties>
     </Item>
-    <Item class="Part" referent="59">
+    <Item class="Part" referent="71">
       <Properties>
-        <string name="Name">Part41</string>
+        <string name="Name">Part53</string>
         <bool name="Anchored">true</bool>
         <token name="BottomSurface">0</token>
         <CoordinateFrame name="CFrame">
@@ -1439,9 +1811,9 @@
         <token name="TopSurface">0</token>
       </Properties>
     </Item>
-    <Item class="Part" referent="60">
+    <Item class="Part" referent="72">
       <Properties>
-        <string name="Name">Part42</string>
+        <string name="Name">Part54</string>
         <bool name="Anchored">true</bool>
         <token name="BottomSurface">0</token>
         <CoordinateFrame name="CFrame">
@@ -1471,9 +1843,9 @@
         <token name="TopSurface">0</token>
       </Properties>
     </Item>
-    <Item class="Part" referent="61">
+    <Item class="Part" referent="73">
       <Properties>
-        <string name="Name">Part43</string>
+        <string name="Name">Part55</string>
         <bool name="Anchored">true</bool>
         <token name="BottomSurface">0</token>
         <CoordinateFrame name="CFrame">
@@ -1503,9 +1875,9 @@
         <token name="TopSurface">0</token>
       </Properties>
     </Item>
-    <Item class="Part" referent="62">
+    <Item class="Part" referent="74">
       <Properties>
-        <string name="Name">Part44</string>
+        <string name="Name">Part56</string>
         <bool name="Anchored">true</bool>
         <token name="BottomSurface">0</token>
         <CoordinateFrame name="CFrame">
@@ -1531,378 +1903,6 @@
           <X>0.3375</X>
           <Y>0.3375</Y>
           <Z>0.3375</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-    </Item>
-    <Item class="Part" referent="63">
-      <Properties>
-        <string name="Name">Part45</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>0.567</X>
-          <Y>2.7</Y>
-          <Z>-1.4175</Z>
-          <R00>0.000000000000000061232</R00>
-          <R01>0</R01>
-          <R02>1</R02>
-          <R10>0.17365</R10>
-          <R11>0.98481</R11>
-          <R12>-0.000000000000000010633</R12>
-          <R20>-0.98481</R20>
-          <R21>0.17365</R21>
-          <R22>0.000000000000000060302</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
-        <token name="Material">288</token>
-        <Vector3 name="size">
-          <X>0.320625</X>
-          <Y>0.108</Y>
-          <Z>0.135</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-    </Item>
-    <Item class="Part" referent="64">
-      <Properties>
-        <string name="Name">Part46</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>0.4910355</X>
-          <Y>2.650725</Y>
-          <Z>-1.1383065</Z>
-          <R00>0.5</R00>
-          <R01>0</R01>
-          <R02>0.86603</R02>
-          <R10>0.15038</R10>
-          <R11>0.98481</R11>
-          <R12>-0.086824</R12>
-          <R20>-0.85287</R20>
-          <R21>0.17365</R21>
-          <R22>0.4924</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
-        <token name="Material">288</token>
-        <Vector3 name="size">
-          <X>0.320625</X>
-          <Y>0.108</Y>
-          <Z>0.135</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-    </Item>
-    <Item class="Part" referent="65">
-      <Properties>
-        <string name="Name">Part47</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>0.2835</X>
-          <Y>2.61468</Y>
-          <Z>-0.93393</Z>
-          <R00>0.86603</R00>
-          <R01>0</R01>
-          <R02>0.5</R02>
-          <R10>0.086824</R10>
-          <R11>0.98481</R11>
-          <R12>-0.15038</R12>
-          <R20>-0.4924</R20>
-          <R21>0.17365</R21>
-          <R22>0.85287</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
-        <token name="Material">288</token>
-        <Vector3 name="size">
-          <X>0.320625</X>
-          <Y>0.108</Y>
-          <Z>0.135</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-    </Item>
-    <Item class="Part" referent="66">
-      <Properties>
-        <string name="Name">Part48</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>0.0000000000000000347193</X>
-          <Y>2.601585</Y>
-          <Z>-0.859113</Z>
-          <R00>1</R00>
-          <R01>0</R01>
-          <R02>0</R02>
-          <R10>0</R10>
-          <R11>0.98481</R11>
-          <R12>-0.17365</R12>
-          <R20>0</R20>
-          <R21>0.17365</R21>
-          <R22>0.98481</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
-        <token name="Material">288</token>
-        <Vector3 name="size">
-          <X>0.320625</X>
-          <Y>0.108</Y>
-          <Z>0.135</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-    </Item>
-    <Item class="Part" referent="67">
-      <Properties>
-        <string name="Name">Part49</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>-0.2835</X>
-          <Y>2.61468</Y>
-          <Z>-0.93393</Z>
-          <R00>0.86603</R00>
-          <R01>0</R01>
-          <R02>-0.5</R02>
-          <R10>-0.086824</R10>
-          <R11>0.98481</R11>
-          <R12>-0.15038</R12>
-          <R20>0.4924</R20>
-          <R21>0.17365</R21>
-          <R22>0.85287</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
-        <token name="Material">288</token>
-        <Vector3 name="size">
-          <X>0.320625</X>
-          <Y>0.108</Y>
-          <Z>0.135</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-    </Item>
-    <Item class="Part" referent="68">
-      <Properties>
-        <string name="Name">Part50</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>-0.4910355</X>
-          <Y>2.650725</Y>
-          <Z>-1.1383065</Z>
-          <R00>0.5</R00>
-          <R01>0</R01>
-          <R02>-0.86603</R02>
-          <R10>-0.15038</R10>
-          <R11>0.98481</R11>
-          <R12>-0.086824</R12>
-          <R20>0.85287</R20>
-          <R21>0.17365</R21>
-          <R22>0.4924</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
-        <token name="Material">288</token>
-        <Vector3 name="size">
-          <X>0.320625</X>
-          <Y>0.108</Y>
-          <Z>0.135</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-    </Item>
-    <Item class="Part" referent="69">
-      <Properties>
-        <string name="Name">Part51</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>-0.567</X>
-          <Y>2.7</Y>
-          <Z>-1.4175</Z>
-          <R00>0.000000000000000061232</R00>
-          <R01>0</R01>
-          <R02>-1</R02>
-          <R10>-0.17365</R10>
-          <R11>0.98481</R11>
-          <R12>-0.000000000000000010633</R12>
-          <R20>0.98481</R20>
-          <R21>0.17365</R21>
-          <R22>0.000000000000000060302</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
-        <token name="Material">288</token>
-        <Vector3 name="size">
-          <X>0.320625</X>
-          <Y>0.108</Y>
-          <Z>0.135</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-    </Item>
-    <Item class="Part" referent="70">
-      <Properties>
-        <string name="Name">Part52</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>-0.4910355</X>
-          <Y>2.749275</Y>
-          <Z>-1.69668</Z>
-          <R00>-0.5</R00>
-          <R01>0</R01>
-          <R02>-0.86603</R02>
-          <R10>-0.15038</R10>
-          <R11>0.98481</R11>
-          <R12>0.086824</R12>
-          <R20>0.85287</R20>
-          <R21>0.17365</R21>
-          <R22>-0.4924</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
-        <token name="Material">288</token>
-        <Vector3 name="size">
-          <X>0.320625</X>
-          <Y>0.108</Y>
-          <Z>0.135</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-    </Item>
-    <Item class="Part" referent="71">
-      <Properties>
-        <string name="Name">Part53</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>-0.2835</X>
-          <Y>2.78532</Y>
-          <Z>-1.90107</Z>
-          <R00>-0.86603</R00>
-          <R01>0</R01>
-          <R02>-0.5</R02>
-          <R10>-0.086824</R10>
-          <R11>0.98481</R11>
-          <R12>0.15038</R12>
-          <R20>0.4924</R20>
-          <R21>0.17365</R21>
-          <R22>-0.85287</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
-        <token name="Material">288</token>
-        <Vector3 name="size">
-          <X>0.320625</X>
-          <Y>0.108</Y>
-          <Z>0.135</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-    </Item>
-    <Item class="Part" referent="72">
-      <Properties>
-        <string name="Name">Part54</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>-0.00000000000000010415655</X>
-          <Y>2.798415</Y>
-          <Z>-1.97586</Z>
-          <R00>-1</R00>
-          <R01>0</R01>
-          <R02>-0.00000000000000012246</R02>
-          <R10>-0.000000000000000021266</R10>
-          <R11>0.98481</R11>
-          <R12>0.17365</R12>
-          <R20>0.0000000000000001206</R20>
-          <R21>0.17365</R21>
-          <R22>-0.98481</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
-        <token name="Material">288</token>
-        <Vector3 name="size">
-          <X>0.320625</X>
-          <Y>0.108</Y>
-          <Z>0.135</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-    </Item>
-    <Item class="Part" referent="73">
-      <Properties>
-        <string name="Name">Part55</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>0.2835</X>
-          <Y>2.78532</Y>
-          <Z>-1.90107</Z>
-          <R00>-0.86603</R00>
-          <R01>0</R01>
-          <R02>0.5</R02>
-          <R10>0.086824</R10>
-          <R11>0.98481</R11>
-          <R12>0.15038</R12>
-          <R20>-0.4924</R20>
-          <R21>0.17365</R21>
-          <R22>-0.85287</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
-        <token name="Material">288</token>
-        <Vector3 name="size">
-          <X>0.320625</X>
-          <Y>0.108</Y>
-          <Z>0.135</Z>
-        </Vector3>
-        <token name="TopSurface">0</token>
-      </Properties>
-    </Item>
-    <Item class="Part" referent="74">
-      <Properties>
-        <string name="Name">Part56</string>
-        <bool name="Anchored">true</bool>
-        <token name="BottomSurface">0</token>
-        <CoordinateFrame name="CFrame">
-          <X>0.4910355</X>
-          <Y>2.749275</Y>
-          <Z>-1.69668</Z>
-          <R00>-0.5</R00>
-          <R01>0</R01>
-          <R02>0.86603</R02>
-          <R10>0.15038</R10>
-          <R11>0.98481</R11>
-          <R12>0.086824</R12>
-          <R20>-0.85287</R20>
-          <R21>0.17365</R21>
-          <R22>-0.4924</R22>
-        </CoordinateFrame>
-        <bool name="CanCollide">false</bool>
-        <bool name="CastShadow">false</bool>
-        <Color3uint8 name="Color3uint8">15909198</Color3uint8>
-        <token name="Material">288</token>
-        <Vector3 name="size">
-          <X>0.320625</X>
-          <Y>0.108</Y>
-          <Z>0.135</Z>
         </Vector3>
         <token name="TopSurface">0</token>
       </Properties>

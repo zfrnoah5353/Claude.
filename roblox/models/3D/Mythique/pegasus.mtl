@@ -1,0 +1,78 @@
+# Sweet Pets Factory - pegasus
+newmtl Mat_FFF6FB
+Kd 1.0000 0.9216 0.9647
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Gold_F2C14E
+Kd 0.8879 0.5333 0.0762
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Neon_F2C14E
+Kd 0.8879 0.5333 0.0762
+Ka 0 0 0
+Ke 0.8879 0.5333 0.0762
+d 1.000
+illum 2
+
+newmtl Mat_FFD6EC
+Kd 1.0000 0.6724 0.8388
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_2B1B3A
+Kd 0.0242 0.0110 0.0423
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FF8FB8
+Kd 1.0000 0.2747 0.4793
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_7FD6FF
+Kd 0.2122 0.6724 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FFB3E6
+Kd 1.0000 0.4508 0.7913
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_B9E8FF
+Kd 0.4851 0.8070 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FFFFFF
+Kd 1.0000 1.0000 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Neon_FF8FB8
+Kd 1.0000 0.2747 0.4793
+Ka 0 0 0
+Ke 1.0000 0.2747 0.4793
+d 0.700
+illum 2
+

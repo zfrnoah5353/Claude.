@@ -1,0 +1,50 @@
+# Sweet Pets Factory - fudge_dragon
+newmtl Mat_2E1A12
+Kd 0.0273 0.0103 0.0060
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_B58A6A
+Kd 0.4621 0.2542 0.1441
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 0.950
+illum 2
+
+newmtl Mat_5A3424
+Kd 0.1022 0.0343 0.0176
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FFD23F
+Kd 1.0000 0.6445 0.0497
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_2B1B3A
+Kd 0.0242 0.0110 0.0423
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FFFFFF
+Kd 1.0000 1.0000 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FF8FB0
+Kd 1.0000 0.2747 0.4342
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 0.850
+illum 2
+

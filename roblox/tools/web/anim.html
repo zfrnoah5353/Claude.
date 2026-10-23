@@ -1,0 +1,39 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#fff;font:600 15px sans-serif;color:#3B2A5A}</style>
+<script type="importmap">{"imports":{"three":"./three.module.js"}}</script></head><body>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+const q = new URLSearchParams(location.search);
+const files = q.get('files').split(',');
+const clipName = q.get('clip') || 'ability';
+const frames = +(q.get("frames") || 6), tile = +(q.get("tile") || 220);
+const W = (frames + 1) * tile, H = files.length * tile;
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setSize(W, H); renderer.setScissorTest(true); document.body.appendChild(renderer.domElement);
+const loader = new GLTFLoader();
+for (let r = 0; r < files.length; r++) {
+  const gltf = await loader.loadAsync(files[r]);
+  const scene = new THREE.Scene(); scene.background = new THREE.Color('#F3EEFF');
+  scene.add(new THREE.AmbientLight(0xffffff, 1.6));
+  const d = new THREE.DirectionalLight(0xffffff, 2.2); d.position.set(-3, 6, -5); scene.add(d);
+  scene.add(gltf.scene);
+  const box = new THREE.Box3().setFromObject(gltf.scene); const c = box.getCenter(new THREE.Vector3()); const size = box.getSize(new THREE.Vector3()).length();
+  const cam = new THREE.PerspectiveCamera(30, 1, 0.1, 500); const dist = size * 1.7;
+  cam.position.set(c.x + dist * 0.55, c.y + dist * 0.35, c.z - dist * 0.8); cam.lookAt(c);
+  const mixer = new THREE.AnimationMixer(gltf.scene);
+  const clip = gltf.animations.find(a => a.name === clipName);
+  const act = mixer.clipAction(clip); act.play();
+  const y = H - (r + 1) * tile;
+  const label = document.createElement('div');
+  label.textContent = files[r].split('/').pop().replace('.glb', '') + ' · ' + clipName + ' (' + gltf.animations.map(a => a.name).join('/') + ')';
+  label.style.cssText = `position:absolute;left:4px;top:${r * tile + 4}px;width:${tile - 8}px`;
+  document.body.appendChild(label);
+  for (let f = 0; f < frames; f++) {
+    mixer.setTime(f * 2 / frames);
+    const x = (f + 1) * tile;
+    renderer.setViewport(x, y, tile, tile); renderer.setScissor(x, y, tile, tile);
+    renderer.render(scene, cam);
+  }
+}
+document.title = 'done';
+</script></body></html>

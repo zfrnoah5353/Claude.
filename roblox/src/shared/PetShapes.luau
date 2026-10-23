@@ -102,7 +102,19 @@ local B = {}
 B.__index = B
 
 function Shapes.builder()
-	return setmetatable({ parts = {}, stack = {}, p = { 0, 0, 0 }, r = I }, B)
+	return setmetatable({ parts = {}, stack = {}, p = { 0, 0, 0 }, r = I, bones = {}, boneStack = { 0 } }, B)
+end
+
+-- Os d'animation : toutes les pièces ajoutées jusqu'à endBone() suivent cet os.
+-- pivot est le point de rotation (dans le repère courant). Les os s'emboîtent.
+function B:bone(name, pivot, extra)
+	local parent = self.boneStack[#self.boneStack]
+	table.insert(self.bones, { name = name, pivot = add(self.p, mv(self.r, pivot)), parent = parent, axis = extra and extra.axis })
+	table.insert(self.boneStack, #self.bones)
+end
+
+function B:endBone()
+	table.remove(self.boneStack)
 end
 
 -- Ouvre un sous-repère (position, rotation) ; pop() pour revenir.
@@ -130,6 +142,7 @@ function B:add(shape, size, pos, rot, color, opt)
 		alpha = opt.alpha or 0,
 		tag = opt.tag,
 		pivot = opt.pivot, -- centre de rotation des pièces SpinZ
+		bone = self.boneStack[#self.boneStack], -- 0 = aucun os
 		name = opt.name or shape,
 	})
 end
@@ -201,6 +214,11 @@ end
 -- Anneau de blocs dans le plan XZ local (le tourner pour un anneau vertical)
 function B:ring(center, rot, radius, n, seg, color, opt)
 	self:push(center, rot)
+	-- un anneau qui tourne tourne sur lui-même : son centre sert de pivot
+	if opt and opt.tag and not opt.pivot then
+		opt = table.clone(opt)
+		opt.pivot = { self.p[1], self.p[2], self.p[3] }
+	end
 	local w = 2 * math.pi * radius / n * 1.08
 	for i = 0, n - 1 do
 		local a = i / n * math.pi * 2
@@ -349,7 +367,9 @@ species.king = function(b, c)
 	end
 	b:ball(0.18, { 0, 1.12, -0.52 }, "FF3B6B", { mat = "neon" })
 	-- cape
+	b:bone("Cape", { 0, 0.1, 0.62 })
 	b:box({ 1.3, 1.1, 0.12 }, { 0, -0.45, 0.62 }, "C8102E", { -12, 0, 0 })
+	b:endBone()
 end
 
 species.dragon = function(b, c)
@@ -359,17 +379,21 @@ species.dragon = function(b, c)
 		b:ball(0.1, { 0.15 * s, 0.12, -1.0 }, BLACK)
 		b:chain({ { 0.42 * s, 0.85, 0.15 }, { 0.6 * s, 1.3, 0.45 }, { 0.66 * s, 1.55, 0.85 } }, { 0.26, 0.18, 0.08 }, c.accent, "cyl")
 		-- ailes : 3 baleines + membrane
+		b:bone(if s < 0 then "WingL" else "WingR", { 0.62 * s, -0.25, 0.5 })
 		b:push({ 0.62 * s, -0.25, 0.5 }, { 0, 25 * s, -55 * s })
 		b:box({ 0.08, 1.2, 0.08 }, { 0, 0.6, 0 }, c.dark)
 		b:box({ 0.06, 1.0, 0.7 }, { 0, 0.55, 0.35 }, c.belly, nil, { alpha = 0.05 })
 		b:box({ 0.08, 0.9, 0.08 }, { 0, 0.45, 0.7 }, c.dark, { -20, 0, 0 })
 		b:pop()
+		b:endBone()
 	end
 	for i = 0, 3 do
 		b:spike({ 0, 1.0 - i * 0.38, 0.55 + i * 0.12 }, 0.24 - i * 0.03, c.accent, { 35 + i * 15, 0, 0 })
 	end
+	b:bone("Tail", { 0, -0.7, 0.6 })
 	b:chain({ { 0, -0.7, 0.6 }, { 0, -0.75, 1.1 }, { 0.15, -0.5, 1.5 } }, { 0.4, 0.28, 0.16 }, c.body, "cyl")
 	b:spike({ 0.15, -0.45, 1.6 }, 0.25, c.accent, { 60, 0, 0 })
+	b:endBone()
 	cuteFace(b, 0.4, -0.72, 0.38, c)
 end
 
@@ -389,9 +413,11 @@ species.unicorn = function(b, c)
 	for i, col in mane do
 		b:ball(0.5 - i * 0.04, { -0.45 + i * 0.05, 1.0 - i * 0.28, 0.45 + i * 0.08 }, col)
 	end
+	b:bone("Tail", { 0, -0.6, 0.75 })
 	for i, col in mane do
 		b:ball(0.35, { 0, -0.6 - i * 0.04, 0.75 + i * 0.15 }, col)
 	end
+	b:endBone()
 	cuteFace(b, 0.4, -0.75, 0.36, c)
 end
 
@@ -413,7 +439,9 @@ species.phantom = function(b, c)
 		b:ball(0.6, { math.cos(a) * 0.55, -0.85, math.sin(a) * 0.5 }, c.body, { alpha = 0.12, name = "Body" })
 	end
 	for _, s in { -1, 1 } do
+		b:bone(if s < 0 then "ArmL" else "ArmR", { 0.7 * s, 0.15, -0.1 })
 		b:ell({ 0.35, 0.6, 0.3 }, { 0.85 * s, -0.05, -0.1 }, c.body, { 0, 0, 30 * s }, { alpha = 0.12 })
+		b:endBone()
 	end
 	b:ring({ 0, 1.35, 0 }, { 10, 0, 0 }, 0.5, 14, { nil, 0.08, 0.1 }, "FFE27A", { mat = "neon", tag = "SpinY" })
 	cuteFace(b, 0.35, -0.7, 0.32, { glow = c.glow or "B9F3FF" })
@@ -425,8 +453,10 @@ species.golem = function(b, c)
 	b:box({ 1.0, 0.7, 0.2 }, { 0, -0.3, -0.62 }, c.belly)
 	for _, s in { -1, 1 } do
 		b:ball(0.45, { 0.5 * s, 1.25, 0 }, c.body)
+		b:bone(if s < 0 then "ArmL" else "ArmR", { 1.1 * s, 0.2, -0.05 })
 		b:box({ 0.5, 1.05, 0.55 }, { 1.15 * s, -0.3, -0.05 }, c.body, { 0, 0, 8 * s })
 		b:box({ 0.6, 0.35, 0.65 }, { 1.2 * s, -0.9, -0.1 }, c.dark)
+		b:endBone()
 		b:box({ 0.6, 0.45, 0.65 }, { 0.45 * s, -1.0, 0 }, c.dark)
 		b:spike({ 0.8 * s, 0.45, 0.1 }, 0.35, c.dark, { 0, 0, -30 * s })
 	end
@@ -446,32 +476,42 @@ species.pegasus = function(b, c)
 	b:ell({ 1.15, 1.1, 2.1 }, { 0, 0, 0.2 }, c.body, nil, { name = "Body" })
 	for _, x in { -0.38, 0.38 } do
 		for _, z in { -0.45, 0.85 } do
+			b:bone("Leg", { x, -0.15, z })
 			b:box({ 0.28, 1.0, 0.3 }, { x, -0.65, z }, c.body)
 			b:box({ 0.34, 0.22, 0.38 }, { x, -1.12, z - 0.02 }, GOLD, nil, { mat = "metal" })
+			b:endBone()
 		end
 	end
+	b:bone("Head", { 0, 0.35, -0.6 })
 	b:box({ 0.55, 1.0, 0.6 }, { 0, 0.7, -0.75 }, c.body, { -30, 0, 0 })
 	b:box({ 0.62, 0.6, 0.85 }, { 0, 1.3, -1.15 }, c.body, { 15, 0, 0 })
 	b:box({ 0.48, 0.42, 0.45 }, { 0, 1.12, -1.6 }, c.belly, { 15, 0, 0 })
 	for _, s in { -1, 1 } do
 		b:spike({ 0.2 * s, 1.7, -1.0 }, 0.22, c.body, { -10, 0, -10 * s })
 		b:box({ 0.08, 0.12, 0.05 }, { 0.26 * s, 1.38, -1.58 }, BLACK)
+	end
+	local mane = { "FF8FB8", "7FD6FF", "FFB3E6", "B9E8FF" }
+	for i = 1, 6 do
+		b:ball(0.42, { 0, 1.5 - i * 0.2, -0.95 + i * 0.12 }, mane[(i - 1) % 4 + 1])
+	end
+	b:ring({ 0, 2.0, -1.05 }, { 10, 0, 0 }, 0.42, 12, { nil, 0.08, 0.1 }, GOLD, { mat = "neon", tag = "SpinY" })
+	b:endBone()
+	for _, s in { -1, 1 } do
 		-- grandes ailes de plumes
+		b:bone(if s < 0 then "WingL" else "WingR", { 0.5 * s, 0.45, -0.1 })
 		b:push({ 0.5 * s, 0.45, -0.1 }, { 0, 0, -40 * s })
 		for k = 0, 5 do
 			b:ell({ 0.26, 2.3 - k * 0.25, 0.55 }, { 0, 1.1 - k * 0.08, k * 0.34 }, if k % 2 == 0 then WHITE else c.belly, { -k * 11, 0, 0 })
 		end
 		b:ell({ 0.2, 1.2, 0.4 }, { 0, 2.0, -0.05 }, c.accent, { 12, 0, 0 }, { mat = "neon", alpha = 0.3 })
 		b:pop()
+		b:endBone()
 	end
-	local mane = { "FF8FB8", "7FD6FF", "FFB3E6", "B9E8FF" }
-	for i = 1, 6 do
-		b:ball(0.42, { 0, 1.5 - i * 0.2, -0.95 + i * 0.12 }, mane[(i - 1) % 4 + 1])
-	end
+	b:bone("Tail", { 0, 0.2, 1.3 })
 	for i = 1, 5 do
 		b:ball(0.4 - i * 0.03, { 0, 0.2 - i * 0.15, 1.35 + i * 0.15 }, mane[(i - 1) % 4 + 1])
 	end
-	b:ring({ 0, 2.0, -1.05 }, { 10, 0, 0 }, 0.42, 12, { nil, 0.08, 0.1 }, GOLD, { mat = "neon", tag = "SpinY" })
+	b:endBone()
 end
 
 -- Cerbère guimauve, chien à trois têtes (Grèce)
@@ -479,12 +519,15 @@ species.cerberus = function(b, c)
 	b:ell({ 1.7, 1.3, 2.0 }, { 0, -0.2, 0.3 }, c.body, nil, { name = "Body" })
 	for _, x in { -0.5, 0.5 } do
 		for _, z in { -0.4, 0.9 } do
+			b:bone("Leg", { x, -0.45, z })
 			b:box({ 0.38, 0.75, 0.4 }, { x, -0.8, z }, c.body)
 			b:box({ 0.44, 0.18, 0.5 }, { x, -1.12, z - 0.05 }, c.dark)
+			b:endBone()
 		end
 	end
 	local heads = { { -0.72, 0.65, -0.75, -20 }, { 0, 0.95, -0.95, 0 }, { 0.72, 0.65, -0.75, 20 } }
 	for i, h in heads do
+		b:bone("Head" .. i, { h[1], h[2] - 0.35, h[3] + 0.25 })
 		b:push({ h[1], h[2], h[3] }, { 0, h[4], 0 })
 		b:ell({ 0.85, 0.8, 0.8 }, { 0, 0, 0 }, c.body, nil, { name = "Body" })
 		b:box({ 0.45, 0.32, 0.45 }, { 0, -0.12, -0.45 }, c.belly)
@@ -499,9 +542,12 @@ species.cerberus = function(b, c)
 			b:spike({ math.cos(a) * 0.38, -0.42, math.sin(a) * 0.38 + 0.05 }, 0.14, GOLD, { 0, -math.deg(a), 90 }, { mat = "metal" })
 		end
 		b:pop()
+		b:endBone()
 	end
+	b:bone("Tail", { 0, -0.1, 1.2 })
 	b:chain({ { 0, -0.1, 1.2 }, { 0, 0.3, 1.6 }, { 0, 0.75, 1.75 } }, { 0.3, 0.22, 0.14 }, c.body, "cyl")
 	b:ball(0.45, { 0, 0.95, 1.78 }, c.glow or "FF4FD8", { mat = "neon", alpha = 0.2 })
+	b:endBone()
 end
 
 -- Sphinx praliné (Égypte)
@@ -512,6 +558,7 @@ species.sphinx = function(b, c)
 		b:box({ 0.45, 0.25, 0.25 }, { 0.48 * s, -0.98, -1.4 }, c.belly)
 		b:box({ 0.35, 0.6, 0.9 }, { 0.78 * s, -0.75, 0.9 }, c.body)
 	end
+	b:bone("Head", { 0, 0.1, -0.5 })
 	b:ell({ 1.05, 1.1, 1.0 }, { 0, 0.45, -0.75 }, c.belly)
 	-- némès rayé
 	b:box({ 1.45, 1.1, 0.55 }, { 0, 0.62, -0.1 }, GOLD, nil, { mat = "metal" })
@@ -529,23 +576,30 @@ species.sphinx = function(b, c)
 	b:box({ 0.22, 0.5, 0.2 }, { 0, -0.25, -1.2 }, GOLD, nil, { mat = "metal" })
 	b:chain({ { 0, 1.05, -1.2 }, { 0, 1.35, -1.25 }, { 0, 1.45, -1.12 } }, { 0.14, 0.12, 0.16 }, GOLD, "cyl", { mat = "metal" })
 	fierceEyes(b, 0.55, -1.22, 0.24, c.glow or "5BE7FF", 5)
+	b:endBone()
+	b:bone("Tail", { 0, -0.65, 1.55 })
 	b:chain({ { 0, -0.65, 1.55 }, { 0.3, -0.85, 1.95 }, { 0.6, -0.8, 2.2 } }, { 0.22, 0.17, 0.12 }, c.body, "cyl")
 	b:ball(0.3, { 0.65, -0.78, 2.25 }, "2C5DAA")
+	b:endBone()
 end
 
 -- Anubis cacao (Égypte)
 species.anubis = function(b, c)
 	b:ell({ 1.2, 1.5, 1.2 }, { 0, -0.35, 0.15 }, c.body, nil, { name = "Body" })
+	b:bone("Head", { 0, 0.6, -0.15 })
 	b:box({ 0.75, 0.75, 0.85 }, { 0, 0.95, -0.15 }, c.body, nil, { name = "Body" })
 	b:box({ 0.36, 0.36, 0.75 }, { 0, 0.82, -0.8 }, c.body)
 	b:ball(0.16, { 0, 0.9, -1.18 }, BLACK)
 	for _, s in { -1, 1 } do
 		b:box({ 0.26, 0.95, 0.12 }, { 0.24 * s, 1.75, -0.05 }, c.body, { 0, 0, -8 * s })
 		b:box({ 0.12, 0.7, 0.04 }, { 0.24 * s, 1.72, -0.12 }, GOLD, { 0, 0, -8 * s }, { mat = "metal" })
+	end
+	fierceEyes(b, 1.02, -0.58, 0.2, c.glow or "FFD54A", 10)
+	b:endBone()
+	for _, s in { -1, 1 } do
 		b:box({ 0.3, 0.95, 0.35 }, { 0.42 * s, -0.95, -0.1 }, c.body)
 		b:ring({ 0.62 * s, -0.25, -0.2 }, { 0, 0, 90 }, 0.2, 8, { nil, 0.12, 0.08 }, GOLD, { mat = "metal" })
 	end
-	fierceEyes(b, 1.02, -0.58, 0.2, c.glow or "FFD54A", 10)
 	-- collier wesekh
 	for k = 0, 2 do
 		b:ring({ 0, 0.42 - k * 0.14, -0.05 }, { 12, 0, 0 }, 0.5 + k * 0.08, 16, { nil, 0.12, 0.14 }, if k == 1 then "2C5DAA" else GOLD, { mat = if k == 1 then "plastic" else "metal" })
@@ -564,37 +618,44 @@ species.fenrir = function(b, c)
 	b:ell({ 1.4, 1.35, 1.0 }, { 0, 0.05, -0.5 }, c.body, nil, { name = "Body" })
 	for _, x in { -0.45, 0.45 } do
 		for _, z in { -0.6, 1.0 } do
+			b:bone("Leg", { x, -0.2, z })
 			b:box({ 0.38, 1.0, 0.42 }, { x, -0.65, z }, c.body)
 			b:box({ 0.46, 0.2, 0.56 }, { x, -1.1, z - 0.06 }, c.dark)
 			for k = -1, 1 do
 				b:spike({ x + k * 0.13, -1.12, z - 0.36 }, 0.12, WHITE, { -80, 0, 0 })
 			end
+			if z < 0 then
+				b:ring({ x, -0.85, -0.6 }, nil, 0.3, 8, { nil, 0.1, 0.1 }, GOLD, { mat = "metal" })
+			end
+			b:endBone()
 		end
 	end
-	-- chaînes brisées dorées
-	for _, x in { -0.45, 0.45 } do
-		b:ring({ x, -0.85, -0.6 }, nil, 0.3, 8, { nil, 0.1, 0.1 }, GOLD, { mat = "metal" })
-	end
+	b:bone("Head", { 0, 0.45, -0.6 })
 	b:box({ 0.9, 0.8, 0.8 }, { 0, 0.6, -0.85 }, c.body, { -30, 0, 0 })
 	b:box({ 1.0, 0.85, 0.95 }, { 0, 1.0, -1.2 }, c.body, nil, { name = "Body" })
 	b:box({ 0.6, 0.42, 0.78 }, { 0, 0.82, -1.9 }, c.body)
-	b:box({ 0.55, 0.14, 0.65 }, { 0, 0.55, -1.82 }, c.belly)
 	b:ball(0.18, { 0, 0.98, -2.3 }, BLACK)
+	b:bone("Jaw", { 0, 0.62, -1.5 })
+	b:box({ 0.55, 0.14, 0.65 }, { 0, 0.55, -1.82 }, c.belly)
 	for k = -2, 2 do
 		b:spike({ k * 0.1, 0.6, -2.12 }, 0.1, WHITE, { 180, 0, 0 })
 	end
+	b:endBone()
 	for _, s in { -1, 1 } do
 		b:spike({ 0.32 * s, 1.55, -1.05 }, 0.42, c.dark, { -10, 0, -15 * s })
 	end
 	fierceEyes(b, 1.1, -1.68, 0.3, c.glow or "FF2A3D", 15)
+	b:endBone()
 	for i = 0, 6 do
 		b:spike({ 0, 1.45 - i * 0.16, -0.9 + i * 0.36 }, 0.42 - i * 0.03, if i % 2 == 0 then c.glow or "FF2A3D" else c.dark, { 25, 0, 0 }, { mat = if i % 2 == 0 then "neon" else "plastic" })
 	end
 	for _, s in { -1, 1 } do
 		b:spike({ 0.65 * s, 0.65, -0.5 }, 0.35, c.dark, { 0, 0, -50 * s })
 	end
+	b:bone("Tail", { 0, 0.2, 1.3 })
 	b:chain({ { 0, 0.2, 1.3 }, { 0, 0.75, 2.0 }, { 0, 1.25, 2.3 } }, { 0.45, 0.35, 0.2 }, c.body, "block")
 	b:spike({ 0, 1.4, 2.35 }, 0.3, c.glow or "FF2A3D", { 20, 0, 0 }, { mat = "neon" })
+	b:endBone()
 	-- lune de sang et cristaux flottants
 	b:ball(1.5, { 0, 2.6, 1.6 }, c.glow or "FF2A3D", { mat = "neon", alpha = 0.15 })
 	for k = 0, 5 do
@@ -612,16 +673,26 @@ species.mammoth = function(b, c)
 	end
 	b:ell({ 1.6, 1.5, 1.4 }, { 0, 0.8, -1.25 }, c.body, nil, { name = "Body" })
 	for _, s in { -1, 1 } do
+		b:bone(if s < 0 then "EarL" else "EarR", { 0.75 * s, 0.85, -1.15 })
 		b:ell({ 0.3, 1.1, 0.9 }, { 0.88 * s, 0.85, -1.0 }, c.dark, { 0, 20 * s, 10 * s })
+		b:endBone()
 		b:chain({ { 0.4 * s, 0.35, -1.75 }, { 0.62 * s, -0.35, -2.25 }, { 0.5 * s, -0.35, -2.85 }, { 0.3 * s, 0.05, -3.0 } }, { 0.3, 0.26, 0.2, 0.1 }, c.belly, "cyl")
 		b:ring({ 0.62 * s, -0.35, -2.25 }, { 0, 0, 80 * s }, 0.17, 8, { nil, 0.12, 0.1 }, GOLD, { mat = "metal" })
 		b:box({ 0.14, 0.14, 0.05 }, { 0.36 * s, 1.0, -1.93 }, c.glow or "FFE27A", nil, { mat = "neon" })
 		for _, z in { -0.6, 1.0 } do
+			b:bone("Leg", { 0.72 * s, -0.1, z })
 			b:pole(1.1, 0.75, { 0.72 * s, -0.6, z }, c.body)
 			b:disc(0.82, 0.18, { 0.72 * s, -1.08, z }, GOLD, nil, { mat = "metal" })
+			b:endBone()
 		end
 	end
-	b:chain({ { 0, 0.55, -1.9 }, { 0, -0.15, -2.2 }, { 0, -0.75, -2.05 }, { 0, -0.95, -1.8 } }, { 0.5, 0.42, 0.34, 0.28 }, c.body, "cyl")
+	b:bone("Trunk", { 0, 0.55, -1.9 })
+	b:chain({ { 0, 0.55, -1.9 }, { 0, -0.15, -2.2 } }, { 0.5, 0.42 }, c.body, "cyl")
+	b:bone("TrunkTip", { 0, -0.15, -2.2 })
+	b:ball(0.43, { 0, -0.15, -2.2 }, c.body)
+	b:chain({ { 0, -0.15, -2.2 }, { 0, -0.75, -2.05 }, { 0, -0.95, -1.8 } }, { 0.42, 0.34, 0.28 }, c.body, "cyl")
+	b:endBone()
+	b:endBone()
 	-- tour d'horloge sur le dos
 	b:box({ 0.7, 0.9, 0.7 }, { 0, 1.65, 0.4 }, GOLD_DARK, nil, { mat = "metal" })
 	b:ball(0.4, { 0, 1.75, 0.03 }, c.glow or "FFE27A", { mat = "neon" })
@@ -639,6 +710,7 @@ end
 species.griffin = function(b, c)
 	b:ell({ 1.3, 1.25, 2.1 }, { 0, 0, 0.35 }, c.body, nil, { name = "Body" })
 	b:ell({ 1.2, 1.3, 1.0 }, { 0, 0.35, -0.5 }, c.belly)
+	b:bone("Head", { 0, 0.75, -0.6 })
 	b:ell({ 0.95, 0.95, 1.0 }, { 0, 1.15, -0.85 }, c.belly, nil, { name = "Body" })
 	b:push({ 0, 1.05, -1.4 }, { 90, 0, 0 })
 	b:spike({ 0, 0, 0 }, 0.42, GOLD, nil, { mat = "metal" })
@@ -646,19 +718,30 @@ species.griffin = function(b, c)
 	fierceEyes(b, 1.3, -1.28, 0.25, c.glow or "7FD6FF", 18)
 	for _, s in { -1, 1 } do
 		b:spike({ 0.25 * s, 1.65, -0.7 }, 0.3, c.belly, { -30, 0, -15 * s })
+	end
+	b:endBone()
+	for _, s in { -1, 1 } do
+		b:bone("Leg", { 0.42 * s, -0.15, -0.55 })
 		b:box({ 0.3, 0.9, 0.35 }, { 0.42 * s, -0.6, -0.55 }, GOLD, nil, { mat = "metal" })
 		for k = -1, 1 do
 			b:spike({ 0.42 * s + k * 0.1, -1.1, -0.82 }, 0.12, BLACK, { -80, 0, 0 })
 		end
+		b:endBone()
+		b:bone("Leg", { 0.45 * s, -0.15, 1.0 })
 		b:box({ 0.36, 0.95, 0.42 }, { 0.45 * s, -0.6, 1.0 }, c.body)
+		b:endBone()
+		b:bone(if s < 0 then "WingL" else "WingR", { 0.55 * s, 0.45, 0.1 })
 		b:push({ 0.55 * s, 0.45, 0.1 }, { 0, 0, -55 * s })
 		for k = 0, 5 do
 			b:ell({ 0.2, 1.9 - k * 0.22, 0.42 }, { 0, 0.9 - k * 0.07, k * 0.28 }, if k % 2 == 0 then c.accent else c.dark, { -k * 9, 0, 0 })
 		end
 		b:pop()
+		b:endBone()
 	end
+	b:bone("Tail", { 0, -0.1, 1.35 })
 	b:chain({ { 0, -0.1, 1.35 }, { 0, -0.4, 1.9 }, { 0, -0.1, 2.35 } }, { 0.22, 0.18, 0.14 }, c.body, "cyl")
 	b:ball(0.4, { 0, 0.05, 2.45 }, c.accent)
+	b:endBone()
 	for k = 0, 5 do
 		local a = k / 6 * math.pi * 2
 		b:ball(0.22, { math.cos(a) * 2.0, 1.2 + (k % 2) * 0.4, math.sin(a) * 2.0 }, "FFF3B8", { mat = "neon", tag = "SpinY" })
@@ -673,18 +756,8 @@ species.longdragon = function(b, c)
 		table.insert(pts, { math.sin(t * math.pi * 2.2) * 1.0, 1.5 - t * 1.9 + math.sin(t * math.pi * 2) * 0.45, -0.8 + t * 3.0 })
 		table.insert(ds, 0.85 - t * 0.55)
 	end
-	b:chain(pts, ds, c.body, "cyl", { name = "Body" })
-	for i = 2, 11, 2 do
-		b:spike(add(pts[i], { 0, ds[i] * 0.5, 0 }), 0.3, c.accent, { 20, 0, 0 })
-		b:ball(ds[i] * 0.7, add(pts[i], { 0, -ds[i] * 0.3, -0.05 }), c.belly)
-	end
-	for _, i in { 3, 8 } do
-		for _, s in { -1, 1 } do
-			b:chain({ pts[i], add(pts[i], { 0.55 * s, -0.55, -0.1 }), add(pts[i], { 0.65 * s, -0.95, -0.3 }) }, { 0.18, 0.15, 0.12 }, c.body, "cyl")
-			b:spike(add(pts[i], { 0.65 * s, -1.05, -0.4 }), 0.14, GOLD, { -90, 0, 0 }, { mat = "metal" })
-		end
-	end
 	local head = add(pts[1], { 0, 0.25, -0.7 })
+	b:bone("Head", pts[1])
 	b:box({ 1.0, 0.75, 1.1 }, head, c.body, nil, { name = "Body" })
 	b:box({ 0.75, 0.4, 0.7 }, add(head, { 0, -0.15, -0.75 }), c.belly)
 	b:ball(0.16, add(head, { 0.18, 0.02, -1.12 }), BLACK)
@@ -697,7 +770,29 @@ species.longdragon = function(b, c)
 		b:chain({ add(head, { 0.3 * s, 0.3, 0.2 }), add(head, { 0.5 * s, 0.85, 0.5 }), add(head, { 0.75 * s, 1.05, 0.4 }) }, { 0.14, 0.1, 0.06 }, GOLD, "cyl", { mat = "metal" })
 		b:chain({ add(head, { 0.25 * s, -0.15, -0.85 }), add(head, { 0.8 * s, -0.25, -1.0 }), add(head, { 1.2 * s, -0.05, -0.8 }) }, { 0.05, 0.04, 0.03 }, GOLD, "cyl")
 	end
+	b:endBone()
 	b:ball(0.55, add(head, { 0, -0.4, -1.4 }), "BFF8FF", { mat = "neon", alpha = 0.2, tag = "SpinY" })
+	-- corps : un os par segment, emboîtés de la tête vers la queue
+	for i = 1, #pts - 1 do
+		b:bone("Seg" .. i, pts[i])
+		b:seg(pts[i], pts[i + 1], (ds[i] + ds[i + 1]) / 2, c.body, "cyl", { name = "Body" })
+		b:ball(ds[i + 1] * 1.02, pts[i + 1], c.body, { name = "Body" })
+		if (i + 1) % 2 == 0 then
+			local p = pts[i + 1]
+			b:spike(add(p, { 0, ds[i + 1] * 0.5, 0 }), 0.3, c.accent, { 20, 0, 0 })
+			b:ball(ds[i + 1] * 0.7, add(p, { 0, -ds[i + 1] * 0.3, -0.05 }), c.belly)
+		end
+		if i + 1 == 3 or i + 1 == 8 then
+			local p = pts[i + 1]
+			for _, s in { -1, 1 } do
+				b:chain({ p, add(p, { 0.55 * s, -0.55, -0.1 }), add(p, { 0.65 * s, -0.95, -0.3 }) }, { 0.18, 0.15, 0.12 }, c.body, "cyl")
+				b:spike(add(p, { 0.65 * s, -1.05, -0.4 }), 0.14, GOLD, { -90, 0, 0 }, { mat = "metal" })
+			end
+		end
+	end
+	for _ = 1, #pts - 1 do
+		b:endBone()
+	end
 end
 
 ---------------------------------------------------------------------------
@@ -719,6 +814,7 @@ species.hydra = function(b, c)
 	for i, x in { -1, -0.5, 0, 0.5, 1 } do
 		local top = { x * 1.5, 2.1 + (1 - math.abs(x)) * 0.5, -0.8 + math.abs(x) * 0.4 }
 		local pts = { { x * 0.55, 0.3, -0.45 }, { x * 1.0, 1.15, -0.75 }, top }
+		b:bone("Neck" .. i, pts[1])
 		b:chain(pts, { 0.5, 0.4, 0.34 }, c.body, "cyl", { name = "Body" })
 		b:spike({ x * 1.0, 1.4, -0.55 }, 0.22, c.accent, { 20, 0, 0 })
 		b:push(top, { 0, -x * 25, 0 })
@@ -732,8 +828,11 @@ species.hydra = function(b, c)
 			b:ring({ 0, 0.38, -0.15 }, nil, 0.32, 10, { nil, 0.12, 0.08 }, GOLD, { mat = "neon" })
 		end
 		b:pop()
+		b:endBone()
 	end
+	b:bone("Tail", { 0, -0.2, 1.5 })
 	b:chain({ { 0, -0.2, 1.5 }, { 0.3, -0.6, 2.2 }, { 0.8, -0.8, 2.6 } }, { 0.6, 0.4, 0.2 }, c.body, "cyl")
+	b:endBone()
 	-- couronne de laurier divine
 	b:ring({ 0, 0.1, 0.35 }, nil, 2.7, 24, { 0.35, 0.08, 0.18 }, "7EE0A0", { mat = "neon", tag = "SpinY" })
 	for k = 0, 7 do
@@ -751,24 +850,30 @@ species.phoenix = function(b, c)
 	b:spike({ 0, 0, 0 }, 0.32, GOLD, nil, { mat = "metal" })
 	b:pop()
 	fierceEyes(b, 1.3, -0.72, 0.2, c.glow or "FFF3B8", 15)
+	b:bone("Crest", { 0, 1.55, -0.2 })
 	for k = -2, 2 do
 		b:ell({ 0.2, 0.95 - math.abs(k) * 0.15, 0.25 }, { k * 0.14, 1.95 - math.abs(k) * 0.08, -0.15 + math.abs(k) * 0.05 }, if k % 2 == 0 then "FFD23F" else "FF7A1F", { 0, 0, -k * 12 }, { mat = "neon" })
 	end
+	b:endBone()
 	local flame = { "D8241F", "FF5A1F", "FF8A1F", "FFB020", "FFE27A" }
 	for _, s in { -1, 1 } do
+		b:bone(if s < 0 then "WingL" else "WingR", { 0.45 * s, 0.6, 0.1 })
 		b:push({ 0.45 * s, 0.6, 0.1 }, { 0, 0, -35 * s })
 		for k = 1, 5 do
 			b:ell({ 0.24, 2.3 - k * 0.2, 0.45 }, { 0, 1.0, (k - 3) * 0.3 }, flame[k], { -(k - 3) * 12, 0, -k * 9 * s }, { mat = if k >= 4 then "neon" else "plastic" })
 		end
 		b:pop()
+		b:endBone()
 		b:box({ 0.12, 0.6, 0.12 }, { 0.25 * s, -0.75, 0 }, GOLD, nil, { mat = "metal" })
 		for k = -1, 1 do
 			b:spike({ 0.25 * s + k * 0.08, -1.08, -0.1 }, 0.1, GOLD, { -80, 0, 0 }, { mat = "metal" })
 		end
 	end
+	b:bone("Tail", { 0, -0.25, 0.5 })
 	for k = -2, 2 do
 		b:ell({ 0.22, 1.6, 0.35 }, { k * 0.22, -0.6, 0.85 }, flame[k + 3], { 55, 0, k * 14 }, { mat = if math.abs(k) <= 1 then "neon" else "plastic" })
 	end
+	b:endBone()
 	-- disque solaire derrière
 	local sun = { 0, 1.1, 0.95 }
 	b:ring(sun, { 90, 0, 0 }, 2.0, 30, { nil, 0.18, 0.22 }, "FFC93C", { mat = "neon", tag = "SpinZ", pivot = sun })
@@ -805,14 +910,27 @@ species.kraken = function(b, c)
 			local wob = math.sin(i * 1.3 + k) * 0.25
 			table.insert(pts, { math.cos(a + wob * 0.2) * rs[i], ys[i], 0.1 + math.sin(a + wob * 0.2) * rs[i] })
 		end
-		b:chain(pts, ds, c.body, "cyl", { name = "Body" })
-		for i = 2, #rs - 1 do
-			b:spike(add(pts[i], { 0, ds[i] * 0.45, 0 }), ds[i] * 0.6, c.accent, { 0, -math.deg(a), -20 })
+		local axis = { -math.sin(a), 0, math.cos(a) }
+		local function deco(i)
+			if i >= 2 and i <= #rs - 1 then
+				b:spike(add(pts[i], { 0, ds[i] * 0.45, 0 }), ds[i] * 0.6, c.accent, { 0, -math.deg(a), -20 })
+			end
+			if i == 2 or i == 4 then
+				local dir = sub(pts[i + 1], pts[i])
+				b:add("cyl", { 0.12, ds[i] * 1.18, ds[i] * 1.18 }, add(pts[i], scale(dir, 0.5)), mul(alongY(dir), euler(0, 0, 90)), GOLD, { mat = "metal" })
+			end
 		end
-		for _, i in { 2, 4 } do
-			local dir = sub(pts[i + 1], pts[i])
-			b:add("cyl", { 0.12, ds[i] * 1.18, ds[i] * 1.18 }, add(pts[i], scale(dir, 0.5)), mul(alongY(dir), euler(0, 0, 90)), GOLD, { mat = "metal" })
-		end
+		b:bone("Tentacle" .. (k + 1), pts[1], { axis = axis })
+		b:chain({ pts[1], pts[2], pts[3] }, { ds[1], ds[2], ds[3] }, c.body, "cyl", { name = "Body" })
+		deco(2)
+		b:bone("TentacleTip" .. (k + 1), pts[3], { axis = axis })
+		b:ball(ds[3] * 1.02, pts[3], c.body, { name = "Body" })
+		b:chain({ pts[3], pts[4], pts[5], pts[6] }, { ds[3], ds[4], ds[5], ds[6] }, c.body, "cyl", { name = "Body" })
+		deco(3)
+		deco(4)
+		deco(5)
+		b:endBone()
+		b:endBone()
 	end
 	-- runes et bulles divines
 	for k = 0, 5 do
@@ -850,8 +968,11 @@ species.leviathan = function(b, c)
 		end
 	end
 	local head = { 0, 3.35, -1.05 }
+	b:bone("Head", { 0, 3.1, -0.7 })
 	b:box({ 0.95, 0.75, 1.35 }, head, c.body, { 10, 0, 0 }, { name = "Body" })
+	b:bone("Jaw", add(head, { 0, -0.35, 0.3 }))
 	b:box({ 0.8, 0.25, 1.0 }, add(head, { 0, -0.5, -0.25 }), c.belly, { 25, 0, 0 })
+	b:endBone()
 	for k = -2, 2 do
 		b:spike(add(head, { k * 0.15, -0.3, -0.75 }), 0.12, WHITE, { 180, 0, 0 })
 	end
@@ -869,6 +990,7 @@ species.leviathan = function(b, c)
 		b:box({ 0.08, 0.9, 0.6 }, { 0, 0.45, 0 }, c.dark, nil, { alpha = 0.1 })
 		b:pop()
 	end
+	b:endBone()
 	-- piliers dorés et bulles qui flottent autour
 	for k = 0, 5 do
 		local a = k / 6 * math.pi * 2
@@ -877,6 +999,165 @@ species.leviathan = function(b, c)
 		b:box({ 0.55, 0.18, 0.55 }, add(p, { 0, 0.55, 0 }), GOLD, nil, { mat = "metal", tag = "SpinY" })
 		b:ball(0.3, add(p, { 0.6, 1.2, 0 }), "9FF2EA", { mat = "neon", alpha = 0.4, tag = "SpinY" })
 	end
+end
+
+
+---------------------------------------------------------------------------
+-- Animations des pets rares : 3 états (idle = repos, move = déplacement,
+-- ability = attaque). Une piste fait osciller un os autour d'un axe :
+--   angle = base + amp * sin(2π · freq · t + phase)   (degrés)
+-- bone = "Nom" ou "Préfixe*" (tous les os qui commencent ainsi, avec un
+-- décalage de phase step entre chacun) ; alt = pattes en diagonale ;
+-- axis = "own" pour utiliser l'axe propre à l'os (tentacules).
+-- Les fréquences sont des multiples de 0,5 Hz : les boucles durent 2 s.
+---------------------------------------------------------------------------
+local X, Y, Z = { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 }
+
+local function wings(amp, freq, axis)
+	return { bone = "WingL", axis = axis or Z, amp = -amp, freq = freq }, { bone = "WingR", axis = axis or Z, amp = amp, freq = freq }
+end
+
+local function legs(amp, freq)
+	return { bone = "Leg*", axis = X, amp = amp, freq = freq, alt = true }
+end
+
+local anims = {}
+
+anims.dragon = {
+	idle = { { wings(15, 1) }, { bone = "Tail", axis = Y, amp = 10, freq = 1 } },
+	move = { { wings(35, 2.5) }, { bone = "Tail", axis = Y, amp = 15, freq = 1.5 } },
+	ability = { { wings(50, 3) }, { bone = "Tail", axis = Y, amp = 25, freq = 2 } },
+}
+anims.king = {
+	idle = { { bone = "Cape", axis = X, amp = 6, freq = 1 } },
+	move = { { bone = "Cape", axis = X, amp = 14, freq = 2, base = -10 } },
+	ability = { { bone = "Cape", axis = X, amp = 14, freq = 2, base = -10 } },
+}
+anims.unicorn = {
+	idle = { { bone = "Tail", axis = Y, amp = 15, freq = 1 } },
+	move = { { bone = "Tail", axis = Y, amp = 25, freq = 2 } },
+	ability = { { bone = "Tail", axis = Y, amp = 25, freq = 2 } },
+}
+anims.phantom = {
+	idle = { { bone = "ArmL", axis = Z, amp = -15, freq = 1 }, { bone = "ArmR", axis = Z, amp = 15, freq = 1 } },
+	move = { { bone = "ArmL", axis = X, amp = 20, freq = 2 }, { bone = "ArmR", axis = X, amp = 20, freq = 2, phase = math.pi } },
+	ability = { { bone = "ArmL", axis = Z, amp = -40, freq = 3 }, { bone = "ArmR", axis = Z, amp = 40, freq = 3 } },
+}
+anims.golem = {
+	idle = { { bone = "ArmL", axis = X, amp = 5, freq = 0.5 }, { bone = "ArmR", axis = X, amp = 5, freq = 0.5, phase = math.pi } },
+	move = { { bone = "ArmL", axis = X, amp = 25, freq = 2 }, { bone = "ArmR", axis = X, amp = 25, freq = 2, phase = math.pi } },
+	ability = { { bone = "ArmL", axis = X, amp = 70, freq = 2, base = -30 }, { bone = "ArmR", axis = X, amp = 70, freq = 2, base = -30, phase = math.pi } },
+}
+anims.pegasus = {
+	idle = { { wings(10, 1) }, { bone = "Head", axis = X, amp = 5, freq = 0.5 }, { bone = "Tail", axis = Y, amp = 15, freq = 1 } },
+	move = { { wings(30, 2) }, legs(25, 2), { bone = "Head", axis = X, amp = 6, freq = 2 }, { bone = "Tail", axis = Y, amp = 20, freq = 2 } },
+	ability = { { wings(45, 3) }, { bone = "Head", axis = X, amp = 12, freq = 1.5, base = -10 } },
+}
+anims.cerberus = {
+	idle = { { bone = "Head*", axis = X, amp = 8, freq = 1, step = 1.0 }, { bone = "Tail", axis = Y, amp = 20, freq = 2 } },
+	move = { legs(25, 2), { bone = "Head*", axis = X, amp = 6, freq = 2, step = 0.8 }, { bone = "Tail", axis = Y, amp = 35, freq = 3 } },
+	ability = { { bone = "Head*", axis = X, amp = 22, freq = 3, step = 1.2 }, { bone = "Tail", axis = Y, amp = 40, freq = 4 } },
+}
+anims.sphinx = {
+	idle = { { bone = "Head", axis = X, amp = 3, freq = 0.5 }, { bone = "Tail", axis = Y, amp = 20, freq = 1 } },
+	move = { { bone = "Head", axis = Y, amp = 6, freq = 1 }, { bone = "Tail", axis = Y, amp = 25, freq = 2 } },
+	ability = { { bone = "Head", axis = X, amp = 12, freq = 1, base = -8 }, { bone = "Tail", axis = Y, amp = 30, freq = 3 } },
+}
+anims.anubis = {
+	idle = { { bone = "Head", axis = Y, amp = 12, freq = 0.5 } },
+	move = { { bone = "Head", axis = X, amp = 6, freq = 2 } },
+	ability = { { bone = "Head", axis = X, amp = 18, freq = 2 } },
+}
+anims.fenrir = {
+	idle = { { bone = "Head", axis = X, amp = 4, freq = 0.5 }, { bone = "Jaw", axis = X, amp = 3, freq = 1, base = 3 }, { bone = "Tail", axis = Y, amp = 15, freq = 1 } },
+	move = { legs(28, 2), { bone = "Head", axis = X, amp = 5, freq = 2 }, { bone = "Tail", axis = Y, amp = 25, freq = 2 } },
+	ability = { { bone = "Head", axis = X, amp = 10, freq = 1, base = -18 }, { bone = "Jaw", axis = X, amp = 15, freq = 3, base = 15 }, { bone = "Tail", axis = Y, amp = 30, freq = 3 } },
+}
+anims.mammoth = {
+	idle = { { bone = "Trunk", axis = X, amp = 10, freq = 0.5 }, { bone = "TrunkTip", axis = X, amp = 15, freq = 0.5, phase = 0.8 }, { bone = "EarL", axis = Y, amp = 12, freq = 1 }, { bone = "EarR", axis = Y, amp = -12, freq = 1 } },
+	move = { legs(18, 1.5), { bone = "Trunk", axis = X, amp = 15, freq = 1.5 }, { bone = "TrunkTip", axis = X, amp = 20, freq = 1.5, phase = 0.8 } },
+	ability = { { bone = "Trunk", axis = X, amp = 35, freq = 1.5, base = -20 }, { bone = "TrunkTip", axis = X, amp = 40, freq = 1.5, phase = 0.8 }, { bone = "EarL", axis = Y, amp = 25, freq = 2 }, { bone = "EarR", axis = Y, amp = -25, freq = 2 } },
+}
+anims.griffin = {
+	idle = { { wings(12, 1) }, { bone = "Head", axis = Y, amp = 8, freq = 0.5 }, { bone = "Tail", axis = Y, amp = 15, freq = 1 } },
+	move = { { wings(35, 2.5) }, legs(25, 2.5), { bone = "Tail", axis = Y, amp = 20, freq = 2.5 } },
+	ability = { { wings(55, 3) }, { bone = "Head", axis = X, amp = 15, freq = 3 } },
+}
+anims.longdragon = {
+	idle = { { bone = "Seg*", axis = Y, amp = 7, freq = 0.5, step = 0.6 }, { bone = "Seg*", axis = X, amp = 4, freq = 1, step = 0.6 }, { bone = "Head", axis = Y, amp = 8, freq = 0.5 } },
+	move = { { bone = "Seg*", axis = Y, amp = 10, freq = 1, step = 0.7 }, { bone = "Head", axis = X, amp = 6, freq = 1 } },
+	ability = { { bone = "Seg*", axis = Y, amp = 14, freq = 1.5, step = 0.8 }, { bone = "Head", axis = X, amp = 15, freq = 3 } },
+}
+anims.hydra = {
+	idle = { { bone = "Neck*", axis = X, amp = 6, freq = 0.5, step = 1.1 }, { bone = "Neck*", axis = Z, amp = 7, freq = 0.5, step = 1.7 }, { bone = "Tail", axis = Y, amp = 10, freq = 1 } },
+	move = { legs(20, 2), { bone = "Neck*", axis = X, amp = 8, freq = 1, step = 1.1 }, { bone = "Tail", axis = Y, amp = 18, freq = 2 } },
+	ability = { { bone = "Neck*", axis = X, amp = 25, freq = 2, step = 1.3 }, { bone = "Tail", axis = Y, amp = 20, freq = 2 } },
+}
+anims.phoenix = {
+	idle = { { wings(12, 1) }, { bone = "Crest", axis = X, amp = 8, freq = 2 }, { bone = "Tail", axis = X, amp = 8, freq = 1 } },
+	move = { { wings(35, 2.5) }, { bone = "Tail", axis = X, amp = 12, freq = 2.5 } },
+	ability = { { wings(55, 3.5) }, { bone = "Crest", axis = X, amp = 15, freq = 4 }, { bone = "Tail", axis = X, amp = 15, freq = 3.5 } },
+}
+anims.kraken = {
+	idle = { { bone = "Tentacle*", axis = "own", amp = 8, freq = 0.5, step = 0.8 }, { bone = "TentacleTip*", axis = "own", amp = 16, freq = 0.5, step = 0.8, phase = 0.9 } },
+	move = { { bone = "Tentacle*", axis = "own", amp = 12, freq = 1, step = 0.8 }, { bone = "TentacleTip*", axis = "own", amp = 22, freq = 1, step = 0.8, phase = 0.9 } },
+	ability = { { bone = "Tentacle*", axis = "own", amp = 22, freq = 1.5, step = 0.8 }, { bone = "TentacleTip*", axis = "own", amp = 35, freq = 1.5, step = 0.8, phase = 0.9 } },
+}
+anims.leviathan = {
+	idle = { { bone = "Head", axis = Y, amp = 10, freq = 0.5 }, { bone = "Head", axis = X, amp = 5, freq = 1 }, { bone = "Jaw", axis = X, amp = 4, freq = 1, base = 4 } },
+	move = { { bone = "Head", axis = Y, amp = 14, freq = 1 }, { bone = "Jaw", axis = X, amp = 4, freq = 1, base = 4 } },
+	ability = { { bone = "Head", axis = X, amp = 20, freq = 2, base = -5 }, { bone = "Jaw", axis = X, amp = 25, freq = 4, base = 20 } },
+}
+
+-- Aplatissement : wings() renvoie deux pistes
+for _, clips in anims do
+	for name, tracks in clips do
+		local flat = {}
+		for _, t in tracks do
+			if t.bone == nil then
+				for _, part in t do
+					table.insert(flat, part)
+				end
+			else
+				table.insert(flat, t)
+			end
+		end
+		clips[name] = flat
+	end
+end
+
+Shapes.anims = anims
+Shapes.CLIP_LENGTH = 2
+
+-- Associe chaque piste aux os concernés. Renvoie, par état, une liste
+-- { bone = index, axis = {x,y,z}, amp, freq, phase, base } prête à évaluer.
+function Shapes.bindAnims(speciesName, bones)
+	local clips = anims[speciesName]
+	if not clips or #bones == 0 then
+		return nil
+	end
+	local out = {}
+	for state, tracks in clips do
+		local list = {}
+		for _, t in tracks do
+			local prefix = if string.sub(t.bone, -1) == "*" then string.sub(t.bone, 1, -2) else nil
+			local j = 0
+			for bi, bone in bones do
+				local match = if prefix then string.sub(bone.name, 1, #prefix) == prefix and not (prefix == "Tentacle" and string.sub(bone.name, 1, 11) == "TentacleTip") else bone.name == t.bone
+				if match then
+					j += 1
+					local phase = (t.phase or 0) + (j - 1) * (t.step or 0)
+					if t.alt and (j == 2 or j == 3) then
+						phase += math.pi
+					end
+					local axis = if t.axis == "own" then (bone.axis or X) else t.axis
+					table.insert(list, { bone = bi, axis = axis, amp = t.amp, freq = t.freq, phase = phase, base = t.base or 0 })
+				end
+			end
+		end
+		out[state] = list
+	end
+	return out
 end
 
 ---------------------------------------------------------------------------
@@ -890,7 +1171,7 @@ function Shapes.build(speciesName, colors)
 	local b = Shapes.builder()
 	local f = species[speciesName] or species.bunny
 	f(b, colors)
-	return b.parts
+	return b.parts, b.bones
 end
 
 return Shapes

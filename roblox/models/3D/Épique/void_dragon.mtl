@@ -1,0 +1,50 @@
+# Sweet Pets Factory - void_dragon
+newmtl Mat_14102A
+Kd 0.0070 0.0052 0.0232
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_6B5BD6
+Kd 0.1470 0.1046 0.6724
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 0.950
+illum 2
+
+newmtl Mat_2A2350
+Kd 0.0232 0.0168 0.0802
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_C04BD8
+Kd 0.5271 0.0704 0.6867
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_2B1B3A
+Kd 0.0242 0.0110 0.0423
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FFFFFF
+Kd 1.0000 1.0000 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FF8FB0
+Kd 1.0000 0.2747 0.4342
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 0.850
+illum 2
+
