@@ -3,6 +3,7 @@
 <script type="module">
 import * as THREE from 'three';
 import { build, clips, triCount } from './forge.js';
+import { loadPet } from './load.js';
 const q = new URLSearchParams(location.search);
 const ids = (q.get('pets') || 'kraken').split(',');
 const W = +(q.get('w') || 900), H = +(q.get('h') || 700);
@@ -19,7 +20,7 @@ R.setScissorTest(true);
 const info = [];
 let k = 0;
 for (const id of ids) {
-  const F = (await import(`./pets/${id}.js?${Date.now()}`)).default();
+  const F = await loadPet(id);
   const rig = build(F);
   const scene = new THREE.Scene(); scene.background = new THREE.Color('#f4f2f8');
   scene.add(new THREE.HemisphereLight(0xffffff, 0x8a7fa0, 1.6));

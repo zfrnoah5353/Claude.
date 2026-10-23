@@ -4,9 +4,10 @@
 import * as THREE from 'three';
 import { GLTFExporter } from './jsm/exporters/GLTFExporter.js';
 import { build, clips, triCount } from './forge.js';
+import { loadPet } from './load.js';
 import { toOBJ } from './rig.js';
 window.exportOne = async (id) => {
-  const F = (await import(`./pets/${id}.js`)).default();
+  const F = await loadPet(id);
   const rig = build(F);
   const cl = clips(F, rig);
   const scene = new THREE.Scene(); scene.add(rig.root);

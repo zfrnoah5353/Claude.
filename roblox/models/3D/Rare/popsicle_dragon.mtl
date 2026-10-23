@@ -1,6 +1,6 @@
 # Sweet Pets Factory - popsicle_dragon
-newmtl Mat_C4621A
-Kd 0.5520 0.1221 0.0103
+newmtl Mat_FF9A3C
+Kd 1.0000 0.3231 0.0452
 Ka 0 0 0
 Ke 0.0000 0.0000 0.0000
 d 1.000
@@ -10,25 +10,11 @@ newmtl Mat_FFE0B8
 Kd 1.0000 0.7454 0.4793
 Ka 0 0 0
 Ke 0.0000 0.0000 0.0000
-d 0.950
-illum 2
-
-newmtl Mat_FF9A3C
-Kd 1.0000 0.3231 0.0452
-Ka 0 0 0
-Ke 0.0000 0.0000 0.0000
 d 1.000
 illum 2
 
-newmtl Mat_7FD6FF
-Kd 0.2122 0.6724 1.0000
-Ka 0 0 0
-Ke 0.0000 0.0000 0.0000
-d 1.000
-illum 2
-
-newmtl Mat_2B1B3A
-Kd 0.0242 0.0110 0.0423
+newmtl Mat_3A2A4A
+Kd 0.0423 0.0232 0.0685
 Ka 0 0 0
 Ke 0.0000 0.0000 0.0000
 d 1.000
@@ -41,10 +27,80 @@ Ke 0.0000 0.0000 0.0000
 d 1.000
 illum 2
 
-newmtl Mat_FF8FB0
-Kd 1.0000 0.2747 0.4342
+newmtl Mat_2A1F3D
+Kd 0.0232 0.0137 0.0467
 Ka 0 0 0
 Ke 0.0000 0.0000 0.0000
-d 0.850
+d 1.000
+illum 2
+
+newmtl Neon_FFFFFF
+Kd 1.0000 1.0000 1.0000
+Ka 0 0 0
+Ke 1.0000 1.0000 1.0000
+d 1.000
+illum 2
+
+newmtl Mat_FF9AB8
+Kd 1.0000 0.3231 0.4793
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Gold_7FD6FF
+Kd 0.2122 0.6724 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_C4621A
+Kd 0.5520 0.1221 0.0103
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_E8344E
+Kd 0.8070 0.0343 0.0762
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_3DBE5C
+Kd 0.0467 0.5149 0.1070
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_d2947e
+Kd 0.6445 0.2961 0.2086
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_7FD6FF
+Kd 0.2122 0.6724 1.0000
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_FF5A8A
+Kd 1.0000 0.1022 0.2542
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Gold_E8B64A
+Kd 0.8070 0.4678 0.0685
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
 illum 2
 

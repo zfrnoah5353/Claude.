@@ -42,7 +42,7 @@ Pour importer un modèle dans Studio : clic droit sur Workspace › **Insert fro
 - **`.glb`** : modèle en couleurs, avec ses animations `idle`, `move` et `ability` (boucles de 2 s). Il s'ouvre dans Blender, dans la Visionneuse 3D de Windows ou dans n'importe quel moteur.
 - **`.obj` + `.mtl`** : modèle statique en couleurs, le format le plus compatible.
 
-Les 13 Mythiques et Divins sont des modèles détaillés à facettes, de 3 000 à 22 000 triangles : fourrure en éclats, piques de cristal, écailles, objets qui flottent autour (lune de sang, engrenages, colonnes, épaves). Leurs fichiers sources sont dans `tools/web/pets/`.
+Les 13 Mythiques et Divins sont des modèles détaillés à facettes, de 3 000 à 22 000 triangles : fourrure en éclats, piques de cristal, écailles, objets qui flottent autour (lune de sang, engrenages, colonnes, épaves). Les 40 autres pets (Commun → Légendaire) sont plus simples : 10 espèces mignonnes, décorées selon leur monde (bonbons, baies, chocolat, café, glace, sundae, planètes, étoiles). Plus un pet est rare, plus il a d'accessoires : décoration sur la tête dès Peu commun, collier dès Rare, objets en orbite dès Épique, auréole dorée pour les Légendaires. Les fichiers sources sont dans `tools/web/pets/`.
 
 Pour les mettre dans Roblox : onglet Accueil › **Import 3D** (3D Importer), puis choisis le `.glb` ou le `.obj`. Chaque maillage reste sous la limite de 20 000 triangles. Dans le jeu, les pets restent construits en pièces Roblox, plus simples que ces fichiers.
 

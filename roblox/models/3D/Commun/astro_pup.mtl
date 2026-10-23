@@ -13,6 +13,34 @@ Ke 0.0000 0.0000 0.0000
 d 1.000
 illum 2
 
+newmtl Mat_3A2A4A
+Kd 0.0423 0.0232 0.0685
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Mat_2A1F3D
+Kd 0.0232 0.0137 0.0467
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
+newmtl Neon_FFFFFF
+Kd 1.0000 1.0000 1.0000
+Ka 0 0 0
+Ke 1.0000 1.0000 1.0000
+d 1.000
+illum 2
+
+newmtl Mat_FF9AB8
+Kd 1.0000 0.3231 0.4793
+Ka 0 0 0
+Ke 0.0000 0.0000 0.0000
+d 1.000
+illum 2
+
 newmtl Mat_9AA6E0
 Kd 0.3231 0.3813 0.7454
 Ka 0 0 0
@@ -20,31 +48,17 @@ Ke 0.0000 0.0000 0.0000
 d 1.000
 illum 2
 
-newmtl Mat_2B1B3A
-Kd 0.0242 0.0110 0.0423
+newmtl Mat_FF6F91
+Kd 1.0000 0.1590 0.2831
 Ka 0 0 0
 Ke 0.0000 0.0000 0.0000
 d 1.000
 illum 2
 
-newmtl Mat_FF5A6E
-Kd 1.0000 0.1022 0.1559
+newmtl Mat_d4d9f1
+Kd 0.6584 0.6939 0.8796
 Ka 0 0 0
 Ke 0.0000 0.0000 0.0000
 d 1.000
-illum 2
-
-newmtl Gold_F2C14E
-Kd 0.8879 0.5333 0.0762
-Ka 0 0 0
-Ke 0.0000 0.0000 0.0000
-d 1.000
-illum 2
-
-newmtl Mat_FF8FB0
-Kd 1.0000 0.2747 0.4342
-Ka 0 0 0
-Ke 0.0000 0.0000 0.0000
-d 0.850
 illum 2
 

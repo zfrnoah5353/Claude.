@@ -1,0 +1,382 @@
+[
+{
+"id": "gumdrop_bunny",
+"name": "Gumdrop Bunny",
+"species": "bunny",
+"body": "FF9EC4",
+"belly": "FFE3EE",
+"rarity": 1,
+"egg": "candy"
+},
+{
+"id": "jelly_cat",
+"name": "Jelly Cat",
+"species": "cat",
+"body": "7FD6FF",
+"belly": "E3F6FF",
+"rarity": 2,
+"egg": "candy"
+},
+{
+"id": "cupcake_pup",
+"name": "Cupcake Pup",
+"species": "pup",
+"body": "FFC97A",
+"belly": "FFF0D6",
+"rarity": 3,
+"egg": "candy",
+"dark": "C98A4A"
+},
+{
+"id": "lollipop_fox",
+"name": "Lollipop Fox",
+"species": "fox",
+"body": "FF8A4C",
+"belly": "FFF0DD",
+"rarity": 4,
+"egg": "candy"
+},
+{
+"id": "mochi_dragon",
+"name": "Mochi Dragon",
+"species": "dragon",
+"body": "B69CFF",
+"belly": "EBE2FF",
+"rarity": 5,
+"egg": "candy",
+"dark": "6B5BD6",
+"accent": "FFD23F"
+},
+{
+"id": "berry_bunny",
+"name": "Berry Bunny",
+"species": "bunny",
+"body": "C86BD8",
+"belly": "F3D6F8",
+"rarity": 1,
+"egg": "berry"
+},
+{
+"id": "cotton_cloud",
+"name": "Cotton Cloud",
+"species": "cloud",
+"body": "CFEFFF",
+"belly": "FFFFFF",
+"rarity": 2,
+"egg": "berry"
+},
+{
+"id": "grape_cat",
+"name": "Grape Cat",
+"species": "cat",
+"body": "8E6BE8",
+"belly": "E2D8FF",
+"rarity": 3,
+"egg": "berry"
+},
+{
+"id": "razz_dragon",
+"name": "Razzberry Dragon",
+"species": "dragon",
+"body": "FF5A8A",
+"belly": "FFD6E2",
+"rarity": 4,
+"egg": "berry",
+"dark": "B8285A",
+"accent": "FFD23F"
+},
+{
+"id": "donut_unicorn",
+"name": "Donut Unicorn",
+"species": "unicorn",
+"body": "FFF1F8",
+"belly": "FFFFFF",
+"rarity": 5,
+"egg": "berry"
+},
+{
+"id": "choco_bear",
+"name": "Choco Bear",
+"species": "bear",
+"body": "A8704B",
+"belly": "E8C9A8",
+"rarity": 1,
+"egg": "choco"
+},
+{
+"id": "truffle_pup",
+"name": "Truffle Pup",
+"species": "pup",
+"body": "7A4E36",
+"belly": "C9A07E",
+"rarity": 2,
+"egg": "choco",
+"dark": "4A2C20"
+},
+{
+"id": "cocoa_fox",
+"name": "Cocoa Fox",
+"species": "fox",
+"body": "C47A3D",
+"belly": "F3D9B8",
+"rarity": 3,
+"egg": "choco"
+},
+{
+"id": "fudge_dragon",
+"name": "Fudge Dragon",
+"species": "dragon",
+"body": "5A3424",
+"belly": "B58A6A",
+"rarity": 4,
+"egg": "choco",
+"dark": "2E1A12",
+"accent": "FFD23F"
+},
+{
+"id": "golden_king",
+"name": "Golden Gummy King",
+"species": "king",
+"body": "FFD23F",
+"belly": "FFF1A8",
+"rarity": 5,
+"egg": "choco"
+},
+{
+"id": "mocha_cat",
+"name": "Mocha Cat",
+"species": "cat",
+"body": "B08060",
+"belly": "EAD7C2",
+"rarity": 1,
+"egg": "mocha"
+},
+{
+"id": "caramel_bear",
+"name": "Caramel Bear",
+"species": "bear",
+"body": "E0A040",
+"belly": "FBE3B5",
+"rarity": 2,
+"egg": "mocha"
+},
+{
+"id": "toffee_unicorn",
+"name": "Toffee Unicorn",
+"species": "unicorn",
+"body": "F5D6A8",
+"belly": "FFF4E0",
+"rarity": 3,
+"egg": "mocha"
+},
+{
+"id": "brownie_dragon",
+"name": "Brownie Dragon",
+"species": "dragon",
+"body": "4A2C20",
+"belly": "9C6E52",
+"rarity": 4,
+"egg": "mocha",
+"dark": "2A1810",
+"accent": "FFD23F"
+},
+{
+"id": "choco_phantom",
+"name": "Choco Phantom",
+"species": "phantom",
+"body": "3A2418",
+"belly": "7A5440",
+"rarity": 5,
+"egg": "mocha",
+"glow": "FFC97A"
+},
+{
+"id": "vanilla_bunny",
+"name": "Vanilla Bunny",
+"species": "bunny",
+"body": "FFF6E0",
+"belly": "FFFFFF",
+"rarity": 1,
+"egg": "frost"
+},
+{
+"id": "mint_cat",
+"name": "Mint Cat",
+"species": "cat",
+"body": "7EE0B8",
+"belly": "DDF8EC",
+"rarity": 2,
+"egg": "frost"
+},
+{
+"id": "sorbet_fox",
+"name": "Sorbet Fox",
+"species": "fox",
+"body": "FF7A9A",
+"belly": "FFE0E8",
+"rarity": 3,
+"egg": "frost"
+},
+{
+"id": "frosty_cloud",
+"name": "Frosty Cloud",
+"species": "cloud",
+"body": "A8DCFF",
+"belly": "F0FAFF",
+"rarity": 4,
+"egg": "frost"
+},
+{
+"id": "ice_unicorn",
+"name": "Ice Unicorn",
+"species": "unicorn",
+"body": "CFF3FF",
+"belly": "FFFFFF",
+"rarity": 5,
+"egg": "frost"
+},
+{
+"id": "sundae_pup",
+"name": "Sundae Pup",
+"species": "pup",
+"body": "FFB3C8",
+"belly": "FFFFFF",
+"rarity": 1,
+"egg": "sundae",
+"dark": "E87A9A"
+},
+{
+"id": "cherry_bear",
+"name": "Cherry Bear",
+"species": "bear",
+"body": "E8344E",
+"belly": "FFC6CF",
+"rarity": 2,
+"egg": "sundae"
+},
+{
+"id": "popsicle_dragon",
+"name": "Popsicle Dragon",
+"species": "dragon",
+"body": "FF9A3C",
+"belly": "FFE0B8",
+"rarity": 3,
+"egg": "sundae",
+"dark": "C4621A",
+"accent": "7FD6FF"
+},
+{
+"id": "split_unicorn",
+"name": "Banana Split Unicorn",
+"species": "unicorn",
+"body": "FFE27A",
+"belly": "FFFAE0",
+"rarity": 4,
+"egg": "sundae"
+},
+{
+"id": "frozen_king",
+"name": "Frozen King",
+"species": "king",
+"body": "8FD8FF",
+"belly": "E8F8FF",
+"rarity": 5,
+"egg": "sundae"
+},
+{
+"id": "star_bunny",
+"name": "Star Bunny",
+"species": "bunny",
+"body": "6B5BD6",
+"belly": "B7AEF5",
+"rarity": 1,
+"egg": "nebula"
+},
+{
+"id": "cosmic_cat",
+"name": "Cosmic Cat",
+"species": "cat",
+"body": "4846A8",
+"belly": "9C98EC",
+"rarity": 2,
+"egg": "nebula"
+},
+{
+"id": "comet_fox",
+"name": "Comet Fox",
+"species": "fox",
+"body": "FF6A3C",
+"belly": "FFD0B8",
+"rarity": 3,
+"egg": "nebula"
+},
+{
+"id": "nebula_dragon",
+"name": "Nebula Dragon",
+"species": "dragon",
+"body": "C04BD8",
+"belly": "F0C0FA",
+"rarity": 4,
+"egg": "nebula",
+"dark": "6E2280",
+"accent": "7FD6FF"
+},
+{
+"id": "sugar_phantom",
+"name": "Sugar Phantom",
+"species": "phantom",
+"body": "4B3A8C",
+"belly": "7C6BD0",
+"rarity": 5,
+"egg": "nebula",
+"glow": "B9F3FF"
+},
+{
+"id": "astro_pup",
+"name": "Astro Pup",
+"species": "pup",
+"body": "E0E6FF",
+"belly": "FFFFFF",
+"rarity": 1,
+"egg": "star",
+"dark": "9AA6E0"
+},
+{
+"id": "galaxy_bear",
+"name": "Galaxy Bear",
+"species": "bear",
+"body": "3A3266",
+"belly": "7C6BD0",
+"rarity": 2,
+"egg": "star"
+},
+{
+"id": "meteor_unicorn",
+"name": "Meteor Unicorn",
+"species": "unicorn",
+"body": "FFB86B",
+"belly": "FFF0DA",
+"rarity": 3,
+"egg": "star"
+},
+{
+"id": "void_dragon",
+"name": "Void Dragon",
+"species": "dragon",
+"body": "2A2350",
+"belly": "6B5BD6",
+"rarity": 4,
+"egg": "star",
+"dark": "14102A",
+"accent": "C04BD8"
+},
+{
+"id": "supernova_king",
+"name": "Supernova King",
+"species": "king",
+"body": "FF5A6E",
+"belly": "FFD0D6",
+"rarity": 5,
+"egg": "star"
+}
+]
