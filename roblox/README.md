@@ -84,8 +84,18 @@ L'assistant IA et la traduction utilisent l'API Claude. La partie Manuel et l'Ad
 
 ## Sons
 
-Les sons du jeu sont dans `dist/SweetPets_Sons/` : `click`, `tap`, `coin`, `pop`, `error`, `buy`, `hatch`, `reveal`, `legend` (fichiers `.ogg`). Roblox ne lit que les sons envoyés sur ton compte, il faut donc les importer une fois :
-1. Dans Studio, onglet **Accueil › Importer**, choisis les 9 fichiers `.ogg` et lance l'import. Ils arrivent dans la Boîte à outils › **Inventaire › Audio** (ou dans le Gestionnaire de ressources).
+Les sons sont faits dans l'esprit des simulateurs de pets qui marchent : courts, avec une petite basse, des pièces dont le son monte quand tu en ramasses à la suite, un roulement de tambour avant l'éclosion et une révélation qui grossit avec la rareté.
+
+| Son | Quand |
+| --- | --- |
+| `click`, `open`, `close`, `error` | boutons, ouverture et fermeture des fenêtres, action impossible |
+| `tap`, `break`, `coin` | coup sur un tas, tas cassé, pièces ramassées |
+| `buy`, `quest` | achat, récompense de quête |
+| `hatch` | roulement de tambour et œuf qui craque |
+| `reveal`, `reveal_rare`, `legend`, `divine` | révélation : Commun et Peu commun, Rare et Épique, Légendaire et Mythique (aussi la fusion et le rebirth), Divin |
+
+Les fichiers `.ogg` sont dans `dist/SweetPets_Sons/`. Roblox ne lit que les sons envoyés sur ton compte, il faut donc les importer une fois :
+1. Dans Studio, onglet **Accueil › Importer**, choisis les 14 fichiers `.ogg` et lance l'import. Ils arrivent dans la Boîte à outils › **Inventaire › Audio** (ou dans le Gestionnaire de ressources).
 2. Fais glisser chaque son dans l'Explorer, dans **SoundService › SweetSounds**, en gardant son nom (`click`, `coin`…).
 3. Enregistre le jeu. Le jeu trouve chaque son par son nom.
 

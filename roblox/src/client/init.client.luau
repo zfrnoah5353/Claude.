@@ -41,14 +41,20 @@ end
 local SOUNDS = {
 	-- nom = { volume, son de remplacement, vitesse du remplaçant }
 	click = { 0.35 },
-	coin = { 0.3, "rbxasset://sounds/electronicpingshort.wav", 2.2 },
-	pop = { 0.45, "rbxasset://sounds/swoosh.wav", 1.4 },
-	tap = { 0.4 },
+	open = { 0.3 },
+	close = { 0.25 },
 	error = { 0.4 },
+	tap = { 0.4 },
+	coin = { 0.3, "rbxasset://sounds/electronicpingshort.wav", 2.2 },
+	["break"] = { 0.5, "rbxasset://sounds/swoosh.wav", 1.4 },
+	pop = { 0.45, "rbxasset://sounds/swoosh.wav", 1.4 },
 	buy = { 0.5, "rbxasset://sounds/electronicpingshort.wav", 1.1 },
+	quest = { 0.5, "rbxasset://sounds/electronicpingshort.wav", 1.3 },
 	hatch = { 0.6, "rbxasset://sounds/swoosh.wav", 0.8 },
-	reveal = { 0.55, "rbxasset://sounds/electronicpingshort.wav", 0.9 },
+	reveal = { 0.5, "rbxasset://sounds/electronicpingshort.wav", 0.9 },
+	reveal_rare = { 0.55, "rbxasset://sounds/electronicpingshort.wav", 0.8 },
 	legend = { 0.7, "rbxasset://sounds/electronicpingshort.wav", 0.6 },
+	divine = { 0.85, "rbxasset://sounds/electronicpingshort.wav", 0.5 },
 }
 local soundObjs: { [string]: Sound | false } = {}
 local function soundFor(name: string): Sound?
@@ -90,17 +96,24 @@ local function soundFor(name: string): Sound?
 	return nil
 end
 local lastSound: { [string]: number } = {}
+local coinStreak = 0
 local function play(name: string)
 	if muted then
 		return
 	end
 	local now = os.clock()
-	if now - (lastSound[name] or 0) < 0.06 then
+	local last = lastSound[name] or 0
+	if now - last < 0.06 then
 		return
 	end
 	lastSound[name] = now
 	local snd = soundFor(name)
 	if snd then
+		if name == "coin" then
+			-- pièces ramassées à la suite : le son monte d'un demi-ton à chaque fois (une octave max)
+			coinStreak = if now - last < 1.2 then math.min(coinStreak + 1, 12) else 0
+			snd.PlaybackSpeed = 2 ^ (coinStreak / 12) * (if snd.SoundId:find("rbxasset://") then 2.2 else 1)
+		end
 		SoundService:PlayLocalSound(snd)
 	end
 end
@@ -324,6 +337,9 @@ local onOpen: { [string]: () -> () } = {} -- appelé à l'ouverture d'un panneau
 local current = { name = nil :: string?, sig = "", tab = 1, sel = nil :: number?, scroll = Vector2.zero }
 
 local function closePanel()
+	if current.name then
+		play("close")
+	end
 	current.name = nil
 	panelHost.Visible = false
 	panelHost:ClearAllChildren()
@@ -366,6 +382,7 @@ openPanel = function(name: string)
 		return
 	end
 	if current.name ~= name then
+		play("open")
 		current.tab = 1
 		current.scroll = Vector2.zero
 	end
@@ -1049,7 +1066,7 @@ local function showHatch(data)
 				tag("Auto-supprimé", UI.GRAY)
 			end
 		end
-		play(if best >= Config.LEGENDARY then "legend" else "reveal")
+		play(if best >= Config.DIVINE then "divine" elseif best >= Config.LEGENDARY then "legend" elseif best >= 3 then "reveal_rare" else "reveal")
 		if best >= Config.MYTHIC then
 			-- révélation spéciale : flash, rayons et grand titre
 			local divine = best >= Config.DIVINE
@@ -1480,7 +1497,7 @@ Fx.OnClientEvent:Connect(function(kind: string, data: any)
 			end
 		end
 	elseif kind == "break" then
-		play("pop")
+		play("break")
 		confetti(data.pos, Config.Worlds[data.world].candy)
 	elseif kind == "hatch" then
 		showHatch(data)
@@ -1493,8 +1510,10 @@ Fx.OnClientEvent:Connect(function(kind: string, data: any)
 		if root then
 			floatText(root.Position + Vector3.new(0, 6, 0), data.name .. " niveau " .. data.lvl .. " !", UI.MINT, 24)
 		end
-	elseif kind == "bought" or kind == "claimed" then
+	elseif kind == "bought" then
 		play("buy")
+	elseif kind == "claimed" then
+		play("quest")
 	elseif kind == "fused" then
 		play("legend")
 		current.sel = data.uid
