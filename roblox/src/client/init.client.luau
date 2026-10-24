@@ -32,68 +32,35 @@ local function send(name: string, arg: any?)
 end
 
 ---------------------------------------------------------------------------
--- Sons
--- Les vrais sons du jeu sont dans dist/SweetPets_Sons (click.ogg, coin.ogg…).
--- Importe-les dans Studio et range-les dans SoundService › SweetSounds (voir le
--- README) : chaque Sound est trouvé par son nom. En attendant, les sons
--- intégrés à Roblox servent de remplaçants, et le clic des boutons reste muet.
+-- Sons : sons publics de la bibliothèque Roblox (Roblox, ProSoundEffects, APM),
+-- utilisables dans n'importe quel jeu. Pour en changer un, mets un Sound du même
+-- nom dans SoundService › SweetSounds : il remplace celui de la liste.
 ---------------------------------------------------------------------------
-local SOUNDS = {
-	-- nom = { volume, son de remplacement, vitesse du remplaçant }
-	click = { 0.35 },
-	open = { 0.3 },
-	close = { 0.25 },
-	error = { 0.4 },
-	tap = { 0.4 },
-	coin = { 0.3, "rbxasset://sounds/electronicpingshort.wav", 2.2 },
-	["break"] = { 0.5, "rbxasset://sounds/swoosh.wav", 1.4 },
-	pop = { 0.45, "rbxasset://sounds/swoosh.wav", 1.4 },
-	buy = { 0.5, "rbxasset://sounds/electronicpingshort.wav", 1.1 },
-	quest = { 0.5, "rbxasset://sounds/electronicpingshort.wav", 1.3 },
-	hatch = { 0.6, "rbxasset://sounds/swoosh.wav", 0.8 },
-	reveal = { 0.5, "rbxasset://sounds/electronicpingshort.wav", 0.9 },
-	reveal_rare = { 0.55, "rbxasset://sounds/electronicpingshort.wav", 0.8 },
-	legend = { 0.7, "rbxasset://sounds/electronicpingshort.wav", 0.6 },
-	divine = { 0.85, "rbxasset://sounds/electronicpingshort.wav", 0.5 },
+local SOUNDS: { [string]: { id: number, vol: number, start: number? } } = {
+	click = { id = 15675059323, vol = 0.5 }, -- Roblox_UI_Bright_Click
+	open = { id = 15675012262, vol = 0.35 }, -- Roblox_UI_Whoosh_04
+	close = { id = 17208186900, vol = 0.35 }, -- Roblox GUI - Back
+	error = { id = 17208353912, vol = 0.5 }, -- Roblox GUI - Negative
+	tap = { id = 9113537815, vol = 0.3 }, -- Boink Pop Blip
+	coin = { id = 17208319162, vol = 0.35 }, -- Roblox GUI - Pickup
+	["break"] = { id = 9113959343, vol = 0.6, start = 0.15 }, -- Crack Egg Crunchy
+	pop = { id = 17208204604, vol = 0.45 }, -- Roblox GUI - Bubble
+	buy = { id = 17208380755, vol = 0.5 }, -- Roblox GUI - Purchase
+	quest = { id = 17208361335, vol = 0.5 }, -- Roblox GUI - Notification High
+	hatch = { id = 9125805579, vol = 0.45 }, -- montée qui siffle pendant que l'œuf tremble
+	crack = { id = 9113959071, vol = 0.6, start = 0.16 }, -- l'œuf craque
+	reveal = { id = 15675043410, vol = 0.5 }, -- Roblox_UI_Tonal_Stinger
+	reveal_rare = { id = 17208327798, vol = 0.5 }, -- Roblox GUI - Aura
+	legend = { id = 1845411858, vol = 0.55, start = 0.24 }, -- APM « Top Prize »
+	divine = { id = 9047024260, vol = 0.6 }, -- APM « Epic Win - Stinger 1 »
+	burst = { id = 9116384485, vol = 0.5, start = 0.1 }, -- Magic Burst (avec divine)
 }
-local soundObjs: { [string]: Sound | false } = {}
-local function soundFor(name: string): Sound?
-	local cached = soundObjs[name]
-	if cached then
-		return cached
-	end
-	local info = SOUNDS[name]
-	if not info then
-		return nil
-	end
-	local folder = SoundService:FindFirstChild("SweetSounds")
-	local custom = folder and folder:FindFirstChild(name)
-	if custom and custom:IsA("Sound") and custom.SoundId ~= "" then
-		local snd = UI.new("Sound", { SoundId = custom.SoundId, Volume = info[1] * (custom.Volume / 0.5), Parent = SoundService })
-		soundObjs[name] = snd
-		return snd
-	end
-	if cached == false then
-		return nil
-	end
-	if info[2] then
-		-- remplaçant (sera réévalué si le vrai son est ajouté pendant la partie)
-		local snd = UI.new("Sound", { SoundId = info[2], PlaybackSpeed = info[3], Volume = info[1] * 0.6, Parent = SoundService })
-		task.delay(10, function()
-			if soundObjs[name] == snd then
-				soundObjs[name] = nil
-			end
-		end)
-		soundObjs[name] = snd
-		return snd
-	end
-	soundObjs[name] = false
-	task.delay(10, function()
-		if soundObjs[name] == false then
-			soundObjs[name] = nil
-		end
-	end)
-	return nil
+local sweet = SoundService:FindFirstChild("SweetSounds")
+local soundObjs: { [string]: Sound } = {}
+for name, info in SOUNDS do
+	local custom = sweet and sweet:FindFirstChild(name)
+	local id = if custom and custom:IsA("Sound") and custom.SoundId ~= "" then custom.SoundId else "rbxassetid://" .. info.id
+	soundObjs[name] = UI.new("Sound", { Name = "Sfx_" .. name, SoundId = id, Volume = info.vol, Parent = SoundService })
 end
 local lastSound: { [string]: number } = {}
 local coinStreak = 0
@@ -107,13 +74,23 @@ local function play(name: string)
 		return
 	end
 	lastSound[name] = now
-	local snd = soundFor(name)
-	if snd then
-		if name == "coin" then
-			-- pièces ramassées à la suite : le son monte d'un demi-ton à chaque fois (une octave max)
-			coinStreak = if now - last < 1.2 then math.min(coinStreak + 1, 12) else 0
-			snd.PlaybackSpeed = 2 ^ (coinStreak / 12) * (if snd.SoundId:find("rbxasset://") then 2.2 else 1)
-		end
+	local snd = soundObjs[name]
+	if not snd then
+		return
+	end
+	if name == "coin" then
+		-- pièces ramassées à la suite : le son monte d'un demi-ton à chaque fois (une octave max)
+		coinStreak = if now - last < 1.2 then math.min(coinStreak + 1, 12) else 0
+		snd.PlaybackSpeed = 2 ^ (coinStreak / 12)
+	elseif name == "tap" then
+		snd.PlaybackSpeed = 0.92 + math.random() * 0.2
+	end
+	local start = SOUNDS[name].start
+	if start then
+		-- son local (créé par ce joueur) : on peut sauter le silence du début
+		snd.TimePosition = start
+		snd:Play()
+	else
 		SoundService:PlayLocalSound(snd)
 	end
 end
@@ -1022,6 +999,11 @@ local function showHatch(data)
 		slots[i] = slot
 	end
 	play("hatch")
+	task.delay(0.9, function()
+		if hatchState.open and hatchState.t0 == t0 then
+			play("crack")
+		end
+	end)
 	task.delay(1.0, function()
 		if not hatchState.open or hatchState.t0 ~= t0 then
 			return
@@ -1067,6 +1049,9 @@ local function showHatch(data)
 			end
 		end
 		play(if best >= Config.DIVINE then "divine" elseif best >= Config.LEGENDARY then "legend" elseif best >= 3 then "reveal_rare" else "reveal")
+		if best >= Config.DIVINE then
+			play("burst")
+		end
 		if best >= Config.MYTHIC then
 			-- révélation spéciale : flash, rayons et grand titre
 			local divine = best >= Config.DIVINE

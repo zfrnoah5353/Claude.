@@ -84,22 +84,17 @@ L'assistant IA et la traduction utilisent l'API Claude. La partie Manuel et l'Ad
 
 ## Sons
 
-Les sons sont faits dans l'esprit des simulateurs de pets qui marchent : courts, avec une petite basse, des pièces dont le son monte quand tu en ramasses à la suite, un roulement de tambour avant l'éclosion et une révélation qui grossit avec la rareté.
+Les sons sont déjà dans le jeu, il n'y a rien à importer. Ce sont des sons publics de la bibliothèque Roblox (packs officiels Roblox, ProSoundEffects et APM), utilisables dans n'importe quel jeu. Comme dans les simulateurs de pets qui marchent, les pièces montent d'un demi-ton quand tu en ramasses à la suite, l'œuf siffle puis craque, et la révélation grossit avec la rareté.
 
-| Son | Quand |
+| Moment | Son |
 | --- | --- |
-| `click`, `open`, `close`, `error` | boutons, ouverture et fermeture des fenêtres, action impossible |
-| `tap`, `break`, `coin` | coup sur un tas, tas cassé, pièces ramassées |
-| `buy`, `quest` | achat, récompense de quête |
-| `hatch` | roulement de tambour et œuf qui craque |
-| `reveal`, `reveal_rare`, `legend`, `divine` | révélation : Commun et Peu commun, Rare et Épique, Légendaire et Mythique (aussi la fusion et le rebirth), Divin |
+| Boutons, fenêtres, action impossible | Roblox UI Bright Click, Whoosh, GUI Back, GUI Negative |
+| Coup sur un tas, tas cassé, pièces | Boink Pop, Crack Egg Crunchy, GUI Pickup |
+| Achat, récompense de quête | GUI Purchase, GUI Notification High |
+| Éclosion | montée sifflante puis craquement |
+| Révélation Commun · Rare · Légendaire et Mythique · Divin | Tonal Stinger · GUI Aura · APM « Top Prize » · APM « Epic Win » + Magic Burst |
 
-Les fichiers `.ogg` sont dans `dist/SweetPets_Sons/`. Roblox ne lit que les sons envoyés sur ton compte, il faut donc les importer une fois :
-1. Dans Studio, onglet **Accueil › Importer**, choisis les 14 fichiers `.ogg` et lance l'import. Ils arrivent dans la Boîte à outils › **Inventaire › Audio** (ou dans le Gestionnaire de ressources).
-2. Fais glisser chaque son dans l'Explorer, dans **SoundService › SweetSounds**, en gardant son nom (`click`, `coin`…).
-3. Enregistre le jeu. Le jeu trouve chaque son par son nom.
-
-Tant que le dossier est vide, le clic des boutons est muet et quelques sons intégrés à Roblox servent de remplaçants. Le script `tools/sfx/synth.py` régénère les sons.
+Pour changer un son : mets un Sound dans **SoundService › SweetSounds** avec le même nom que dans le tableau `SOUNDS` de `src/client/init.client.luau` (`click`, `coin`, `legend`…). Il remplace celui d'origine.
 
 ## Robux (optionnel)
 
