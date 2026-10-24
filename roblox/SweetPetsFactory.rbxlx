@@ -9,9 +9,9 @@
     <Properties>
       <string name="Name">Lighting</string>
       <Color3 name="Ambient">
-        <R>70</R>
-        <G>62</G>
-        <B>86</B>
+        <R>0.2745</R>
+        <G>0.2431</G>
+        <B>0.3373</B>
       </Color3>
       <float name="Brightness">1.6</float>
       <float name="ClockTime">14</float>
@@ -20,9 +20,9 @@
       <float name="ExposureCompensation">-0.25</float>
       <bool name="GlobalShadows">true</bool>
       <Color3 name="OutdoorAmbient">
-        <R>128</R>
-        <G>118</G>
-        <B>140</B>
+        <R>0.502</R>
+        <G>0.4627</G>
+        <B>0.549</B>
       </Color3>
     </Properties>
     <Item class="ColorCorrectionEffect" referent="2">
@@ -36,14 +36,14 @@
       <Properties>
         <string name="Name">Sky</string>
         <Color3 name="Color">
-          <R>255</R>
-          <G>214</G>
-          <B>230</B>
+          <R>1</R>
+          <G>0.8392</G>
+          <B>0.902</B>
         </Color3>
         <Color3 name="Decay">
-          <R>150</R>
-          <G>120</G>
-          <B>170</B>
+          <R>0.5882</R>
+          <G>0.4706</G>
+          <B>0.6667</B>
         </Color3>
         <float name="Density">0.28</float>
         <float name="Glare">0</float>
