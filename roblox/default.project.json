@@ -26,13 +26,47 @@
     "Lighting": {
       "$properties": {
         "ClockTime": 14,
-        "Brightness": 2.5,
+        "Brightness": 1.6,
         "GlobalShadows": true,
+        "Ambient": [
+          70,
+          62,
+          86
+        ],
         "OutdoorAmbient": [
-          180,
-          170,
-          190
-        ]
+          128,
+          118,
+          140
+        ],
+        "ExposureCompensation": -0.25,
+        "EnvironmentDiffuseScale": 0.4,
+        "EnvironmentSpecularScale": 0.3
+      },
+      "Sky": {
+        "$className": "Atmosphere",
+        "$properties": {
+          "Density": 0.28,
+          "Offset": 0.1,
+          "Color": [
+            255,
+            214,
+            230
+          ],
+          "Decay": [
+            150,
+            120,
+            170
+          ],
+          "Glare": 0,
+          "Haze": 1
+        }
+      },
+      "Grade": {
+        "$className": "ColorCorrectionEffect",
+        "$properties": {
+          "Saturation": 0.18,
+          "Contrast": 0.08
+        }
       }
     },
     "Workspace": {

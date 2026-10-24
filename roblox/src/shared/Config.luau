@@ -70,7 +70,7 @@ Config.WORLD_SPACING = 700
 Config.Worlds = {
 	{
 		id = 1, origin = Vector3.zero, name = "Candy Meadow", theme = "meadow", scale = 1, coinMult = 1, unlock = 0,
-		ground = hex("FFD9E8"), ground2 = hex("FFE6F0"), plaza = hex("FFF6E6"), banner = hex("FFD54A"),
+		ground = hex("FFB3CF"), ground2 = hex("FFC6DB"), plaza = hex("FFF6E6"), banner = hex("FFD54A"),
 		candy = { hex("FF8FB8"), hex("B69CFF"), hex("FFD54A"), hex("7FD6FF"), hex("7EE0B8"), hex("FF9A3C") },
 		eggs = { "candy", "berry" },
 	},
@@ -82,7 +82,7 @@ Config.Worlds = {
 	},
 	{
 		id = 3, origin = Vector3.zero, name = "Ice Cream Island", theme = "ice", scale = 2200, coinMult = 2, unlock = 15e6,
-		ground = hex("D6F0FF"), ground2 = hex("E6F7FF"), plaza = hex("FFFFFF"), banner = hex("7EE0B8"),
+		ground = hex("B9E4FF"), ground2 = hex("CDEBFF"), plaza = hex("FFFFFF"), banner = hex("7EE0B8"),
 		candy = { hex("FF8FB8"), hex("7EE0B8"), hex("FFF3B8"), hex("B69CFF"), hex("FFFFFF"), hex("A8704B") },
 		eggs = { "frost", "sundae" },
 	},

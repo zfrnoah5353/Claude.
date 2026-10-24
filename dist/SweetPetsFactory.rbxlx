@@ -8,25 +8,59 @@
   <Item class="Lighting" referent="1">
     <Properties>
       <string name="Name">Lighting</string>
-      <float name="Brightness">2.5</float>
+      <Color3 name="Ambient">
+        <R>70</R>
+        <G>62</G>
+        <B>86</B>
+      </Color3>
+      <float name="Brightness">1.6</float>
       <float name="ClockTime">14</float>
+      <float name="EnvironmentDiffuseScale">0.4</float>
+      <float name="EnvironmentSpecularScale">0.3</float>
+      <float name="ExposureCompensation">-0.25</float>
       <bool name="GlobalShadows">true</bool>
       <Color3 name="OutdoorAmbient">
-        <R>180</R>
-        <G>170</G>
-        <B>190</B>
+        <R>128</R>
+        <G>118</G>
+        <B>140</B>
       </Color3>
     </Properties>
+    <Item class="ColorCorrectionEffect" referent="2">
+      <Properties>
+        <string name="Name">Grade</string>
+        <float name="Contrast">0.08</float>
+        <float name="Saturation">0.18</float>
+      </Properties>
+    </Item>
+    <Item class="Atmosphere" referent="3">
+      <Properties>
+        <string name="Name">Sky</string>
+        <Color3 name="Color">
+          <R>255</R>
+          <G>214</G>
+          <B>230</B>
+        </Color3>
+        <Color3 name="Decay">
+          <R>150</R>
+          <G>120</G>
+          <B>170</B>
+        </Color3>
+        <float name="Density">0.28</float>
+        <float name="Glare">0</float>
+        <float name="Haze">1</float>
+        <float name="Offset">0.1</float>
+      </Properties>
+    </Item>
   </Item>
-  <Item class="ReplicatedStorage" referent="2">
+  <Item class="ReplicatedStorage" referent="4">
     <Properties>
       <string name="Name">ReplicatedStorage</string>
     </Properties>
-    <Item class="Folder" referent="3">
+    <Item class="Folder" referent="5">
       <Properties>
         <string name="Name">Shared</string>
       </Properties>
-      <Item class="ModuleScript" referent="4">
+      <Item class="ModuleScript" referent="6">
         <Properties>
           <string name="Name">Config</string>
           <string name="Source"><![CDATA[--!strict
@@ -101,7 +135,7 @@ Config.WORLD_SPACING = 700
 Config.Worlds = {
 	{
 		id = 1, origin = Vector3.zero, name = "Candy Meadow", theme = "meadow", scale = 1, coinMult = 1, unlock = 0,
-		ground = hex("FFD9E8"), ground2 = hex("FFE6F0"), plaza = hex("FFF6E6"), banner = hex("FFD54A"),
+		ground = hex("FFB3CF"), ground2 = hex("FFC6DB"), plaza = hex("FFF6E6"), banner = hex("FFD54A"),
 		candy = { hex("FF8FB8"), hex("B69CFF"), hex("FFD54A"), hex("7FD6FF"), hex("7EE0B8"), hex("FF9A3C") },
 		eggs = { "candy", "berry" },
 	},
@@ -113,7 +147,7 @@ Config.Worlds = {
 	},
 	{
 		id = 3, origin = Vector3.zero, name = "Ice Cream Island", theme = "ice", scale = 2200, coinMult = 2, unlock = 15e6,
-		ground = hex("D6F0FF"), ground2 = hex("E6F7FF"), plaza = hex("FFFFFF"), banner = hex("7EE0B8"),
+		ground = hex("B9E4FF"), ground2 = hex("CDEBFF"), plaza = hex("FFFFFF"), banner = hex("7EE0B8"),
 		candy = { hex("FF8FB8"), hex("7EE0B8"), hex("FFF3B8"), hex("B69CFF"), hex("FFFFFF"), hex("A8704B") },
 		eggs = { "frost", "sundae" },
 	},
@@ -458,7 +492,7 @@ return Config
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="5">
+      <Item class="ModuleScript" referent="7">
         <Properties>
           <string name="Name">PetModels</string>
           <string name="Source"><![CDATA[--!strict
@@ -800,11 +834,11 @@ return PetModels
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Folder" referent="6">
+      <Item class="Folder" referent="8">
         <Properties>
           <string name="Name">PetPlans</string>
         </Properties>
-        <Item class="ModuleScript" referent="7">
+        <Item class="ModuleScript" referent="9">
           <Properties>
             <string name="Name">anubis</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -812,7 +846,7 @@ return [==[{"parts":[{"color":"F2EEE6","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="8">
+        <Item class="ModuleScript" referent="10">
           <Properties>
             <string name="Name">astro_pup</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -820,7 +854,7 @@ return [==[{"parts":[{"color":"E0E6FF","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="9">
+        <Item class="ModuleScript" referent="11">
           <Properties>
             <string name="Name">berry_bunny</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -828,7 +862,7 @@ return [==[{"parts":[{"color":"C86BD8","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="10">
+        <Item class="ModuleScript" referent="12">
           <Properties>
             <string name="Name">brownie_dragon</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -836,7 +870,7 @@ return [==[{"parts":[{"color":"4A2C20","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="11">
+        <Item class="ModuleScript" referent="13">
           <Properties>
             <string name="Name">caramel_bear</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -844,7 +878,7 @@ return [==[{"parts":[{"color":"E0A040","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="12">
+        <Item class="ModuleScript" referent="14">
           <Properties>
             <string name="Name">cerberus</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -852,7 +886,7 @@ return [==[{"parts":[{"color":"F5E6FF","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="13">
+        <Item class="ModuleScript" referent="15">
           <Properties>
             <string name="Name">cherry_bear</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -860,7 +894,7 @@ return [==[{"parts":[{"color":"E8344E","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="14">
+        <Item class="ModuleScript" referent="16">
           <Properties>
             <string name="Name">choco_bear</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -868,7 +902,7 @@ return [==[{"parts":[{"color":"A8704B","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="15">
+        <Item class="ModuleScript" referent="17">
           <Properties>
             <string name="Name">choco_phantom</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -876,7 +910,7 @@ return [==[{"parts":[{"color":"3A2418","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="16">
+        <Item class="ModuleScript" referent="18">
           <Properties>
             <string name="Name">cocoa_fox</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -884,7 +918,7 @@ return [==[{"parts":[{"color":"C47A3D","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="17">
+        <Item class="ModuleScript" referent="19">
           <Properties>
             <string name="Name">comet_fox</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -892,7 +926,7 @@ return [==[{"parts":[{"color":"FF6A3C","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="18">
+        <Item class="ModuleScript" referent="20">
           <Properties>
             <string name="Name">cosmic_cat</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -900,7 +934,7 @@ return [==[{"parts":[{"color":"4846A8","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="19">
+        <Item class="ModuleScript" referent="21">
           <Properties>
             <string name="Name">cotton_cloud</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -908,7 +942,7 @@ return [==[{"parts":[{"color":"FFFFFF","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="20">
+        <Item class="ModuleScript" referent="22">
           <Properties>
             <string name="Name">cupcake_pup</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -916,7 +950,7 @@ return [==[{"parts":[{"color":"FFC97A","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="21">
+        <Item class="ModuleScript" referent="23">
           <Properties>
             <string name="Name">donut_unicorn</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -924,7 +958,7 @@ return [==[{"parts":[{"color":"FFF1F8","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="22">
+        <Item class="ModuleScript" referent="24">
           <Properties>
             <string name="Name">fenrir</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -932,7 +966,7 @@ return [==[{"parts":[{"color":"2A1F2E","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="23">
+        <Item class="ModuleScript" referent="25">
           <Properties>
             <string name="Name">frosty_cloud</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -940,7 +974,7 @@ return [==[{"parts":[{"color":"F0FAFF","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="24">
+        <Item class="ModuleScript" referent="26">
           <Properties>
             <string name="Name">frozen_king</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -948,7 +982,7 @@ return [==[{"parts":[{"color":"8FD8FF","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="25">
+        <Item class="ModuleScript" referent="27">
           <Properties>
             <string name="Name">fudge_dragon</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -956,7 +990,7 @@ return [==[{"parts":[{"color":"5A3424","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="26">
+        <Item class="ModuleScript" referent="28">
           <Properties>
             <string name="Name">galaxy_bear</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -964,7 +998,7 @@ return [==[{"parts":[{"color":"3A3266","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="27">
+        <Item class="ModuleScript" referent="29">
           <Properties>
             <string name="Name">golden_king</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -972,7 +1006,7 @@ return [==[{"parts":[{"color":"FFD23F","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="28">
+        <Item class="ModuleScript" referent="30">
           <Properties>
             <string name="Name">grape_cat</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -980,7 +1014,7 @@ return [==[{"parts":[{"color":"8E6BE8","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="29">
+        <Item class="ModuleScript" referent="31">
           <Properties>
             <string name="Name">griffin</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -988,7 +1022,7 @@ return [==[{"parts":[{"color":"C89A50","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="30">
+        <Item class="ModuleScript" referent="32">
           <Properties>
             <string name="Name">gumdrop_bunny</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -996,7 +1030,7 @@ return [==[{"parts":[{"color":"FF9EC4","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="31">
+        <Item class="ModuleScript" referent="33">
           <Properties>
             <string name="Name">gummy_golem</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1004,7 +1038,7 @@ return [==[{"parts":[{"color":"6FD66F","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="32">
+        <Item class="ModuleScript" referent="34">
           <Properties>
             <string name="Name">hydra</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1012,7 +1046,7 @@ return [==[{"parts":[{"color":"6B3FA0","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="33">
+        <Item class="ModuleScript" referent="35">
           <Properties>
             <string name="Name">ice_unicorn</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1020,7 +1054,7 @@ return [==[{"parts":[{"color":"CFF3FF","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="34">
+        <Item class="ModuleScript" referent="36">
           <Properties>
             <string name="Name">jelly_cat</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1028,7 +1062,7 @@ return [==[{"parts":[{"color":"7FD6FF","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="35">
+        <Item class="ModuleScript" referent="37">
           <Properties>
             <string name="Name">kraken</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1036,7 +1070,7 @@ return [==[{"parts":[{"color":"2A8C8A","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="36">
+        <Item class="ModuleScript" referent="38">
           <Properties>
             <string name="Name">leviathan</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1044,7 +1078,7 @@ return [==[{"parts":[{"color":"2E9AA0","mat":"plastic","alpha":0,"bone":0,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="37">
+        <Item class="ModuleScript" referent="39">
           <Properties>
             <string name="Name">lollipop_fox</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1052,7 +1086,7 @@ return [==[{"parts":[{"color":"FF8A4C","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="38">
+        <Item class="ModuleScript" referent="40">
           <Properties>
             <string name="Name">longdragon</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1060,7 +1094,7 @@ return [==[{"parts":[{"color":"3DBE8C","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="39">
+        <Item class="ModuleScript" referent="41">
           <Properties>
             <string name="Name">mammoth</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1068,7 +1102,7 @@ return [==[{"parts":[{"color":"7A4A2A","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="40">
+        <Item class="ModuleScript" referent="42">
           <Properties>
             <string name="Name">meteor_unicorn</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1076,7 +1110,7 @@ return [==[{"parts":[{"color":"FFB86B","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="41">
+        <Item class="ModuleScript" referent="43">
           <Properties>
             <string name="Name">mint_cat</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1084,7 +1118,7 @@ return [==[{"parts":[{"color":"7EE0B8","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="42">
+        <Item class="ModuleScript" referent="44">
           <Properties>
             <string name="Name">mocha_cat</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1092,7 +1126,7 @@ return [==[{"parts":[{"color":"B08060","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="43">
+        <Item class="ModuleScript" referent="45">
           <Properties>
             <string name="Name">mochi_dragon</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1100,7 +1134,7 @@ return [==[{"parts":[{"color":"B69CFF","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="44">
+        <Item class="ModuleScript" referent="46">
           <Properties>
             <string name="Name">nebula_dragon</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1108,7 +1142,7 @@ return [==[{"parts":[{"color":"C04BD8","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="45">
+        <Item class="ModuleScript" referent="47">
           <Properties>
             <string name="Name">pegasus</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1116,7 +1150,7 @@ return [==[{"parts":[{"color":"FFF6FB","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="46">
+        <Item class="ModuleScript" referent="48">
           <Properties>
             <string name="Name">popsicle_dragon</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1124,7 +1158,7 @@ return [==[{"parts":[{"color":"FF9A3C","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="47">
+        <Item class="ModuleScript" referent="49">
           <Properties>
             <string name="Name">ra_phoenix</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1132,7 +1166,7 @@ return [==[{"parts":[{"color":"FF5A1F","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="48">
+        <Item class="ModuleScript" referent="50">
           <Properties>
             <string name="Name">razz_dragon</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1140,7 +1174,7 @@ return [==[{"parts":[{"color":"FF5A8A","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="49">
+        <Item class="ModuleScript" referent="51">
           <Properties>
             <string name="Name">sorbet_fox</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1148,7 +1182,7 @@ return [==[{"parts":[{"color":"FF7A9A","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="50">
+        <Item class="ModuleScript" referent="52">
           <Properties>
             <string name="Name">sphinx</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1156,7 +1190,7 @@ return [==[{"parts":[{"color":"D9A066","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="51">
+        <Item class="ModuleScript" referent="53">
           <Properties>
             <string name="Name">split_unicorn</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1164,7 +1198,7 @@ return [==[{"parts":[{"color":"FFE27A","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="52">
+        <Item class="ModuleScript" referent="54">
           <Properties>
             <string name="Name">star_bunny</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1172,7 +1206,7 @@ return [==[{"parts":[{"color":"6B5BD6","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="53">
+        <Item class="ModuleScript" referent="55">
           <Properties>
             <string name="Name">sugar_phantom</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1180,7 +1214,7 @@ return [==[{"parts":[{"color":"4B3A8C","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="54">
+        <Item class="ModuleScript" referent="56">
           <Properties>
             <string name="Name">sundae_pup</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1188,7 +1222,7 @@ return [==[{"parts":[{"color":"FFB3C8","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="55">
+        <Item class="ModuleScript" referent="57">
           <Properties>
             <string name="Name">supernova_king</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1196,7 +1230,7 @@ return [==[{"parts":[{"color":"FF5A6E","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="56">
+        <Item class="ModuleScript" referent="58">
           <Properties>
             <string name="Name">toffee_unicorn</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1204,7 +1238,7 @@ return [==[{"parts":[{"color":"F5D6A8","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="57">
+        <Item class="ModuleScript" referent="59">
           <Properties>
             <string name="Name">truffle_pup</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1212,7 +1246,7 @@ return [==[{"parts":[{"color":"7A4E36","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="58">
+        <Item class="ModuleScript" referent="60">
           <Properties>
             <string name="Name">vanilla_bunny</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1220,7 +1254,7 @@ return [==[{"parts":[{"color":"FFF6E0","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="59">
+        <Item class="ModuleScript" referent="61">
           <Properties>
             <string name="Name">void_dragon</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1229,7 +1263,7 @@ return [==[{"parts":[{"color":"2A2350","mat":"plastic","alpha":0,"bone":1,"shape
           </Properties>
         </Item>
       </Item>
-      <Item class="ModuleScript" referent="60">
+      <Item class="ModuleScript" referent="62">
         <Properties>
           <string name="Name">PetShapes</string>
           <string name="Source"><![CDATA[--!nonstrict
@@ -2414,11 +2448,11 @@ return Shapes
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="61">
+  <Item class="ServerScriptService" referent="63">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Script" referent="62">
+    <Item class="Script" referent="64">
       <Properties>
         <string name="Name">GameServer</string>
         <token name="RunContext">0</token>
@@ -4433,7 +4467,7 @@ RunService.Heartbeat:Connect(function(dt)
 end)
 ]]></string>
       </Properties>
-      <Item class="ModuleScript" referent="63">
+      <Item class="ModuleScript" referent="65">
         <Properties>
           <string name="Name">Admin</string>
           <string name="Source"><![CDATA[-- Panneau admin (côté serveur) : actions manuelles, assistant IA (Claude), événements
@@ -5123,17 +5157,17 @@ return Admin
       </Item>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="64">
+  <Item class="StarterPlayer" referent="66">
     <Properties>
       <string name="Name">StarterPlayer</string>
       <float name="CameraMaxZoomDistance">90</float>
       <float name="CharacterWalkSpeed">22</float>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="65">
+    <Item class="StarterPlayerScripts" referent="67">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="LocalScript" referent="66">
+      <Item class="LocalScript" referent="68">
         <Properties>
           <string name="Name">Client</string>
           <string name="Source"><![CDATA[-- Sweet Pets Factory : côté joueur
@@ -5317,8 +5351,9 @@ local questLbl = UI.text(questBox, { Text = "", TextSize = 13, Size = UDim2.new(
 local questBtn = UI.new("TextButton", { BackgroundTransparency = 1, Text = "", Size = UDim2.fromScale(1, 1), Parent = questBox })
 
 -- minuteurs (haut droite)
-local timers = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.fromOffset(260, 200), Position = UDim2.new(1, -12, 0, 8), AnchorPoint = Vector2.new(1, 0), Parent = hud })
-UI.new("UIListLayout", { Padding = UDim.new(0, 8), HorizontalAlignment = Enum.HorizontalAlignment.Right, SortOrder = Enum.SortOrder.LayoutOrder, Parent = timers })
+-- sous le nom du monde, au centre : la liste des joueurs de Roblox occupe le coin haut droit
+local timers = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.fromOffset(940, 40), Position = UDim2.new(0.5, 0, 0, 134), AnchorPoint = Vector2.new(0.5, 0), Parent = hud })
+UI.new("UIListLayout", { Padding = UDim.new(0, 8), FillDirection = Enum.FillDirection.Horizontal, HorizontalAlignment = Enum.HorizontalAlignment.Center, SortOrder = Enum.SortOrder.LayoutOrder, Parent = timers })
 local timerLabels: { [string]: TextLabel } = {}
 local timerChips: { [string]: Frame } = {}
 local function timerChip(id: string, icon: string, order: number)
@@ -7020,7 +7055,7 @@ player:GetAttributeChangedSignal("IsAdmin"):Connect(function()
 end)
 
 -- bannières : annonce et événements en cours
-local annBanner = UI.box(hud, { Size = UDim2.fromOffset(640, 92), Position = UDim2.new(0.5, 0, 0, 96), AnchorPoint = Vector2.new(0.5, 0), Color = UI.WHITE, Radius = 24 })
+local annBanner = UI.box(hud, { Size = UDim2.fromOffset(640, 92), Position = UDim2.new(0.5, 0, 0, 236), AnchorPoint = Vector2.new(0.5, 0), Color = UI.WHITE, Radius = 24 })
 local annHolder = annBanner.Parent :: Frame
 annHolder.Visible = false
 annHolder.ZIndex = 4
@@ -7028,7 +7063,7 @@ local annFrom = UI.text(annBanner, { Text = "", TextSize = 16, Color = ADMIN_RED
 local annText = UI.text(annBanner, { Text = "", TextSize = 22, Wrap = true, Size = UDim2.new(1, -24, 0, 56), Position = UDim2.fromOffset(12, 28) })
 local annToken = 0
 
-local abuseBanner = UI.box(hud, { Size = UDim2.fromOffset(360, 40), Position = UDim2.new(0.5, 0, 0, 196), AnchorPoint = Vector2.new(0.5, 0), Color = ADMIN_RED, Radius = 18 })
+local abuseBanner = UI.box(hud, { Size = UDim2.fromOffset(360, 40), Position = UDim2.new(0.5, 0, 0, 184), AnchorPoint = Vector2.new(0.5, 0), Color = ADMIN_RED, Radius = 18 })
 local abuseHolder = abuseBanner.Parent :: Frame
 abuseHolder.Visible = false
 local abuseText = UI.text(abuseBanner, { Text = "", TextSize = 17, Color = UI.WHITE, Outline = 2, Size = UDim2.new(1, -16, 1, 0), Position = UDim2.fromOffset(8, 0) })
@@ -7218,7 +7253,7 @@ RunService.RenderStepped:Connect(function(dt)
 end)
 ]]></string>
         </Properties>
-        <Item class="ModuleScript" referent="67">
+        <Item class="ModuleScript" referent="69">
           <Properties>
             <string name="Name">UI</string>
             <string name="Source"><![CDATA[-- Petite boîte à outils d'interface : boutons « cartoon », textes avec contour,
@@ -7515,12 +7550,12 @@ return UI
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="68">
+  <Item class="Workspace" referent="70">
     <Properties>
       <string name="Name">Workspace</string>
       <bool name="NeedsPivotMigration">false</bool>
     </Properties>
-    <Item class="SpawnLocation" referent="69">
+    <Item class="SpawnLocation" referent="71">
       <Properties>
         <string name="Name">SpawnLocation</string>
         <bool name="Anchored">true</bool>

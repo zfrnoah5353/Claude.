@@ -179,8 +179,9 @@ local questLbl = UI.text(questBox, { Text = "", TextSize = 13, Size = UDim2.new(
 local questBtn = UI.new("TextButton", { BackgroundTransparency = 1, Text = "", Size = UDim2.fromScale(1, 1), Parent = questBox })
 
 -- minuteurs (haut droite)
-local timers = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.fromOffset(260, 200), Position = UDim2.new(1, -12, 0, 8), AnchorPoint = Vector2.new(1, 0), Parent = hud })
-UI.new("UIListLayout", { Padding = UDim.new(0, 8), HorizontalAlignment = Enum.HorizontalAlignment.Right, SortOrder = Enum.SortOrder.LayoutOrder, Parent = timers })
+-- sous le nom du monde, au centre : la liste des joueurs de Roblox occupe le coin haut droit
+local timers = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.fromOffset(940, 40), Position = UDim2.new(0.5, 0, 0, 134), AnchorPoint = Vector2.new(0.5, 0), Parent = hud })
+UI.new("UIListLayout", { Padding = UDim.new(0, 8), FillDirection = Enum.FillDirection.Horizontal, HorizontalAlignment = Enum.HorizontalAlignment.Center, SortOrder = Enum.SortOrder.LayoutOrder, Parent = timers })
 local timerLabels: { [string]: TextLabel } = {}
 local timerChips: { [string]: Frame } = {}
 local function timerChip(id: string, icon: string, order: number)
@@ -1882,7 +1883,7 @@ player:GetAttributeChangedSignal("IsAdmin"):Connect(function()
 end)
 
 -- bannières : annonce et événements en cours
-local annBanner = UI.box(hud, { Size = UDim2.fromOffset(640, 92), Position = UDim2.new(0.5, 0, 0, 96), AnchorPoint = Vector2.new(0.5, 0), Color = UI.WHITE, Radius = 24 })
+local annBanner = UI.box(hud, { Size = UDim2.fromOffset(640, 92), Position = UDim2.new(0.5, 0, 0, 236), AnchorPoint = Vector2.new(0.5, 0), Color = UI.WHITE, Radius = 24 })
 local annHolder = annBanner.Parent :: Frame
 annHolder.Visible = false
 annHolder.ZIndex = 4
@@ -1890,7 +1891,7 @@ local annFrom = UI.text(annBanner, { Text = "", TextSize = 16, Color = ADMIN_RED
 local annText = UI.text(annBanner, { Text = "", TextSize = 22, Wrap = true, Size = UDim2.new(1, -24, 0, 56), Position = UDim2.fromOffset(12, 28) })
 local annToken = 0
 
-local abuseBanner = UI.box(hud, { Size = UDim2.fromOffset(360, 40), Position = UDim2.new(0.5, 0, 0, 196), AnchorPoint = Vector2.new(0.5, 0), Color = ADMIN_RED, Radius = 18 })
+local abuseBanner = UI.box(hud, { Size = UDim2.fromOffset(360, 40), Position = UDim2.new(0.5, 0, 0, 184), AnchorPoint = Vector2.new(0.5, 0), Color = ADMIN_RED, Radius = 18 })
 local abuseHolder = abuseBanner.Parent :: Frame
 abuseHolder.Visible = false
 local abuseText = UI.text(abuseBanner, { Text = "", TextSize = 17, Color = UI.WHITE, Outline = 2, Size = UDim2.new(1, -16, 1, 0), Position = UDim2.fromOffset(8, 0) })
