@@ -82,6 +82,15 @@ L'assistant IA et la traduction utilisent l'API Claude. La partie Manuel et l'Ad
 3. Pour tester dans Studio : ajoute une **StringValue** nommée `ClaudeApiKey` dans **ServerStorage** et colle ta clé dans Value. Retire-la avant de publier ou de partager le fichier.
 4. Les requêtes HTTP sont déjà activées dans le fichier du jeu (sinon : Game Settings › Security › Allow HTTP Requests).
 
+## Sons
+
+Les sons du jeu sont dans `dist/SweetPets_Sons/` : `click`, `tap`, `coin`, `pop`, `error`, `buy`, `hatch`, `reveal`, `legend` (fichiers `.ogg`). Roblox ne lit que les sons envoyés sur ton compte, il faut donc les importer une fois :
+1. Dans Studio, onglet **Accueil › Importer**, choisis les 9 fichiers `.ogg` et lance l'import. Ils arrivent dans la Boîte à outils › **Inventaire › Audio** (ou dans le Gestionnaire de ressources).
+2. Fais glisser chaque son dans l'Explorer, dans **SoundService › SweetSounds**, en gardant son nom (`click`, `coin`…).
+3. Enregistre le jeu. Le jeu trouve chaque son par son nom.
+
+Tant que le dossier est vide, le clic des boutons est muet et quelques sons intégrés à Roblox servent de remplaçants. Le script `tools/sfx/synth.py` régénère les sons.
+
 ## Robux (optionnel)
 
 Dans `src/shared/Config.luau`, colle les identifiants de tes Game Passes (`Config.GamePassIds`) et de tes Developer Products (`Config.GemProducts`). Tant qu'un identifiant vaut `0`, l'objet s'achète avec des gemmes gagnées en jeu.

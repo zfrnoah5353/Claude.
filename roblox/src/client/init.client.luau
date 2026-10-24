@@ -32,22 +32,62 @@ local function send(name: string, arg: any?)
 end
 
 ---------------------------------------------------------------------------
--- Sons (sons intégrés à Roblox ; remplace-les par tes propres rbxassetid://)
+-- Sons
+-- Les vrais sons du jeu sont dans dist/SweetPets_Sons (click.ogg, coin.ogg…).
+-- Importe-les dans Studio et range-les dans SoundService › SweetSounds (voir le
+-- README) : chaque Sound est trouvé par son nom. En attendant, les sons
+-- intégrés à Roblox servent de remplaçants, et le clic des boutons reste muet.
 ---------------------------------------------------------------------------
 local SOUNDS = {
-	click = { "rbxasset://sounds/electronicpingshort.wav", 1.5, 0.3 },
-	coin = { "rbxasset://sounds/electronicpingshort.wav", 2.2, 0.18 },
-	pop = { "rbxasset://sounds/swoosh.wav", 1.4, 0.4 },
-	tap = { "rbxasset://sounds/clickfast.wav", 1.0, 0.45 },
-	error = { "rbxasset://sounds/clickfast.wav", 0.5, 0.5 },
-	buy = { "rbxasset://sounds/electronicpingshort.wav", 1.1, 0.45 },
-	hatch = { "rbxasset://sounds/swoosh.wav", 0.8, 0.6 },
-	reveal = { "rbxasset://sounds/electronicpingshort.wav", 0.9, 0.55 },
-	legend = { "rbxasset://sounds/electronicpingshort.wav", 0.6, 0.8 },
+	-- nom = { volume, son de remplacement, vitesse du remplaçant }
+	click = { 0.35 },
+	coin = { 0.3, "rbxasset://sounds/electronicpingshort.wav", 2.2 },
+	pop = { 0.45, "rbxasset://sounds/swoosh.wav", 1.4 },
+	tap = { 0.4 },
+	error = { 0.4 },
+	buy = { 0.5, "rbxasset://sounds/electronicpingshort.wav", 1.1 },
+	hatch = { 0.6, "rbxasset://sounds/swoosh.wav", 0.8 },
+	reveal = { 0.55, "rbxasset://sounds/electronicpingshort.wav", 0.9 },
+	legend = { 0.7, "rbxasset://sounds/electronicpingshort.wav", 0.6 },
 }
-local soundObjs: { [string]: Sound } = {}
-for name, s in SOUNDS do
-	soundObjs[name] = UI.new("Sound", { SoundId = s[1], PlaybackSpeed = s[2], Volume = s[3], Parent = SoundService })
+local soundObjs: { [string]: Sound | false } = {}
+local function soundFor(name: string): Sound?
+	local cached = soundObjs[name]
+	if cached then
+		return cached
+	end
+	local info = SOUNDS[name]
+	if not info then
+		return nil
+	end
+	local folder = SoundService:FindFirstChild("SweetSounds")
+	local custom = folder and folder:FindFirstChild(name)
+	if custom and custom:IsA("Sound") and custom.SoundId ~= "" then
+		local snd = UI.new("Sound", { SoundId = custom.SoundId, Volume = info[1] * (custom.Volume / 0.5), Parent = SoundService })
+		soundObjs[name] = snd
+		return snd
+	end
+	if cached == false then
+		return nil
+	end
+	if info[2] then
+		-- remplaçant (sera réévalué si le vrai son est ajouté pendant la partie)
+		local snd = UI.new("Sound", { SoundId = info[2], PlaybackSpeed = info[3], Volume = info[1] * 0.6, Parent = SoundService })
+		task.delay(10, function()
+			if soundObjs[name] == snd then
+				soundObjs[name] = nil
+			end
+		end)
+		soundObjs[name] = snd
+		return snd
+	end
+	soundObjs[name] = false
+	task.delay(10, function()
+		if soundObjs[name] == false then
+			soundObjs[name] = nil
+		end
+	end)
+	return nil
 end
 local lastSound: { [string]: number } = {}
 local function play(name: string)
@@ -59,7 +99,7 @@ local function play(name: string)
 		return
 	end
 	lastSound[name] = now
-	local snd = soundObjs[name]
+	local snd = soundFor(name)
 	if snd then
 		SoundService:PlayLocalSound(snd)
 	end

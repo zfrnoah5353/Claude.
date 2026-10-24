@@ -95,6 +95,11 @@
       "$properties": {
         "HttpEnabled": true
       }
+    },
+    "SoundService": {
+      "SweetSounds": {
+        "$className": "Folder"
+      }
     }
   }
 }
