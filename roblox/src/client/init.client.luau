@@ -97,6 +97,35 @@ end
 UI.onClick = function()
 	play("click")
 end
+
+-- Musique : une par monde, une pour le boss, en fondu
+local musicOn = true
+local music = UI.new("Sound", { Name = "Music", Looped = true, Volume = 0, Parent = SoundService })
+local musicId = 0
+local function updateMusic(inBoss: boolean)
+	local want = 0
+	if musicOn and S then
+		want = if inBoss then Config.Music.boss else Config.Music.worlds[S.world] or Config.Music.worlds[1]
+	end
+	if want == musicId then
+		return
+	end
+	musicId = want
+	TweenService:Create(music, TweenInfo.new(0.6), { Volume = 0 }):Play()
+	task.delay(0.6, function()
+		if musicId ~= want then
+			return
+		end
+		if want == 0 then
+			music:Stop()
+			return
+		end
+		music.SoundId = "rbxassetid://" .. want
+		music.TimePosition = 0
+		music:Play()
+		TweenService:Create(music, TweenInfo.new(1.2), { Volume = Config.Music.volume }):Play()
+	end)
+end
 UI.onError = function()
 	play("error")
 end
@@ -227,6 +256,7 @@ timerChip("boss", "💀", 0)
 timerChip("coins", "🟡", 1)
 timerChip("luck", "🍀", 2)
 timerChip("dmg", "💪", 3)
+timerChip("sluck", "🍀", 4)
 
 -- menus latéraux
 local menuBadges: { [string]: TextLabel } = {}
@@ -637,18 +667,23 @@ panels.index = {
 }
 
 -- Boutique ----------------------------------------------------------------
-local function anyRobux(): boolean
-	for _, id in Config.GamePassIds :: any do
-		if id ~= 0 then
-			return true
-		end
+-- prix Robux réels lus sur Roblox (sinon prix conseillé de Config)
+local robuxPrice: { [string]: number } = {}
+local function fetchPrice(key: string, id: number, kind: Enum.InfoType)
+	if id == 0 or robuxPrice[key] then
+		return
 	end
-	for _, p in Config.GemProducts do
-		if p.id ~= 0 then
-			return true
+	robuxPrice[key] = -1
+	task.spawn(function()
+		local ok, info = pcall(MarketplaceService.GetProductInfo, MarketplaceService, id, kind)
+		if ok and info and info.PriceInRobux then
+			robuxPrice[key] = info.PriceInRobux
 		end
-	end
-	return false
+	end)
+end
+local function priceText(key: string, fallback: number): string
+	local v = robuxPrice[key]
+	return "R$ " .. tostring(if v and v > 0 then v else fallback)
 end
 
 panels.shop = {
@@ -670,29 +705,29 @@ panels.shop = {
 		for id, left in S.potions do
 			table.insert(t, id .. math.floor(left / 10))
 		end
+		for k, v in robuxPrice do
+			table.insert(t, k .. v)
+		end
 		return table.concat(t, ",")
 	end,
 	build = function(c)
-		local names = { "Améliorations", "Gemmes", "Potions et passes" }
-		if anyRobux() then
-			table.insert(names, "Robux")
-		end
-		tabs(c, names, UI.GREEN)
+		tabs(c, { "Améliorations", "Gemmes", "Potions", "Passes", "Robux" }, UI.GREEN)
 		local list = scroller(c, UDim2.new(1, 0, 1, -56), UDim2.fromOffset(0, 56))
 		UI.new("UIGridLayout", { CellSize = UDim2.fromOffset(500, 100), CellPadding = UDim2.fromOffset(16, 14), SortOrder = Enum.SortOrder.LayoutOrder, Parent = list })
 		UI.new("UIPadding", { PaddingTop = UDim.new(0, 6), PaddingLeft = UDim.new(0, 4), Parent = list })
 		local order = 0
-		local function card(name: string, desc: string, level: string, price: string, enabled: boolean, onBuy: (() -> ())?)
+		local function card(name: string, desc: string, level: string, price: string, enabled: boolean, onBuy: (() -> ())?, color: Color3?)
 			order += 1
 			local holder = UI.new("Frame", { BackgroundTransparency = 1, LayoutOrder = order, Parent = list })
 			local f = UI.new("Frame", { BackgroundColor3 = UI.WHITE, Size = UDim2.new(1, -6, 1, -6), Parent = holder })
 			UI.corner(f, 20)
 			UI.stroke(f, 3.5)
 			UI.text(f, { Text = name, TextSize = 21, AlignX = L, Size = UDim2.new(1, -190, 0, 26), Position = UDim2.fromOffset(18, 10) })
-			UI.text(f, { Text = desc, TextSize = 15, Color = Color3.fromHex("5A4A7A"), AlignX = L, Size = UDim2.new(1, -190, 0, 22), Position = UDim2.fromOffset(18, 38) })
+			UI.text(f, { Text = desc, TextSize = 15, Wrap = true, Color = Color3.fromHex("5A4A7A"), AlignX = L, Size = UDim2.new(1, -190, 0, 22), Position = UDim2.fromOffset(18, 38) })
 			UI.text(f, { Text = level, TextSize = 14, Color = UI.MUTED, AlignX = L, Size = UDim2.new(1, -190, 0, 20), Position = UDim2.fromOffset(18, 62) })
-			UI.button(f, { Text = price, Color = UI.GREEN, Size = UDim2.fromOffset(160, 50), Position = UDim2.new(1, -176, 0, 22), TextSize = 19, Enabled = enabled and onBuy ~= nil }, onBuy)
+			UI.button(f, { Text = price, Color = color or UI.GREEN, Size = UDim2.fromOffset(160, 50), Position = UDim2.new(1, -176, 0, 22), TextSize = 19, Enabled = enabled and onBuy ~= nil }, onBuy)
 		end
+		local ROBUX = Color3.fromHex("3DBE5C")
 		if current.tab == 1 or current.tab == 2 then
 			for _, u in Config.Upgrades do
 				if u.gem ~= (current.tab == 2) then
@@ -716,27 +751,40 @@ panels.shop = {
 					send("potion", p.id)
 				end)
 			end
+		elseif current.tab == 4 then
 			for _, p in Config.Passes do
-				local robuxId = (Config.GamePassIds :: any)[p.id]
+				local robuxId = (Config.GamePassIds :: any)[p.id] or 0
+				local title = p.icon .. " " .. p.name
 				if S.passes[p.id] then
-					card(p.name, p.desc, "Pass permanent", "Acheté", false, nil)
+					card(title, p.desc, "Pass permanent", "✅ Acheté", false, nil)
 				elseif robuxId ~= 0 then
-					card(p.name, p.desc, "Pass permanent", "R$", true, function()
+					fetchPrice("pass_" .. p.id, robuxId, Enum.InfoType.GamePass)
+					card(title, p.desc, "Pass permanent", priceText("pass_" .. p.id, p.robux), true, function()
 						MarketplaceService:PromptGamePassPurchase(player, robuxId)
-					end)
+					end, ROBUX)
 				else
-					card(p.name, p.desc, "Pass permanent", "💎 " .. p.gems, S.gems >= p.gems, function()
+					card(title, p.desc, "Pass permanent", "💎 " .. p.gems, S.gems >= p.gems, function()
 						send("pass", p.id)
 					end)
 				end
 			end
 		else
-			for _, prod in Config.GemProducts do
+			local admin = player:GetAttribute("IsAdmin") == true
+			local shown = 0
+			for _, prod in Config.Products do
 				if prod.id ~= 0 then
-					card(prod.label, "Des gemmes pour la boutique", "Achat Robux", "R$", true, function()
+					shown += 1
+					fetchPrice("prod_" .. prod.key, prod.id, Enum.InfoType.Product)
+					card(prod.icon .. " " .. prod.label, prod.desc, "Achat Robux", priceText("prod_" .. prod.key, prod.robux), true, function()
 						MarketplaceService:PromptProductPurchase(player, prod.id)
-					end)
+					end, ROBUX)
+				elseif admin then
+					shown += 1
+					card(prod.icon .. " " .. prod.label, prod.desc, "Admin : colle l'ID du produit dans Config.Products", "R$ " .. prod.robux, false, nil, ROBUX)
 				end
+			end
+			if shown == 0 then
+				card("Bientôt !", "Les packs Robux arrivent bientôt", "", "…", false, nil)
 			end
 		end
 	end,
@@ -923,11 +971,17 @@ panels.settings = {
 	w = 760,
 	h = 520,
 	sig = function()
-		return tostring(muted) .. math.floor(S.stats.play / 10)
+		return tostring(muted) .. tostring(musicOn) .. math.floor(S.stats.play / 10)
 	end,
 	build = function(c)
-		local row = UI.box(c, { Size = UDim2.new(1, 0, 0, 64), Position = UDim2.fromOffset(0, 8), Color = UI.WHITE, Radius = 20 })
-		UI.text(row, { Text = "Son", TextSize = 22, AlignX = L, Size = UDim2.new(1, -40, 1, 0), Position = UDim2.fromOffset(24, 0) })
+		local mrow = UI.box(c, { Size = UDim2.new(0.5, -8, 0, 64), Position = UDim2.new(0.5, 8, 0, 8), Color = UI.WHITE, Radius = 20 })
+		UI.text(mrow, { Text = "Musique", TextSize = 22, AlignX = L, Size = UDim2.new(1, -40, 1, 0), Position = UDim2.fromOffset(24, 0) })
+		UI.button(mrow, { Text = if musicOn then "OUI" else "NON", Color = if musicOn then UI.GREEN else UI.RED, Size = UDim2.fromOffset(90, 40), Position = UDim2.new(1, -110, 0, 12) }, function()
+			musicOn = not musicOn
+			renderPanel()
+		end)
+		local row = UI.box(c, { Size = UDim2.new(0.5, -8, 0, 64), Position = UDim2.fromOffset(0, 8), Color = UI.WHITE, Radius = 20 })
+		UI.text(row, { Text = "Sons", TextSize = 22, AlignX = L, Size = UDim2.new(1, -40, 1, 0), Position = UDim2.fromOffset(24, 0) })
 		UI.button(row, { Text = if muted then "NON" else "OUI", Color = if muted then UI.RED else UI.GREEN, Size = UDim2.fromOffset(90, 40), Position = UDim2.new(1, -110, 0, 12) }, function()
 			muted = not muted
 			renderPanel()
@@ -999,12 +1053,13 @@ local function showHatch(data)
 		slots[i] = slot
 	end
 	play("hatch")
-	task.delay(0.9, function()
+	local speed = if data.fast then 0.5 else 1
+	task.delay(0.9 * speed, function()
 		if hatchState.open and hatchState.t0 == t0 then
 			play("crack")
 		end
 	end)
-	task.delay(1.0, function()
+	task.delay(1.0 * speed, function()
 		if not hatchState.open or hatchState.t0 ~= t0 then
 			return
 		end
@@ -2103,6 +2158,12 @@ RunService.RenderStepped:Connect(function(dt)
 	end
 	timerChips.boss.Visible = state ~= "open"
 	timerLabels.boss.Text = "Boss dans " .. Config.fmtTime(btime)
+	local sl = ((workspace:GetAttribute("ServerLuckEnds") :: number?) or 0) - os.time()
+	timerChips.sluck.Visible = sl > 0
+	if sl > 0 then
+		timerLabels.sluck.Text = "Chance serveur x2 · " .. Config.fmtTime(sl)
+	end
+	updateMusic(inBoss)
 
 	-- auto-éclosion
 	nearEgg = nil

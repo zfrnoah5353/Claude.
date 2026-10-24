@@ -9,23 +9,44 @@ local function hex(s: string): Color3
 end
 
 ---------------------------------------------------------------------------
--- Robux (optionnel)
--- Crée tes Game Passes / Developer Products sur le site Roblox, puis colle
--- leurs identifiants ici. Tant qu'un identifiant vaut 0, l'objet s'achète
--- avec des gemmes gagnées en jeu.
+-- Robux
+-- 1. Sur le Creator Hub (create.roblox.com), ouvre ton jeu › Monétisation :
+--    crée un Pass pour chaque ligne de GamePassIds et un Produit pour chaque
+--    ligne de Products, au prix conseillé (robux = …).
+-- 2. Colle leurs identifiants ici à la place des 0, puis republie le jeu.
+-- Tant qu'un pass vaut 0, il s'achète avec des gemmes gagnées en jeu ; un
+-- produit à 0 n'apparaît pas dans l'onglet Robux.
 ---------------------------------------------------------------------------
 Config.GamePassIds = {
-	triple = 0, -- Triple éclosion
-	auto = 0, -- Auto-éclosion
-	coins2 = 0, -- Pièces x2
-	luck2 = 0, -- Chance x2
-	vip = 0, -- VIP : +2 emplacements de pets, +10 % de pièces
+	triple = 0, -- Triple éclosion (199 R$)
+	auto = 0, -- Auto-éclosion (149 R$)
+	fast = 0, -- Éclosion rapide (99 R$)
+	coins2 = 0, -- Pièces x2 (249 R$)
+	luck2 = 0, -- Chance x2 (199 R$)
+	dmg2 = 0, -- Dégâts x2 (149 R$)
+	slots = 0, -- +3 pets équipés (249 R$)
+	storage = 0, -- Inventaire +150 (79 R$)
+	speed = 0, -- Super vitesse (49 R$)
+	shiny = 0, -- Chance shiny x3 (199 R$)
+	vip = 0, -- VIP (399 R$)
 }
 
-Config.GemProducts = {
-	-- { id = 123456789, gems = 100, label = "100 gemmes" },
-	{ id = 0, gems = 100, label = "Sac de 100 gemmes" },
-	{ id = 0, gems = 550, label = "Coffre de 550 gemmes" },
+export type Product = { key: string, id: number, kind: string, amount: number, label: string, desc: string, icon: string, robux: number }
+Config.Products = {
+	{ key = "gems100", id = 0, kind = "gems", amount = 100, label = "Sac de 100 gemmes", desc = "Pour la boutique et les passes", icon = "💎", robux = 25 },
+	{ key = "gems550", id = 0, kind = "gems", amount = 550, label = "Coffre de 550 gemmes", desc = "10 % de gemmes en plus", icon = "💎", robux = 99 },
+	{ key = "gems1200", id = 0, kind = "gems", amount = 1200, label = "Malle de 1 200 gemmes", desc = "20 % de gemmes en plus", icon = "💎", robux = 199 },
+	{ key = "gems6500", id = 0, kind = "gems", amount = 6500, label = "Trésor de 6 500 gemmes", desc = "30 % de gemmes en plus", icon = "💎", robux = 899 },
+	{ key = "coins1h", id = 0, kind = "coins", amount = 3600, label = "1 heure de pièces", desc = "Les pièces que tu gagnes en 1 h, tout de suite", icon = "🪙", robux = 49 },
+	{ key = "potions", id = 0, kind = "potions", amount = 1800, label = "Pack de potions", desc = "Les 3 potions, 30 minutes chacune", icon = "🧪", robux = 79 },
+	{ key = "serverluck", id = 0, kind = "serverLuck", amount = 900, label = "Chance x2 pour le serveur", desc = "Tout le serveur, 15 minutes", icon = "🍀", robux = 149 },
+} :: { Product }
+
+-- Musiques (bibliothèque Roblox, APM) : une par monde et une pour le boss
+Config.Music = {
+	worlds = { 1842224894, 1845070858, 1836827855, 1844477817 }, -- Bubblegum Factory, Chocolate Chip, Snowfall Dance, Cosmic Dust
+	boss = 1837301451, -- Epic Battle Simulator
+	volume = 0.35,
 }
 
 ---------------------------------------------------------------------------
@@ -277,11 +298,17 @@ function Config.upgradeCost(u: Upgrade, level: number): number
 end
 
 Config.Passes = {
-	{ id = "triple", name = "Triple éclosion", desc = "Ouvre 3 œufs d'un coup", gems = 120 },
-	{ id = "auto", name = "Auto-éclosion", desc = "Ouvre des œufs en boucle", gems = 80 },
-	{ id = "coins2", name = "Pièces x2", desc = "Double toutes tes pièces", gems = 300 },
-	{ id = "luck2", name = "Chance x2", desc = "Double ta chance sur les œufs", gems = 220 },
-	{ id = "vip", name = "VIP", desc = "+2 emplacements, +10 % de pièces", gems = 400 },
+	{ id = "triple", name = "Triple éclosion", desc = "Ouvre 3 œufs d'un coup", gems = 120, robux = 199, icon = "🥚" },
+	{ id = "auto", name = "Auto-éclosion", desc = "Ouvre des œufs en boucle", gems = 80, robux = 149, icon = "🔁" },
+	{ id = "fast", name = "Éclosion rapide", desc = "Ouvre les œufs deux fois plus vite", gems = 150, robux = 99, icon = "⚡" },
+	{ id = "coins2", name = "Pièces x2", desc = "Double toutes tes pièces", gems = 300, robux = 249, icon = "🪙" },
+	{ id = "luck2", name = "Chance x2", desc = "Double ta chance sur les œufs", gems = 220, robux = 199, icon = "🍀" },
+	{ id = "dmg2", name = "Dégâts x2", desc = "Tes pets et tes clics frappent deux fois plus fort", gems = 250, robux = 149, icon = "💪" },
+	{ id = "slots", name = "+3 pets équipés", desc = "Trois pets de plus avec toi", gems = 350, robux = 249, icon = "🐾" },
+	{ id = "storage", name = "Inventaire +150", desc = "Garde 150 pets de plus", gems = 150, robux = 79, icon = "🎒" },
+	{ id = "speed", name = "Super vitesse", desc = "Cours 40 % plus vite", gems = 100, robux = 49, icon = "👟" },
+	{ id = "shiny", name = "Chance shiny x3", desc = "Trois fois plus de pets brillants", gems = 300, robux = 199, icon = "✨" },
+	{ id = "vip", name = "VIP", desc = "+2 pets équipés et +10 % de pièces", gems = 400, robux = 399, icon = "👑" },
 }
 
 -- Identifiants Roblox (UserId) des admins. Le créateur du jeu est toujours admin,

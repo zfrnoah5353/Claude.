@@ -1,0 +1,52 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0}</style>
+<script type="importmap">{"imports":{"three":"./three.module.js"}}</script></head><body>
+<script type="module">
+import * as THREE from 'three';
+const q = new URLSearchParams(location.search);
+const wi = +(q.get('w') || 1), view = q.get('view') || 'player';
+const W = 1280, H = 720;
+const worlds = await (await fetch('decor.json')).json();
+const G = [{ g: 'FFB3CF', g2: 'FFC6DB', plaza: 'FFF6E6', banner: 'FFD54A', sky: '9FD8FF' }, { g: 'CC9E74', g2: 'D9AE85', plaza: 'F3DCC2', banner: 'C98A5A', sky: 'F3D2B8' }, { g: 'B9E4FF', g2: 'CDEBFF', plaza: 'FFFFFF', banner: '7EE0B8', sky: 'CFEFFF' }, { g: '28224A', g2: '2E2752', plaza: '3F3670', banner: 'B69CFF', sky: '120E2A' }][wi - 1];
+const R = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); R.setSize(W, H); R.shadowMap.enabled = true;
+R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(R.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color('#' + G.sky); scene.fog = new THREE.Fog('#' + G.sky, 250, 700);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x9a8aa8, 1.5));
+const sun = new THREE.DirectionalLight(0xffffff, 2.2); sun.position.set(-200, 300, -150); sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096);
+Object.assign(sun.shadow.camera, { left: -260, right: 260, top: 260, bottom: -260, far: 900 }); scene.add(sun);
+const mats = {};
+const mat = (c, m, t) => { const k = c + m + t; return mats[k] ||= new THREE.MeshStandardMaterial({ color: '#' + c, roughness: m === 'Foil' || m === 'Metal' ? 0.3 : 0.8, metalness: m === 'Foil' || m === 'Metal' ? 0.6 : 0, emissive: m === 'Neon' ? new THREE.Color('#' + c) : new THREE.Color(0), emissiveIntensity: 0.7, transparent: (t || 0) > 0, opacity: 1 - (t || 0) }); };
+function addPart(s, size, p, r, c, m, t) {
+  let g;
+  if (s === 'ball') g = new THREE.SphereGeometry(size[0] / 2, 20, 14);
+  else if (s === 'cyl') { g = new THREE.CylinderGeometry(size[1] / 2, size[1] / 2, size[0], 24); g.rotateZ(-Math.PI / 2); }
+  else g = new THREE.BoxGeometry(...size);
+  const mesh = new THREE.Mesh(g, mat(c, m, t));
+  mesh.position.set(...p);
+  if (r) { mesh.rotation.order = 'XYZ'; mesh.rotation.set(...r.map(THREE.MathUtils.degToRad)); }
+  mesh.castShadow = (t || 0) < 0.5; mesh.receiveShadow = true;
+  scene.add(mesh);
+}
+// base du monde (comme buildWorld)
+addPart('block', [400, 4, 340], [0, -2, 0], null, G.g);
+for (let gx = -4; gx <= 4; gx++) for (let gz = -3; gz <= 3; gz++) if ((gx + gz) % 2 === 0) addPart('block', [40, 0.1, 40], [gx * 40, 0.05, gz * 40 + 10], null, G.g2);
+for (const b of [[[0, 1, 172], [404, 2, 4]], [[0, 1, -172], [404, 2, 4]], [[202, 1, 0], [4, 2, 340]], [[-202, 1, 0], [4, 2, 340]]]) addPart('block', b[1], b[0], null, G.banner);
+addPart('block', [300, 0.3, 70], [0, 0.15, -115], null, G.plaza);
+addPart('block', [36, 9, 1.5], [0, 14, -145], null, G.banner);
+for (const x of [-30, 30]) { addPart('cyl', [3, 12, 12], [x, 1.5, -115], [0, 0, 90], 'FFFFFF'); const e = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 14), mat('FF9EC4')); e.scale.set(3.3, 4.2, 3.3); e.position.set(x, 7.8, -115); scene.add(e); }
+for (const sx of [-7, 7]) addPart('block', [2.5, 16, 2.5], [-105 + sx, 8, -115], null, '6B5BD6');
+addPart('cyl', [0.6, 12, 12], [-105, 8, -115], [0, 90, 0], 'B69CFF', 'Neon');
+for (const sx of [-8, 8]) addPart('block', [3, 18, 3], [105 + sx, 9, -115], null, 'FFFFFF');
+addPart('block', [22, 4, 3], [105, 19, -115], null, '7EE0B8');
+// tas de bonbons
+const rnd = (() => { let s = 5; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+for (let i = 0; i < 26; i++) { const x = (rnd() < 0.5 ? -1 : 1) * (12 + rnd() * 93), z = -65 + rnd() * 170; if ([[-75,-35],[75,-35],[-78,62],[78,62],[-32,96],[34,96]].some(g => Math.hypot(x - g[0], z - g[1]) < 19)) continue; for (let k = 0; k < 3; k++) addPart('ball', [4 + rnd() * 2, 0, 0].map((v, j) => j ? 0 : v).fill(4 + rnd() * 2, 1), [x + (k - 1) * 2, 1.5, z + (k % 2) * 2], null, ['FF8FB8', 'B69CFF', 'FFD54A', '7FD6FF', '7EE0B8'][Math.floor(rnd() * 5)]); }
+for (const p of worlds[wi - 1].parts) if (p.t !== 1) addPart(p.s, p.size, p.p, p.r, p.c, p.m, p.t);
+// joueur
+addPart('block', [2, 5, 1], [0, 2.5, 30], null, '3A6BD6');
+const cam = new THREE.PerspectiveCamera(70, W / H, 0.5, 2000);
+if (view === 'player') { cam.position.set(0, 18, 62); cam.lookAt(0, 4, -60); }
+else if (view === 'side') { cam.position.set(185, 12, 20); cam.lookAt(80, 6, -110); }
+else { cam.position.set(0, 330, 330); cam.lookAt(0, 0, 0); }
+R.render(scene, cam);
+document.title = 'done';
+</script></body></html>

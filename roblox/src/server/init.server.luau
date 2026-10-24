@@ -12,6 +12,7 @@ local MarketplaceService = game:GetService("MarketplaceService")
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Config = require(Shared:WaitForChild("Config"))
 local PetModels = require(Shared:WaitForChild("PetModels"))
+local MapDecor = require(Shared:WaitForChild("MapDecor"))
 
 local rng = Random.new()
 
@@ -98,8 +99,8 @@ local pileFolder = Instance.new("Folder")
 pileFolder.Name = "Piles"
 pileFolder.Parent = workspace
 
-local FIELD_X = 150
-local FIELD_Z0, FIELD_Z1 = -70, 140
+local FIELD_X = MapDecor.FX
+local FIELD_Z0, FIELD_Z1 = MapDecor.Z0, MapDecor.Z1
 local PLAZA_Z = -115
 
 local eggStands: { [string]: Vector3 } = {}
@@ -110,53 +111,100 @@ local function worldSpawn(w: number): CFrame
 	return CFrame.new(o + Vector3.new(0, 4, 30))
 end
 
+-- Décor (calculé par MapDecor) : une pièce par entrée, effets d'ambiance compris
+local MATERIALS: { [string]: Enum.Material } = {
+	Neon = Enum.Material.Neon,
+	Glass = Enum.Material.Glass,
+	Foil = Enum.Material.Foil,
+	Metal = Enum.Material.Metal,
+	Sand = Enum.Material.Sand,
+	Snow = Enum.Material.Snow,
+	SmoothPlastic = Enum.Material.SmoothPlastic,
+}
+local FX_TEXTURE = {
+	sparkle = "rbxasset://textures/particles/sparkles_main.dds",
+	stars = "rbxasset://textures/particles/sparkles_main.dds",
+	bubbles = "rbxasset://textures/particles/smoke_main.dds",
+	snow = "rbxasset://textures/particles/sparkles_main.dds",
+}
+
+local function ambientFx(host: BasePart, kind: string)
+	local pe = Instance.new("ParticleEmitter")
+	pe.Texture = FX_TEXTURE[kind] or FX_TEXTURE.sparkle
+	pe.LightEmission = 1
+	pe.Lifetime = NumberRange.new(4, 7)
+	pe.Rate = 12
+	pe.Speed = NumberRange.new(0.5, 2)
+	pe.SpreadAngle = Vector2.new(180, 180)
+	pe.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(0.3, 0.8), NumberSequenceKeypoint.new(1, 0) })
+	if kind == "snow" then
+		pe.Color = ColorSequence.new(Color3.new(1, 1, 1))
+		pe.Rate = 60
+		pe.Speed = NumberRange.new(2, 4)
+		pe.Acceleration = Vector3.new(0, -2, 0)
+		pe.Size = NumberSequence.new(0.5)
+		pe.LightEmission = 0.3
+	elseif kind == "bubbles" then
+		pe.Color = ColorSequence.new(Color3.fromHex("6B4430"))
+		pe.Rate = 8
+		pe.Speed = NumberRange.new(3, 6)
+		pe.LightEmission = 0
+	elseif kind == "stars" then
+		pe.Color = ColorSequence.new(Color3.fromHex("FFF3B8"), Color3.fromHex("7FD6FF"))
+		pe.Rate = 30
+	else
+		pe.Color = ColorSequence.new(Color3.fromHex("FFF6C8"), Color3.fromHex("FF8FB8"))
+	end
+	pe.Parent = host
+	-- zone d'émission : grande boîte invisible
+	if kind == "snow" or kind == "stars" or kind == "sparkle" then
+		host.Size = if kind == "sparkle" then Vector3.new(FIELD_X * 2, 10, FIELD_Z1 - FIELD_Z0) else Vector3.new(420, 4, 360)
+		pe.Shape = Enum.ParticleEmitterShape.Box
+		pe.ShapeInOut = Enum.ParticleEmitterShapeInOut.Outward
+		pe.ShapeStyle = Enum.ParticleEmitterShapeStyle.Volume
+	end
+end
+
 local function buildDecor(w, folder: Folder)
 	local o = w.origin
-	local r = Random.new(w.id * 977)
-	local placed = 0
-	while placed < 34 do
-		local x = r:NextNumber(-185, 185)
-		local z = r:NextNumber(-155, 155)
-		local inField = math.abs(x) < FIELD_X + 12 and z > FIELD_Z0 - 12 and z < FIELD_Z1 + 12
-		local inPlaza = z < PLAZA_Z + 45 and z > PLAZA_Z - 45 and math.abs(x) < 150
-		if inField or inPlaza then
-			continue
+	local palette = {}
+	for _, c in w.candy do
+		table.insert(palette, c:ToHex())
+	end
+	local decor = Instance.new("Folder")
+	decor.Name = "Decor"
+	decor.Parent = folder
+	for _, sp in MapDecor.build(w.theme, palette, w.id * 977) do
+		local size = Vector3.new(sp.size[1], sp.size[2], sp.size[3])
+		local r = sp.r
+		local cf = CFrame.new(o + Vector3.new(sp.p[1], sp.p[2], sp.p[3]))
+		if r then
+			cf *= CFrame.Angles(math.rad(r[1]), math.rad(r[2]), math.rad(r[3]))
 		end
-		placed += 1
-		local base = o + Vector3.new(x, 0, z)
-		local k = r:NextInteger(1, 3)
-		local h = r:NextNumber(8, 16)
-		if w.theme == "meadow" then
-			if k == 1 then
-				deco({ Parent = folder, Size = Vector3.new(h, 1.2, 1.2), CFrame = CFrame.new(base + Vector3.new(0, h / 2, 0)) * CFrame.Angles(0, 0, math.rad(90)), Shape = Enum.PartType.Cylinder, Color = Color3.new(1, 1, 1), CanCollide = true })
-				deco({ Parent = folder, Size = Vector3.new(1.5, 8, 8), CFrame = CFrame.new(base + Vector3.new(0, h + 3, 0)) * CFrame.Angles(0, math.rad(r:NextNumber(0, 180)), 0), Shape = Enum.PartType.Cylinder, Color = w.candy[r:NextInteger(1, #w.candy)] })
-			elseif k == 2 then
-				for i = 1, 3 do
-					deco({ Parent = folder, Size = Vector3.one * r:NextNumber(5, 8), Position = base + Vector3.new(r:NextNumber(-4, 4), 3, r:NextNumber(-4, 4)), Shape = Enum.PartType.Ball, Color = Color3.fromHex(i == 2 and "8EDDB4" or "A6E8C4"), CanCollide = true })
-				end
-			else
-				deco({ Parent = folder, Size = Vector3.new(1.6, h, 1.6), Position = base + Vector3.new(0, h / 2, 0), Color = Color3.new(1, 1, 1), CanCollide = true })
-				for i = 0, math.floor(h / 2.5) do
-					deco({ Parent = folder, Size = Vector3.new(1.7, 0.5, 1.7), CFrame = CFrame.new(base + Vector3.new(0, 1 + i * 2.5, 0)) * CFrame.Angles(0, 0, math.rad(25)), Color = Color3.fromHex("FF5A6E") })
-				end
-			end
-		elseif w.theme == "choco" then
-			deco({ Parent = folder, Size = Vector3.new(2.4, h, 2.4), Position = base + Vector3.new(0, h / 2, 0), Color = Color3.fromHex("6B4430"), CanCollide = true })
-			for i = 1, 3 do
-				deco({ Parent = folder, Size = Vector3.one * r:NextNumber(6, 9), Position = base + Vector3.new(r:NextNumber(-3, 3), h + r:NextNumber(-1, 2), r:NextNumber(-3, 3)), Shape = Enum.PartType.Ball, Color = Color3.fromHex(i == 1 and "5A3424" or "4A2C20") })
-			end
-		elseif w.theme == "ice" then
-			deco({ Parent = folder, Size = Vector3.new(h * 0.8, 3, 3), CFrame = CFrame.new(base + Vector3.new(0, h * 0.4, 0)) * CFrame.Angles(0, 0, math.rad(90)), Shape = Enum.PartType.Cylinder, Color = Color3.fromHex("E8A85A"), CanCollide = true })
-			for i = 1, k do
-				deco({ Parent = folder, Size = Vector3.one * 5.5, Position = base + Vector3.new(0, h * 0.8 + (i - 1) * 4, 0), Shape = Enum.PartType.Ball, Color = w.candy[r:NextInteger(1, #w.candy)] })
-			end
-		else
-			if k == 1 then
-				local planet = deco({ Parent = folder, Size = Vector3.one * r:NextNumber(8, 14), Position = base + Vector3.new(0, h + 4, 0), Shape = Enum.PartType.Ball, Color = w.candy[r:NextInteger(1, #w.candy)] })
-				deco({ Parent = folder, Size = Vector3.new(0.4, planet.Size.X * 1.7, planet.Size.X * 1.7), CFrame = planet.CFrame * CFrame.Angles(0, 0, math.rad(70)), Shape = Enum.PartType.Cylinder, Color = Color3.fromHex("FFF3B8"), Transparency = 0.3 })
-			else
-				deco({ Parent = folder, Size = Vector3.new(3, h, 3), CFrame = CFrame.new(base + Vector3.new(0, h / 2, 0)) * CFrame.Angles(0, math.rad(45), math.rad(r:NextNumber(-12, 12))), Color = w.candy[r:NextInteger(1, #w.candy)], Material = Enum.Material.Neon, Transparency = 0.25, CanCollide = true })
-			end
+		local p = deco({
+			Parent = decor,
+			Size = size,
+			CFrame = cf,
+			Color = Color3.fromHex(sp.c),
+			Material = MATERIALS[sp.m or "SmoothPlastic"] or Enum.Material.SmoothPlastic,
+			Transparency = sp.t or 0,
+			CanCollide = sp.col == true,
+			CastShadow = math.max(size.X, size.Y, size.Z) > 6 and (sp.t or 0) < 0.5,
+		})
+		if sp.s == "ball" then
+			p.Shape = Enum.PartType.Ball
+		elseif sp.s == "cyl" then
+			p.Shape = Enum.PartType.Cylinder
+		end
+		if sp.light then
+			local l = Instance.new("PointLight")
+			l.Range = sp.light
+			l.Brightness = 1.2
+			l.Color = p.Color
+			l.Parent = p
+		end
+		if sp.fx then
+			ambientFx(p, sp.fx)
 		end
 	end
 end
@@ -273,8 +321,81 @@ end
 for _, b in { { Vector3.new(0, 15, 76), Vector3.new(174, 34, 4) }, { Vector3.new(0, 15, -76), Vector3.new(174, 34, 4) }, { Vector3.new(86, 15, 0), Vector3.new(4, 34, 150) }, { Vector3.new(-86, 15, 0), Vector3.new(4, 34, 150) } } do
 	part({ Parent = arena, Size = b[2], Position = BO + b[1], Color = Color3.fromHex("6B5BD6"), Transparency = 0.6 })
 end
-local ARENA_SPAWN = CFrame.new(BO + Vector3.new(0, 4, 45))
 local GOLEM_POS = BO + Vector3.new(0, 0, -30)
+
+-- Colisée du boss : gradins de spectateurs en gomme, piliers et torches, bannières, douves de sucre
+do
+	local deep, mid, light = Color3.fromHex("3B2F6B"), Color3.fromHex("5A4BA0"), Color3.fromHex("B69CFF")
+	local gummies = { "FF5A8A", "FFD54A", "7EE0B8", "7FD6FF", "FF9A3C", "B69CFF" }
+	local ar = Random.new(4242)
+	-- sol extérieur
+	part({ Parent = arena, Size = Vector3.new(420, 2, 400), Position = BO + Vector3.new(0, -3.2, 0), Color = Color3.fromHex("221A40") })
+	-- douves lumineuses tout autour du sol de combat
+	for _, b in { { Vector3.new(0, 0, 82), Vector3.new(190, 0.4, 8) }, { Vector3.new(0, 0, -82), Vector3.new(190, 0.4, 8) }, { Vector3.new(94, 0, 0), Vector3.new(8, 0.4, 172) }, { Vector3.new(-94, 0, 0), Vector3.new(8, 0.4, 172) } } do
+		deco({ Parent = arena, Size = b[2], Position = BO + b[1] + Vector3.new(0, -0.4, 0), Color = Color3.fromHex("FF4FD8"), Material = Enum.Material.Neon })
+	end
+	-- gradins (3 marches) et spectateurs, sauf devant l'entrée (z > 0 au centre)
+	for tier = 1, 3 do
+		local off = 100 + tier * 10
+		local h = tier * 5
+		for _, side in { { Vector3.new(0, 0, -1), 230 }, { Vector3.new(1, 0, 0), 200 }, { Vector3.new(-1, 0, 0), 200 } } do
+			local n, len = side[1], side[2]
+			local center = BO + n * off + Vector3.new(0, h / 2 - 0.5, 0)
+			local size = if n.Z ~= 0 then Vector3.new(len, h, 10) else Vector3.new(10, h, len)
+			part({ Parent = arena, Size = size, Position = center, Color = if tier % 2 == 0 then mid else deep })
+			-- spectateurs : petits oursons en gomme
+			for k = 1, 26 do
+				local u = (k - 0.5) / 26 - 0.5
+				local pos = if n.Z ~= 0 then BO + n * off + Vector3.new(u * len * 0.92, h, 0) else BO + n * off + Vector3.new(0, h, u * len * 0.92)
+				if ar:NextNumber() < 0.8 then
+					local c = Color3.fromHex(gummies[ar:NextInteger(1, #gummies)])
+					deco({ Parent = arena, Size = Vector3.new(2.6, 3, 2.2), Position = pos + Vector3.new(0, 1.5, 0), Color = c, Material = Enum.Material.Glass, Transparency = 0.15 })
+					deco({ Parent = arena, Size = Vector3.one * 2.2, Position = pos + Vector3.new(0, 3.9, 0), Shape = Enum.PartType.Ball, Color = c, Material = Enum.Material.Glass, Transparency = 0.15 })
+				end
+			end
+		end
+	end
+	-- piliers avec torches
+	for i = 0, 11 do
+		local a = i / 12 * math.pi * 2
+		local pos = BO + Vector3.new(math.cos(a) * 92, 0, math.sin(a) * 78)
+		if pos.Z - BO.Z > 60 and math.abs(pos.X - BO.X) < 30 then
+			continue -- dégage l'entrée
+		end
+		deco({ Parent = arena, Size = Vector3.new(4.5, 26, 4.5), Position = pos + Vector3.new(0, 13, 0), Color = light, CanCollide = true })
+		deco({ Parent = arena, Size = Vector3.new(6.5, 2, 6.5), Position = pos + Vector3.new(0, 1, 0), Color = mid })
+		deco({ Parent = arena, Size = Vector3.new(6.5, 2, 6.5), Position = pos + Vector3.new(0, 26.5, 0), Color = mid })
+		local flame = deco({ Parent = arena, Size = Vector3.new(2.6, 3.4, 2.6), Position = pos + Vector3.new(0, 29.4, 0), Shape = Enum.PartType.Ball, Color = Color3.fromHex("FF9A3C"), Material = Enum.Material.Neon })
+		local fire = Instance.new("Fire")
+		fire.Color = Color3.fromHex("FF6A3D")
+		fire.SecondaryColor = Color3.fromHex("FFD54A")
+		fire.Size = 5
+		fire.Heat = 9
+		fire.Parent = flame
+		local l = Instance.new("PointLight")
+		l.Color = Color3.fromHex("FFB060")
+		l.Range = 30
+		l.Brightness = 2
+		l.Parent = flame
+		-- bannière
+		deco({ Parent = arena, Size = Vector3.new(0.4, 10, 5), CFrame = CFrame.lookAt(pos + Vector3.new(0, 18, 0), BO + Vector3.new(0, 18, 0)) * CFrame.new(0, 0, -2.6) * CFrame.Angles(0, math.rad(90), 0), Color = Color3.fromHex(gummies[i % #gummies + 1]) })
+	end
+	-- portail d'entrée
+	local gate = BO + Vector3.new(0, 0, 72)
+	for _, sx in { -12, 12 } do
+		deco({ Parent = arena, Size = Vector3.new(5, 28, 5), Position = gate + Vector3.new(sx, 14, 0), Color = light, CanCollide = true })
+	end
+	local top = deco({ Parent = arena, Size = Vector3.new(30, 5, 6), Position = gate + Vector3.new(0, 30, 0), Color = mid, CanCollide = true })
+	local bb = billboard(top, Vector3.new(0, 6, 0), UDim2.fromOffset(320, 60), 200)
+	label(bb, "ARÈNE DU GOLEM", UDim2.fromScale(1, 1), UDim2.fromScale(0, 0), 40, Color3.fromHex("FFD54A"))
+	-- runes au sol autour de la zone du golem
+	for i = 0, 7 do
+		local a = i / 8 * math.pi * 2
+		deco({ Parent = arena, Size = Vector3.new(6, 0.2, 2), CFrame = CFrame.new(GOLEM_POS + Vector3.new(math.cos(a) * 34, 0.2, math.sin(a) * 34)) * CFrame.Angles(0, -a, 0), Color = Color3.fromHex("FF4FD8"), Material = Enum.Material.Neon })
+	end
+end
+
+local ARENA_SPAWN = CFrame.new(BO + Vector3.new(0, 4, 45))
 
 ---------------------------------------------------------------------------
 -- Données des joueurs
@@ -319,6 +440,7 @@ local function defaultData()
 		autoCollect = true,
 		autoDelete = 0,
 		lastSeen = 0,
+		receipts = {},
 	}
 end
 
@@ -359,6 +481,8 @@ type Profile = {
 local profiles: { [Player]: Profile } = {}
 -- multiplicateurs des événements « admin abusé » (modifiés par Admin.luau)
 local adminEvents = { coins = 1, luck = 1, dmg = 1, speed = 1 }
+-- chance x2 pour tout le serveur (produit Robux), fin en os.time()
+local serverLuckEnds = 0
 
 ---------------------------------------------------------------------------
 -- Économie
@@ -372,11 +496,11 @@ local function up(prof: Profile, id: string): number
 end
 
 local function slots(prof: Profile): number
-	return Config.BASE_SLOTS + up(prof, "slot") + (hasPass(prof, "vip") and 2 or 0)
+	return Config.BASE_SLOTS + up(prof, "slot") + (hasPass(prof, "vip") and 2 or 0) + (hasPass(prof, "slots") and 3 or 0)
 end
 
 local function storage(prof: Profile): number
-	return Config.BASE_STORAGE + 25 * up(prof, "storage")
+	return Config.BASE_STORAGE + 25 * up(prof, "storage") + (hasPass(prof, "storage") and 150 or 0)
 end
 
 local function potionOn(prof: Profile, id: string): boolean
@@ -384,7 +508,7 @@ local function potionOn(prof: Profile, id: string): boolean
 end
 
 local function damageMult(prof: Profile): number
-	return (1 + 0.1 * up(prof, "power")) * (potionOn(prof, "dmg") and 2 or 1) * adminEvents.dmg
+	return (1 + 0.1 * up(prof, "power")) * (potionOn(prof, "dmg") and 2 or 1) * (hasPass(prof, "dmg2") and 2 or 1) * adminEvents.dmg
 end
 
 local function coinMult(prof: Profile): number
@@ -408,6 +532,9 @@ local function luckMult(prof: Profile): number
 		m *= 2
 	end
 	if potionOn(prof, "luck") then
+		m *= 2
+	end
+	if os.time() < serverLuckEnds then
 		m *= 2
 	end
 	return m * adminEvents.luck
@@ -475,7 +602,7 @@ local function setWalkSpeed(plr: Player)
 	local char = plr.Character
 	local hum = char and char:FindFirstChildOfClass("Humanoid")
 	if prof and hum then
-		hum.WalkSpeed = if os.clock() < prof.stunUntil then 0 else 22 * (1 + 0.08 * up(prof, "speed")) * adminEvents.speed
+		hum.WalkSpeed = if os.clock() < prof.stunUntil then 0 else 22 * (1 + 0.08 * up(prof, "speed")) * (if hasPass(prof, "speed") then 1.4 else 1) * adminEvents.speed
 	end
 end
 
@@ -792,12 +919,18 @@ end
 local function spawnPile(wi: number)
 	local w = Config.Worlds[wi]
 	local o = w.origin
-	for _ = 1, 15 do
+	for _ = 1, 25 do
 		local pos = o + Vector3.new(rng:NextNumber(-FIELD_X, FIELD_X), 0, rng:NextNumber(FIELD_Z0, FIELD_Z1))
-		if (pos - (o + Vector3.new(0, 0, 30))).Magnitude < 12 then
-			continue
+		if (pos - (o + Vector3.new(0, 0, 30))).Magnitude < 14 or math.abs(pos.X - o.X) < 9 then
+			continue -- point d'apparition et chemin
 		end
 		local ok = true
+		for _, g in MapDecor.GROVES do
+			if (Vector3.new(pos.X - o.X, 0, pos.Z - o.Z) - Vector3.new(g[1], 0, g[2])).Magnitude < MapDecor.GROVE_R + 5 then
+				ok = false
+				break
+			end
+		end
 		for _, p in piles do
 			if p.world == wi and (p.pos - pos).Magnitude < 11 then
 				ok = false
@@ -997,7 +1130,8 @@ local function hatch(plr: Player, eggId: string, auto: boolean): boolean
 	end
 	local d = prof.data
 	local now = os.clock()
-	if now - prof.lastHatch < (auto and 2.4 or 1.0) then
+	local fast = hasPass(prof, "fast")
+	if now - prof.lastHatch < (if auto then (if fast then 1.3 else 2.4) else (if fast then 0.55 else 1.0)) then
 		return false
 	end
 	local hrp = hrpOf(plr)
@@ -1030,7 +1164,7 @@ local function hatch(plr: Player, eggId: string, auto: boolean): boolean
 		local petId = rollPet(prof, egg)
 		local def = Config.Pets[petId]
 		local isNew = not d.discovered[petId]
-		local shiny = rng:NextNumber() < 1 / 200
+		local shiny = rng:NextNumber() < (if hasPass(prof, "shiny") then 3 else 1) / 200
 		d.stats.hatched += 1
 		local entry = { def = petId, shiny = shiny, new = isNew, deleted = false, power = def.power * (shiny and 1.5 or 1), chance = realChance(prof, egg, petId) }
 		if def.rarity <= d.autoDelete and not shiny and not isNew then
@@ -1049,7 +1183,7 @@ local function hatch(plr: Player, eggId: string, auto: boolean): boolean
 		end
 	end
 	refreshEquipped(plr)
-	Fx:FireClient(plr, "hatch", { egg = eggId, results = results, auto = auto })
+	Fx:FireClient(plr, "hatch", { egg = eggId, results = results, auto = auto, fast = fast })
 	return true
 end
 
@@ -1719,17 +1853,52 @@ MarketplaceService.PromptGamePassPurchaseFinished:Connect(function(plr, passId, 
 	end
 end)
 
+local save: (Player) -> () -- définie plus bas
+
+-- produits Robux : gemmes, pièces, potions, chance du serveur
+local function grantProduct(plr: Player, prof: Profile, prod: Config.Product)
+	local d = prof.data
+	if prod.kind == "gems" then
+		d.gems += prod.amount
+		toast(plr, "+" .. prod.amount .. " gemmes, merci !", "7FD6FF")
+	elseif prod.kind == "coins" then
+		local v = roundNice(math.max(1000, estimatedCps(prof) * prod.amount))
+		addCoins(prof, v, false)
+		toast(plr, "+" .. Config.fmt(v) .. " pièces, merci !", "FFD54A")
+	elseif prod.kind == "potions" then
+		for _, pt in Config.Potions do
+			d.potions[pt.id] = (d.potions[pt.id] or 0) + prod.amount
+		end
+		toast(plr, "Potions activées, merci !", "7EE0B8")
+	elseif prod.kind == "serverLuck" then
+		serverLuckEnds = math.max(serverLuckEnds, os.time()) + prod.amount
+		workspace:SetAttribute("ServerLuckEnds", serverLuckEnds)
+		Fx:FireAllClients("toast", { text = "🍀 " .. plr.DisplayName .. " offre la CHANCE x2 à tout le serveur !", color = "3DD68C" })
+	end
+	prof.full = true
+	prof.money = true
+	Fx:FireClient(plr, "bought", {})
+end
+
 MarketplaceService.ProcessReceipt = function(info)
 	local plr = Players:GetPlayerByUserId(info.PlayerId)
 	local prof = if plr then profiles[plr] else nil
 	if not plr or not prof then
 		return Enum.ProductPurchaseDecision.NotProcessedYet
 	end
-	for _, prod in Config.GemProducts do
+	-- un même achat ne doit être donné qu'une fois
+	local seen = prof.data.receipts
+	if table.find(seen, info.PurchaseId) then
+		return Enum.ProductPurchaseDecision.PurchaseGranted
+	end
+	for _, prod in Config.Products do
 		if prod.id ~= 0 and prod.id == info.ProductId then
-			prof.data.gems += prod.gems
-			prof.full = true
-			toast(plr, "+" .. prod.gems .. " gemmes, merci !", "7FD6FF")
+			grantProduct(plr, prof, prod)
+			table.insert(seen, info.PurchaseId)
+			if #seen > 50 then
+				table.remove(seen, 1)
+			end
+			task.spawn(save, plr)
 			return Enum.ProductPurchaseDecision.PurchaseGranted
 		end
 	end
@@ -1739,7 +1908,7 @@ end
 ---------------------------------------------------------------------------
 -- Connexion / déconnexion / sauvegarde
 ---------------------------------------------------------------------------
-local function save(plr: Player)
+save = function(plr: Player)
 	local prof = profiles[plr]
 	local ds = store
 	if not prof or not prof.canSave or not ds then

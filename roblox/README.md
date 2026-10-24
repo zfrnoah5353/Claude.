@@ -96,9 +96,25 @@ Les sons sont déjà dans le jeu, il n'y a rien à importer. Ce sont des sons pu
 
 Pour changer un son : mets un Sound dans **SoundService › SweetSounds** avec le même nom que dans le tableau `SOUNDS` de `src/client/init.client.luau` (`click`, `coin`, `legend`…). Il remplace celui d'origine.
 
-## Robux (optionnel)
+## Robux
 
-Dans `src/shared/Config.luau`, colle les identifiants de tes Game Passes (`Config.GamePassIds`) et de tes Developer Products (`Config.GemProducts`). Tant qu'un identifiant vaut `0`, l'objet s'achète avec des gemmes gagnées en jeu.
+La boutique (**B**) a un onglet **Passes** et un onglet **Robux**.
+
+**Gamepass** (prix conseillés) : Triple éclosion 199, Auto-éclosion 149, Éclosion rapide 99, Pièces x2 249, Chance x2 199, Dégâts x2 149, +3 pets équipés 249, Inventaire +150 79, Super vitesse 49, Chance shiny x3 199, VIP 399.
+
+**Produits** (achats répétables) : 100, 550, 1 200 et 6 500 gemmes (25, 99, 199, 899), 1 heure de pièces (49), pack des 3 potions 30 min (79), chance x2 pour tout le serveur pendant 15 min (149).
+
+Pour encaisser des Robux :
+1. Publie le jeu (Fichier › Publier sur Roblox).
+2. Sur [create.roblox.com](https://create.roblox.com), ouvre ton jeu › **Monétisation** : crée un **Pass** pour chaque gamepass et un **Produit de développeur** pour chaque produit, au prix que tu veux.
+3. Copie chaque identifiant dans `src/shared/Config.luau` : `Config.GamePassIds` pour les passes, champ `id` de `Config.Products` pour les produits. Dans Studio, c'est le script **ReplicatedStorage › Shared › Config**.
+4. Republie le jeu. Le bouton affiche alors le vrai prix en Robux.
+
+Tant qu'un pass vaut 0, il s'achète avec des gemmes gagnées en jeu. Un produit à 0 n'apparaît pas pour les joueurs ; les admins le voient grisé, pour savoir lequel configurer.
+
+## Musique
+
+Chaque monde a sa musique et le combat du boss a la sienne (bibliothèque Roblox, APM) : *Bubblegum Factory*, *Chocolate Chip*, *Snowfall Dance*, *Cosmic Dust* et *Epic Battle Simulator*. On peut la couper dans **Réglages**. Les pistes se changent dans `Config.Music`.
 
 ## Commandes
 
