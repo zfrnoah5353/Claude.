@@ -357,6 +357,8 @@ type Profile = {
 }
 
 local profiles: { [Player]: Profile } = {}
+-- multiplicateurs des événements « admin abusé » (modifiés par Admin.luau)
+local adminEvents = { coins = 1, luck = 1, dmg = 1, speed = 1 }
 
 ---------------------------------------------------------------------------
 -- Économie
@@ -382,7 +384,7 @@ local function potionOn(prof: Profile, id: string): boolean
 end
 
 local function damageMult(prof: Profile): number
-	return (1 + 0.1 * up(prof, "power")) * (potionOn(prof, "dmg") and 2 or 1)
+	return (1 + 0.1 * up(prof, "power")) * (potionOn(prof, "dmg") and 2 or 1) * adminEvents.dmg
 end
 
 local function coinMult(prof: Profile): number
@@ -397,7 +399,7 @@ local function coinMult(prof: Profile): number
 	if potionOn(prof, "coins") then
 		m *= 2
 	end
-	return m
+	return m * adminEvents.coins
 end
 
 local function luckMult(prof: Profile): number
@@ -408,7 +410,7 @@ local function luckMult(prof: Profile): number
 	if potionOn(prof, "luck") then
 		m *= 2
 	end
-	return m
+	return m * adminEvents.luck
 end
 
 local function teamDps(prof: Profile): number
@@ -473,7 +475,7 @@ local function setWalkSpeed(plr: Player)
 	local char = plr.Character
 	local hum = char and char:FindFirstChildOfClass("Humanoid")
 	if prof and hum then
-		hum.WalkSpeed = if os.clock() < prof.stunUntil then 0 else 22 * (1 + 0.08 * up(prof, "speed"))
+		hum.WalkSpeed = if os.clock() < prof.stunUntil then 0 else 22 * (1 + 0.08 * up(prof, "speed")) * adminEvents.speed
 	end
 end
 
@@ -1877,6 +1879,30 @@ local function onPlayer(plr: Player)
 	end
 	sendState(plr)
 end
+
+---------------------------------------------------------------------------
+-- Panneau admin (IA, actions manuelles, admin abusé, annonces traduites)
+---------------------------------------------------------------------------
+require(script:WaitForChild("Admin")).start({
+	Config = Config,
+	profiles = profiles,
+	events = adminEvents,
+	remotes = remotes,
+	Fx = Fx,
+	toast = toast,
+	addCoins = addCoins,
+	addPet = addPet,
+	teleport = teleport,
+	setWalkSpeed = setWalkSpeed,
+	defaultData = defaultData,
+	spawnBoss = function(): boolean
+		if boss.state ~= "idle" then
+			return false
+		end
+		spawnBoss()
+		return true
+	end,
+})
 
 Players.PlayerAdded:Connect(onPlayer)
 for _, plr in Players:GetPlayers() do

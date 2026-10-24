@@ -200,7 +200,7 @@ timerChip("dmg", "💪", 3)
 -- menus latéraux
 local menuBadges: { [string]: TextLabel } = {}
 local openPanel: (string) -> ()
-local function menuButton(x: UDim, y: number, id: string, icon: string, labelText: string, color: Color3)
+local function menuButton(x: UDim, y: number, id: string, icon: string, labelText: string, color: Color3): Frame
 	local holder = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.fromOffset(64, 84), Position = UDim2.new(x, UDim.new(0, y)), Parent = hud })
 	local b = UI.button(holder, { Color = color, Size = UDim2.fromOffset(64, 64), Text = "", Radius = 18 }, function()
 		openPanel(id)
@@ -214,6 +214,7 @@ local function menuButton(x: UDim, y: number, id: string, icon: string, labelTex
 	UI.stroke(badge, 2.5)
 	badge.Visible = false
 	menuBadges[id] = badge
+	return holder
 end
 menuButton(UDim.new(0, 12), 150, "pets", "🐾", "Pets (P)", UI.PINK)
 menuButton(UDim.new(0, 12), 240, "index", "📖", "Index (I)", UI.LILAC)
@@ -278,6 +279,7 @@ local panelHost = UI.new("Frame", { Name = "Panel", BackgroundColor3 = Color3.fr
 
 type PanelDef = { title: string, color: Color3, w: number, h: number, sig: () -> string, build: (Frame) -> () }
 local panels: { [string]: PanelDef } = {}
+local onOpen: { [string]: () -> () } = {} -- appelé à l'ouverture d'un panneau
 local current = { name = nil :: string?, sig = "", tab = 1, sel = nil :: number?, scroll = Vector2.zero }
 
 local function closePanel()
@@ -327,6 +329,10 @@ openPanel = function(name: string)
 		current.scroll = Vector2.zero
 	end
 	current.name = name
+	local hook = onOpen[name]
+	if hook then
+		hook()
+	end
 	renderPanel()
 end
 
@@ -1465,6 +1471,499 @@ Fx.OnClientEvent:Connect(function(kind: string, data: any)
 end)
 
 ---------------------------------------------------------------------------
+-- Panneau admin : assistant IA, actions manuelles, admin abusé, annonces traduites
+-- (visible seulement pour les admins ; le serveur revérifie chaque demande)
+---------------------------------------------------------------------------
+local TextChatService = game:GetService("TextChatService")
+local Lighting = game:GetService("Lighting")
+
+local adm = {
+	rev = 0,
+	chat = {} :: { { who: string, text: string } },
+	waiting = false,
+	draft = "",
+	target = "me",
+	amount = "1M",
+	pet = 1,
+	tier = 0,
+	shiny = false,
+	count = 1,
+	minutes = 5,
+	value = "",
+	rarity = 6,
+	ann = "",
+	translate = true,
+	result = "",
+	log = {} :: { string },
+	hasKey = true,
+	confirmReset = false,
+}
+local function admRerender()
+	adm.rev += 1
+	if current.name == "admin" then
+		renderPanel()
+	end
+end
+
+local function adminCall(kind: string, a: any?, b: any?): any
+	local rf = Remotes:FindFirstChild("Admin") :: RemoteFunction?
+	if not rf then
+		return { ok = false, text = "Le serveur admin n'est pas prêt" }
+	end
+	local ok, res = pcall(rf.InvokeServer, rf, kind, a, b)
+	if not ok or type(res) ~= "table" then
+		return { ok = false, text = "Pas de réponse du serveur" }
+	end
+	return res
+end
+
+local function refreshAdminState()
+	task.spawn(function()
+		local st = adminCall("state")
+		if st.ok then
+			adm.log = st.log or {}
+			adm.hasKey = st.hasKey
+			admRerender()
+		end
+	end)
+end
+
+local function act(name: string, input: any)
+	adm.result = "…"
+	admRerender()
+	task.spawn(function()
+		local res = adminCall("act", name, input)
+		adm.result = res.text or ""
+		play(if res.ok then "buy" else "error")
+		refreshAdminState()
+	end)
+end
+
+-- « 1M », « 25k », « 3,5B » -> nombre
+local function parseAmount(s: string): number
+	local t = string.lower((string.gsub(s, "[%s_]", "")))
+	t = (string.gsub(t, ",", "."))
+	local num, suf = string.match(t, "^(%-?[%d%.]+)(%a*)$")
+	local v = tonumber(num) or 0
+	local mult = ({ k = 1e3, m = 1e6, b = 1e9, t = 1e12, qa = 1e15 })[suf or ""] or 1
+	return v * mult
+end
+
+local function textInput(parent: Instance, props: { [string]: any }, onChange: (string) -> ()): TextBox
+	local box = UI.new("TextBox", {
+		Text = props.Text or "",
+		PlaceholderText = props.Placeholder or "",
+		PlaceholderColor3 = UI.MUTED,
+		ClearTextOnFocus = false,
+		MultiLine = props.Multi or false,
+		TextWrapped = true,
+		Font = UI.FONT,
+		TextSize = props.TextSize or 18,
+		TextColor3 = UI.INK,
+		TextXAlignment = Enum.TextXAlignment.Left,
+		TextYAlignment = if props.Multi then Enum.TextYAlignment.Top else Enum.TextYAlignment.Center,
+		BackgroundColor3 = UI.WHITE,
+		Size = props.Size,
+		Position = props.Position or UDim2.new(),
+		ZIndex = 3,
+		Parent = parent,
+	})
+	UI.corner(box, 14)
+	UI.stroke(box, 2.5)
+	UI.new("UIPadding", { PaddingLeft = UDim.new(0, 12), PaddingRight = UDim.new(0, 12), PaddingTop = UDim.new(0, 6), PaddingBottom = UDim.new(0, 6), Parent = box })
+	box:GetPropertyChangedSignal("Text"):Connect(function()
+		onChange(box.Text)
+	end)
+	return box
+end
+
+local function chip(parent: Instance, text: string, on: boolean, color: Color3, x: number, y: number, w: number, cb: () -> ())
+	UI.button(parent, { Text = text, Color = if on then color else Color3.fromHex("C9C2E6"), Size = UDim2.fromOffset(w, 36), Position = UDim2.fromOffset(x, y), TextSize = 16, Radius = 14 }, cb)
+end
+
+local function sectionTitle(parent: Instance, text: string, y: number)
+	UI.text(parent, { Text = text, TextSize = 20, AlignX = L, Size = UDim2.new(1, 0, 0, 26), Position = UDim2.fromOffset(0, y) })
+end
+
+local ADMIN_RED = Color3.fromHex("FF4F8B")
+onOpen.admin = refreshAdminState
+
+local function sendAi(text: string)
+	if adm.waiting or text == "" then
+		return
+	end
+	table.insert(adm.chat, { who = "moi", text = text })
+	adm.draft = ""
+	adm.waiting = true
+	admRerender()
+	task.spawn(function()
+		local res = adminCall("ai", text)
+		adm.waiting = false
+		local reply = res.text or ""
+		if res.done and #res.done > 0 then
+			reply ..= "\n\n✅ " .. table.concat(res.done, "\n✅ ")
+		end
+		table.insert(adm.chat, { who = "ia", text = reply })
+		play(if res.ok then "pop" else "error")
+		refreshAdminState()
+	end)
+end
+
+local function buildAiTab(c: Frame)
+	if not adm.hasKey then
+		UI.text(c, { Text = "⚠️ Clé API Claude manquante : ajoute le secret « anthropic_api_key » (voir le README). La partie Manuel marche sans.", TextSize = 15, Wrap = true, Color = Color3.fromHex("C2185B"), Size = UDim2.new(1, 0, 0, 40), Position = UDim2.fromOffset(0, 52) })
+	end
+	local top = if adm.hasKey then 52 else 94
+	local sc = scroller(c, UDim2.new(1, 0, 1, -(top + 120)), UDim2.fromOffset(0, top))
+	UI.new("UIListLayout", { Padding = UDim.new(0, 8), SortOrder = Enum.SortOrder.LayoutOrder, Parent = sc })
+	UI.new("UIPadding", { PaddingRight = UDim.new(0, 14), Parent = sc })
+	if #adm.chat == 0 then
+		UI.text(sc, { Text = "Demande-moi ce que tu veux en français : je le fais dans le jeu.", TextSize = 18, Color = UI.MUTED, Size = UDim2.new(1, 0, 0, 30) })
+	end
+	for i, m in adm.chat do
+		local mine = m.who == "moi"
+		local row = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, 0, 0, 0), AutomaticSize = Enum.AutomaticSize.Y, LayoutOrder = i, Parent = sc })
+		local bubble = UI.new("Frame", { BackgroundColor3 = if mine then UI.PINK else UI.WHITE, Size = UDim2.new(0.78, 0, 0, 0), AutomaticSize = Enum.AutomaticSize.Y, Position = if mine then UDim2.new(0.22, 0, 0, 0) else UDim2.new(), Parent = row })
+		UI.corner(bubble, 16)
+		UI.stroke(bubble, 2.5)
+		UI.new("UIPadding", { PaddingLeft = UDim.new(0, 12), PaddingRight = UDim.new(0, 12), PaddingTop = UDim.new(0, 8), PaddingBottom = UDim.new(0, 8), Parent = bubble })
+		local t = UI.text(bubble, { Text = (if mine then "" else "🤖 ") .. m.text, TextSize = 16, Wrap = true, AlignX = L, Color = if mine then UI.WHITE else UI.INK, Size = UDim2.new(1, 0, 0, 0) })
+		t.AutomaticSize = Enum.AutomaticSize.Y
+	end
+	if adm.waiting then
+		UI.text(sc, { Text = "🤖 L'IA réfléchit…", TextSize = 16, AlignX = L, Color = UI.MUTED, Size = UDim2.new(1, 0, 0, 24), LayoutOrder = #adm.chat + 1 })
+	end
+	task.defer(function()
+		sc.CanvasPosition = Vector2.new(0, 1e6)
+	end)
+	-- suggestions
+	local ideas = { "Donne 1M de pièces à tout le monde", "Pluie de pets Mythiques !", "Chance x10 pendant 10 min", "Annonce : boss dans 1 minute" }
+	local x = 0
+	for _, idea in ideas do
+		local w = (utf8.len(idea) or #idea) * 7.6 + 28
+		UI.button(c, { Text = idea, Color = UI.LILAC, Size = UDim2.fromOffset(w, 32), Position = UDim2.new(0, x, 1, -108), TextSize = 14, Radius = 14 }, function()
+			sendAi(idea)
+		end)
+		x += w + 8
+	end
+	local box = textInput(c, { Text = adm.draft, Placeholder = "Ex. : donne un Kraken arc-en-ciel à Noah et lance la gravité lunaire 5 min", Size = UDim2.new(1, -250, 0, 56), Position = UDim2.new(0, 0, 1, -62) }, function(t)
+		adm.draft = t
+	end)
+	box.FocusLost:Connect(function(enter)
+		if enter then
+			sendAi(adm.draft)
+		end
+	end)
+	UI.button(c, { Text = if adm.waiting then "…" else "Envoyer", Color = UI.GREEN, Size = UDim2.fromOffset(120, 56), Position = UDim2.new(1, -240, 1, -62), TextSize = 20, Enabled = not adm.waiting }, function()
+		sendAi(adm.draft)
+	end)
+	UI.button(c, { Text = "Effacer", Color = Color3.fromHex("9C93C9"), Size = UDim2.fromOffset(108, 56), Position = UDim2.new(1, -108, 1, -62), TextSize = 18 }, function()
+		adm.chat = {}
+		admRerender()
+		task.spawn(adminCall, "aiReset")
+	end)
+end
+
+local function targetRow(c: Instance, y: number)
+	UI.text(c, { Text = "Cible :", TextSize = 18, AlignX = L, Size = UDim2.fromOffset(70, 36), Position = UDim2.fromOffset(0, y) })
+	local opts = { { "me", "Moi" }, { "all", "Tout le monde" } }
+	for _, p in Players:GetPlayers() do
+		if p ~= player then
+			table.insert(opts, { p.Name, p.DisplayName })
+		end
+	end
+	local x = 74
+	for _, o in opts do
+		local w = (utf8.len(o[2]) or #o[2]) * 9 + 30
+		chip(c, o[2], adm.target == o[1], UI.PINK, x, y, w, function()
+			adm.target = o[1]
+			admRerender()
+		end)
+		x += w + 8
+	end
+end
+
+local function buildManualTab(c: Frame)
+	local sc = scroller(c, UDim2.new(1, 0, 1, -96), UDim2.fromOffset(0, 52))
+	local body = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.new(1, -16, 0, 640), Parent = sc })
+	targetRow(body, 0)
+	-- monnaie
+	sectionTitle(body, "💰 Pièces et gemmes", 50)
+	textInput(body, { Text = adm.amount, Placeholder = "1M, 50k…", Size = UDim2.fromOffset(160, 40), Position = UDim2.fromOffset(0, 80) }, function(t)
+		adm.amount = t
+	end)
+	UI.button(body, { Text = "+ Pièces", Color = UI.YELLOW, Size = UDim2.fromOffset(130, 40), Position = UDim2.fromOffset(172, 80), TextSize = 17 }, function()
+		act("give_currency", { player = adm.target, currency = "coins", amount = parseAmount(adm.amount) })
+	end)
+	UI.button(body, { Text = "+ Gemmes", Color = UI.SKY, Size = UDim2.fromOffset(130, 40), Position = UDim2.fromOffset(312, 80), TextSize = 17 }, function()
+		act("give_currency", { player = adm.target, currency = "gems", amount = parseAmount(adm.amount) })
+	end)
+	UI.button(body, { Text = "− Pièces", Color = UI.RED, Size = UDim2.fromOffset(130, 40), Position = UDim2.fromOffset(452, 80), TextSize = 17 }, function()
+		act("give_currency", { player = adm.target, currency = "coins", amount = -parseAmount(adm.amount) })
+	end)
+	-- pet
+	sectionTitle(body, "🐾 Donner un pet", 136)
+	local id = Config.PetOrder[adm.pet]
+	local def = Config.Pets[id]
+	local card = UI.new("Frame", { BackgroundColor3 = UI.lighten(def.body, 0.75), Size = UDim2.fromOffset(150, 150), Position = UDim2.fromOffset(52, 166), Parent = body })
+	UI.corner(card, 16)
+	UI.stroke(card, 3.5, Config.Rarities[def.rarity].color)
+	UI.viewport(card, PetModels.build(id, adm.tier, adm.shiny, 1, false, THUMB), {})
+	UI.button(body, { Text = "◀", Color = UI.LILAC, Size = UDim2.fromOffset(42, 60), Position = UDim2.fromOffset(0, 210), TextSize = 22 }, function()
+		adm.pet = (adm.pet - 2) % #Config.PetOrder + 1
+		admRerender()
+	end)
+	UI.button(body, { Text = "▶", Color = UI.LILAC, Size = UDim2.fromOffset(42, 60), Position = UDim2.fromOffset(212, 210), TextSize = 22 }, function()
+		adm.pet = adm.pet % #Config.PetOrder + 1
+		admRerender()
+	end)
+	UI.text(body, { Text = def.name, TextSize = 20, AlignX = L, Size = UDim2.fromOffset(560, 26), Position = UDim2.fromOffset(270, 168) })
+	UI.text(body, { Text = Config.Rarities[def.rarity].name, TextSize = 16, AlignX = L, Color = Config.Rarities[def.rarity].color, Size = UDim2.fromOffset(300, 22), Position = UDim2.fromOffset(270, 194) })
+	for i, t in { "Normal", "Doré", "Arc-en-ciel" } do
+		chip(body, t, adm.tier == i - 1, UI.YELLOW, 270 + (i - 1) * 128, 224, 120, function()
+			adm.tier = i - 1
+			admRerender()
+		end)
+	end
+	chip(body, "✨ Shiny", adm.shiny, UI.SKY, 654, 224, 110, function()
+		adm.shiny = not adm.shiny
+		admRerender()
+	end)
+	for i, n in { 1, 5, 10 } do
+		chip(body, "× " .. n, adm.count == n, UI.MINT, 270 + (i - 1) * 78, 270, 70, function()
+			adm.count = n
+			admRerender()
+		end)
+	end
+	UI.button(body, { Text = "Donner", Color = UI.GREEN, Size = UDim2.fromOffset(150, 40), Position = UDim2.fromOffset(510, 268), TextSize = 18 }, function()
+		act("give_pet", { player = adm.target, pet = id, tier = adm.tier, shiny = adm.shiny, count = adm.count })
+	end)
+	-- potions et mondes
+	sectionTitle(body, "🧪 Potions (10 min)", 334)
+	for i, p in Config.Potions do
+		UI.button(body, { Text = p.name, Color = p.color, Size = UDim2.fromOffset(240, 40), Position = UDim2.fromOffset((i - 1) * 252, 364), TextSize = 15 }, function()
+			act("give_potion", { player = adm.target, potion = p.id, minutes = 10 })
+		end)
+	end
+	sectionTitle(body, "🌍 Téléporter", 420)
+	for i, w in Config.Worlds do
+		UI.button(body, { Text = w.name, Color = UI.MINT, Size = UDim2.fromOffset(186, 40), Position = UDim2.fromOffset((i - 1) * 196, 450), TextSize = 15 }, function()
+			act("teleport", { player = adm.target, world = i })
+		end)
+	end
+	-- boss et modération
+	sectionTitle(body, "⚔️ Boss et modération", 506)
+	UI.button(body, { Text = "💀 Faire apparaître le boss", Color = UI.ORANGE, Size = UDim2.fromOffset(280, 40), Position = UDim2.fromOffset(0, 536), TextSize = 16 }, function()
+		act("spawn_boss", {})
+	end)
+	UI.button(body, { Text = "Expulser", Color = UI.RED, Size = UDim2.fromOffset(150, 40), Position = UDim2.fromOffset(292, 536), TextSize = 16, Enabled = adm.target ~= "me" and adm.target ~= "all" }, function()
+		act("kick", { player = adm.target, reason = "Expulsé par un admin" })
+	end)
+	UI.button(body, { Text = if adm.confirmReset then "Sûr ? Re-clique" else "Remettre à zéro", Color = Color3.fromHex("8E1B3A"), Size = UDim2.fromOffset(200, 40), Position = UDim2.fromOffset(452, 536), TextSize = 16, Enabled = adm.target ~= "all" }, function()
+		if adm.confirmReset then
+			adm.confirmReset = false
+			act("reset_player", { player = adm.target, confirm = true })
+		else
+			adm.confirmReset = true
+			admRerender()
+		end
+	end)
+	UI.text(c, { Text = adm.result, TextSize = 16, Wrap = true, AlignX = L, Color = Color3.fromHex("2E7D5B"), Size = UDim2.new(1, 0, 0, 36), Position = UDim2.new(0, 0, 1, -38) })
+end
+
+local ABUSE_CARDS = {
+	{ "coins_x", "🟡", "Pièces x10", Color3.fromHex("FFD54A") },
+	{ "luck_x", "🍀", "Chance x10", Color3.fromHex("7EE0B8") },
+	{ "damage_x", "💪", "Dégâts x10", Color3.fromHex("FF5A6E") },
+	{ "speed_x", "⚡", "Vitesse x2", Color3.fromHex("7FD6FF") },
+	{ "coin_rain", "💰", "Pluie de pièces", Color3.fromHex("FFB020") },
+	{ "low_gravity", "🌙", "Gravité lunaire", Color3.fromHex("B69CFF") },
+	{ "giant", "🦖", "Tout le monde géant", Color3.fromHex("3DD68C") },
+	{ "tiny", "🐜", "Tout le monde mini", Color3.fromHex("FF9A3C") },
+	{ "disco", "🪩", "Disco", Color3.fromHex("FF8FB8") },
+	{ "night", "🌌", "Nuit étoilée", Color3.fromHex("6B5BD6") },
+}
+
+local abuseList: { any } = {}
+local abuseAt = 0
+
+local function buildAbuseTab(c: Frame)
+	UI.text(c, { Text = "Durée :", TextSize = 18, AlignX = L, Size = UDim2.fromOffset(80, 36), Position = UDim2.fromOffset(0, 52) })
+	for i, m in { 1, 5, 10, 30 } do
+		chip(c, m .. " min", adm.minutes == m, ADMIN_RED, 80 + (i - 1) * 92, 52, 84, function()
+			adm.minutes = m
+			admRerender()
+		end)
+	end
+	textInput(c, { Text = adm.value, Placeholder = "Valeur (vide = défaut)", Size = UDim2.fromOffset(220, 36), Position = UDim2.fromOffset(460, 52) }, function(t)
+		adm.value = t
+	end)
+	for i, card in ABUSE_CARDS do
+		local col, row = (i - 1) % 5, (i - 1) // 5
+		local b = UI.button(c, { Text = "", Color = card[4], Size = UDim2.fromOffset(158, 96), Position = UDim2.fromOffset(col * 170, 104 + row * 108), Radius = 20 }, function()
+			act("abuse_event", { kind = card[1], value = tonumber(adm.value), minutes = adm.minutes })
+		end)
+		UI.text(b.frame, { Text = card[2], TextSize = 34, Size = UDim2.new(1, 0, 0, 50), Position = UDim2.fromOffset(0, 4) })
+		UI.text(b.frame, { Text = card[3], TextSize = 15, Color = UI.WHITE, Outline = 2, Wrap = true, Size = UDim2.new(1, -10, 0, 36), Position = UDim2.fromOffset(5, 54) })
+	end
+	-- pluie de pets
+	UI.text(c, { Text = "🎁 Pluie de pets :", TextSize = 18, AlignX = L, Size = UDim2.fromOffset(170, 36), Position = UDim2.fromOffset(0, 330) })
+	for r = 1, 7 do
+		chip(c, Config.Rarities[r].name, adm.rarity == r, Config.Rarities[r].color, 170 + (r - 1) * 96, 330, 90, function()
+			adm.rarity = r
+			admRerender()
+		end)
+	end
+	UI.button(c, { Text = "🎁 Lancer la pluie de pets", Color = ADMIN_RED, Size = UDim2.fromOffset(300, 46), Position = UDim2.fromOffset(0, 378), TextSize = 18 }, function()
+		act("pet_rain", { rarity = adm.rarity })
+	end)
+	UI.button(c, { Text = "⛔ Tout arrêter", Color = Color3.fromHex("5A4A7A"), Size = UDim2.fromOffset(200, 46), Position = UDim2.fromOffset(312, 378), TextSize = 18 }, function()
+		act("stop_events", {})
+	end)
+	local lines = {}
+	for _, e in abuseList do
+		table.insert(lines, e.icon .. " " .. e.label)
+	end
+	UI.text(c, { Text = if #lines > 0 then "En cours : " .. table.concat(lines, " · ") else "Aucun événement en cours", TextSize = 16, Wrap = true, AlignX = L, Size = UDim2.new(1, 0, 0, 30), Position = UDim2.new(0, 0, 1, -70) })
+	UI.text(c, { Text = adm.result, TextSize = 16, Wrap = true, AlignX = L, Color = Color3.fromHex("2E7D5B"), Size = UDim2.new(1, 0, 0, 30), Position = UDim2.new(0, 0, 1, -36) })
+end
+
+local function buildAnnounceTab(c: Frame)
+	textInput(c, { Text = adm.ann, Placeholder = "Ton message (en français) : chaque joueur le reçoit dans sa langue", Multi = true, Size = UDim2.new(1, 0, 0, 110), Position = UDim2.fromOffset(0, 52) }, function(t)
+		adm.ann = t
+	end)
+	chip(c, if adm.translate then "🌍 Traduire : OUI" else "🌍 Traduire : NON", adm.translate, UI.GREEN, 0, 174, 200, function()
+		adm.translate = not adm.translate
+		admRerender()
+	end)
+	UI.button(c, { Text = "📢 Envoyer l'annonce", Color = ADMIN_RED, Size = UDim2.fromOffset(240, 40), Position = UDim2.fromOffset(212, 172), TextSize = 18 }, function()
+		if adm.ann ~= "" then
+			act("announce", { message = adm.ann, translate = adm.translate })
+			adm.ann = ""
+		end
+	end)
+	UI.text(c, { Text = adm.result, TextSize = 15, Wrap = true, AlignX = L, Color = Color3.fromHex("2E7D5B"), Size = UDim2.new(1, -470, 0, 40), Position = UDim2.fromOffset(466, 172) })
+	UI.text(c, { Text = "Les messages des joueurs dans le chat sont traduits automatiquement par Roblox. Tes annonces s'affichent en grand et dans le chat, dans la langue de chacun.", TextSize = 14, Wrap = true, AlignX = L, Color = UI.MUTED, Size = UDim2.new(1, 0, 0, 36), Position = UDim2.fromOffset(0, 220) })
+	sectionTitle(c, "📜 Journal des actions", 262)
+	local sc = scroller(c, UDim2.new(1, 0, 1, -296), UDim2.fromOffset(0, 294))
+	UI.new("UIListLayout", { Padding = UDim.new(0, 4), Parent = sc })
+	for _, line in adm.log do
+		UI.text(sc, { Text = line, TextSize = 14, Wrap = true, AlignX = L, Size = UDim2.new(1, -14, 0, 20) })
+	end
+end
+
+panels.admin = {
+	title = "Admin",
+	color = ADMIN_RED,
+	w = 900,
+	h = 600,
+	sig = function()
+		return tostring(adm.rev)
+	end,
+	build = function(c)
+		tabs(c, { "🤖 Assistant IA", "🛠️ Manuel", "🔥 Admin abusé", "📢 Annonces" }, ADMIN_RED)
+		if current.tab == 1 then
+			buildAiTab(c)
+		elseif current.tab == 2 then
+			buildManualTab(c)
+		elseif current.tab == 3 then
+			buildAbuseTab(c)
+		else
+			buildAnnounceTab(c)
+		end
+	end,
+}
+
+-- bouton du menu, seulement pour les admins
+local adminBtn = menuButton(UDim.new(1, -76), 510, "admin", "🛡️", "Admin (K)", ADMIN_RED)
+adminBtn.Visible = player:GetAttribute("IsAdmin") == true
+player:GetAttributeChangedSignal("IsAdmin"):Connect(function()
+	adminBtn.Visible = player:GetAttribute("IsAdmin") == true
+end)
+
+-- bannières : annonce et événements en cours
+local annBanner = UI.box(hud, { Size = UDim2.fromOffset(640, 92), Position = UDim2.new(0.5, 0, 0, 96), AnchorPoint = Vector2.new(0.5, 0), Color = UI.WHITE, Radius = 24 })
+local annHolder = annBanner.Parent :: Frame
+annHolder.Visible = false
+annHolder.ZIndex = 4
+local annFrom = UI.text(annBanner, { Text = "", TextSize = 16, Color = ADMIN_RED, Size = UDim2.new(1, -24, 0, 22), Position = UDim2.fromOffset(12, 6) })
+local annText = UI.text(annBanner, { Text = "", TextSize = 22, Wrap = true, Size = UDim2.new(1, -24, 0, 56), Position = UDim2.fromOffset(12, 28) })
+local annToken = 0
+
+local abuseBanner = UI.box(hud, { Size = UDim2.fromOffset(360, 40), Position = UDim2.new(0.5, 0, 0, 196), AnchorPoint = Vector2.new(0.5, 0), Color = ADMIN_RED, Radius = 18 })
+local abuseHolder = abuseBanner.Parent :: Frame
+abuseHolder.Visible = false
+local abuseText = UI.text(abuseBanner, { Text = "", TextSize = 17, Color = UI.WHITE, Outline = 2, Size = UDim2.new(1, -16, 1, 0), Position = UDim2.fromOffset(8, 0) })
+
+local disco = UI.new("ColorCorrectionEffect", { Name = "AdminDisco", Enabled = false, Parent = Lighting })
+
+local function chatSystem(text: string)
+	local channels = TextChatService:FindFirstChild("TextChannels")
+	local general = channels and channels:FindFirstChild("RBXGeneral") :: TextChannel?
+	if general then
+		pcall(general.DisplaySystemMessage, general, text)
+	end
+end
+
+Fx.OnClientEvent:Connect(function(kind: string, data: any)
+	if kind == "announce" then
+		annFrom.Text = "📢 Annonce de " .. tostring(data.from)
+		annText.Text = tostring(data.text)
+		annHolder.Visible = true
+		annToken += 1
+		local token = annToken
+		play("legend")
+		chatSystem("📢 [" .. tostring(data.from) .. "] " .. tostring(data.text))
+		task.delay(8, function()
+			if annToken == token then
+				annHolder.Visible = false
+			end
+		end)
+	elseif kind == "abuse" then
+		abuseList = data.list or {}
+		abuseAt = os.clock()
+		if current.name == "admin" then
+			admRerender()
+		end
+	elseif kind == "coinRain" then
+		local root = hrp()
+		if root then
+			for _ = 1, 8 do
+				local start = root.Position + Vector3.new(math.random(-30, 30), 40 + math.random() * 10, math.random(-30, 30))
+				local coin = UI.new("Part", { Shape = Enum.PartType.Cylinder, Size = Vector3.new(0.4, 2, 2), Color = Color3.fromHex("FFD54A"), Material = Enum.Material.Neon, Anchored = true, CanCollide = false, CanQuery = false, CanTouch = false, CFrame = CFrame.new(start) * CFrame.Angles(0, 0, math.rad(90)), Parent = fxFolder })
+				TweenService:Create(coin, TweenInfo.new(1.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { CFrame = CFrame.new(start - Vector3.new(0, 44, 0)) * CFrame.Angles(math.rad(360), 0, math.rad(90)) }):Play()
+				Debris:AddItem(coin, 1.5)
+			end
+		end
+	end
+end)
+
+-- mise à jour des bannières et de l'effet disco
+RunService.Heartbeat:Connect(function()
+	local lines = {}
+	local discoOn = false
+	for _, e in abuseList do
+		local left = math.max(0, e.left - (os.clock() - abuseAt))
+		if left > 0 then
+			table.insert(lines, string.format("%s %s %d:%02d", e.icon, e.label, left // 60, left % 60))
+			if e.kind == "disco" then
+				discoOn = true
+			end
+		end
+	end
+	abuseHolder.Visible = #lines > 0
+	if #lines > 0 then
+		abuseText.Text = "🔥 ADMIN ABUSE · " .. table.concat(lines, "  ")
+		abuseHolder.Size = UDim2.fromOffset(math.min(900, 160 + #lines * 190), 40)
+	end
+	disco.Enabled = discoOn
+	if discoOn then
+		disco.TintColor = Color3.fromHSV((os.clock() * 0.6) % 1, 0.45, 1)
+		disco.Saturation = 0.4
+	end
+end)
+
+---------------------------------------------------------------------------
 -- Raccourcis clavier
 ---------------------------------------------------------------------------
 local keys = {
@@ -1475,12 +1974,16 @@ local keys = {
 	[Enum.KeyCode.C] = "worlds",
 	[Enum.KeyCode.G] = "gift",
 	[Enum.KeyCode.R] = "rebirth",
+	[Enum.KeyCode.K] = "admin",
 }
 UserInputService.InputBegan:Connect(function(input, processed)
 	if processed or not S then
 		return
 	end
 	local p = keys[input.KeyCode]
+	if p == "admin" and player:GetAttribute("IsAdmin") ~= true then
+		p = nil
+	end
 	if p then
 		if current.name == p then
 			closePanel()

@@ -284,6 +284,10 @@ Config.Passes = {
 	{ id = "vip", name = "VIP", desc = "+2 emplacements, +10 % de pièces", gems = 400 },
 }
 
+-- Identifiants Roblox (UserId) des admins. Le créateur du jeu est toujours admin,
+-- et dans Studio tout le monde l'est pour pouvoir tester.
+Config.AdminIds = {} :: { number }
+
 Config.Potions = {
 	{ id = "coins", name = "Potion de pièces x2", color = hex("FFD54A"), gems = 10 },
 	{ id = "luck", name = "Potion de chance x2", color = hex("7EE0B8"), gems = 10 },

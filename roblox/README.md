@@ -62,6 +62,26 @@ Les animations passent en douceur d'un état à l'autre. Les auréoles, les engr
 
 Sont animés : les dragons, licornes, rois et fantômes (Légendaires), et tous les Mythiques et Divins.
 
+## Panneau admin
+
+Bouton 🛡️ **Admin** à droite de l'écran, ou touche **K**. Il n'apparaît que pour les admins : le créateur du jeu (ou le propriétaire du groupe), les identifiants mis dans `Config.AdminIds`, et tout le monde quand on teste dans Studio. Le serveur revérifie chaque action.
+
+![Aperçu du panneau admin](apercu_panneau_admin.png)
+
+Quatre onglets :
+- **🤖 Assistant IA** : écris ce que tu veux en français (« donne un Kraken arc-en-ciel à Noah et lance la gravité lunaire 5 min ») et l'IA (Claude) le fait avec les mêmes actions que les boutons. Elle demande confirmation avant de remettre une partie à zéro.
+- **🛠️ Manuel** : choisis la cible (toi, tout le monde ou un joueur), puis donne des pièces, des gemmes, un pet (normal, doré, arc-en-ciel, shiny), une potion, téléporte, fais apparaître le boss, expulse ou remets une partie à zéro (deux clics).
+- **🔥 Admin abusé** : événements pour tout le serveur, avec une bannière et un minuteur chez chaque joueur : pièces x10, chance x10, dégâts x10, vitesse x2, pluie de pièces, gravité lunaire, tout le monde géant ou mini, disco, nuit étoilée, pluie de pets de la rareté choisie. La case « Valeur » change le multiplicateur ou la taille.
+- **📢 Annonces** : ton message s'affiche en grand et dans le chat, traduit dans la langue de chaque joueur. Le chat entre joueurs est déjà traduit automatiquement par Roblox. Un journal garde les 40 dernières actions.
+
+### Brancher l'IA (une fois)
+
+L'assistant IA et la traduction utilisent l'API Claude. La partie Manuel et l'Admin abusé marchent sans.
+1. Crée une clé API sur [console.anthropic.com](https://console.anthropic.com) (l'utilisation est payante, à quelques centimes la demande).
+2. Jeu publié : sur le Creator Hub, ouvre ton expérience › **Secrets**, ajoute un secret nommé `anthropic_api_key`, avec ta clé comme valeur et `api.anthropic.com` comme domaine.
+3. Pour tester dans Studio : ajoute une **StringValue** nommée `ClaudeApiKey` dans **ServerStorage** et colle ta clé dans Value. Retire-la avant de publier ou de partager le fichier.
+4. Les requêtes HTTP sont déjà activées dans le fichier du jeu (sinon : Game Settings › Security › Allow HTTP Requests).
+
 ## Robux (optionnel)
 
 Dans `src/shared/Config.luau`, colle les identifiants de tes Game Passes (`Config.GamePassIds`) et de tes Developer Products (`Config.GemProducts`). Tant qu'un identifiant vaut `0`, l'objet s'achète avec des gemmes gagnées en jeu.
@@ -76,6 +96,7 @@ Dans `src/shared/Config.luau`, colle les identifiants de tes Game Passes (`Confi
 | Récolte auto | **F** |
 | Pets · Index · Boutique · Quêtes | **P** · **I** · **B** · **J** |
 | Mondes · Cadeau · Rebirth | **C** · **G** · **R** |
+| Panneau admin (admins seulement) | **K** |
 
 ## Pour les développeurs
 
