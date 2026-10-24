@@ -1,0 +1,82 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;overflow:hidden;font-family:Fredoka,sans-serif}
+canvas{display:block}
+.t{position:absolute;left:0;right:0;text-align:center;color:#fff;font-weight:700;-webkit-text-stroke:var(--s) #3B2A5A;paint-order:stroke fill;text-shadow:0 var(--d) 0 #3B2A5A;letter-spacing:.01em;line-height:.92}
+.tag{position:absolute;padding:.25em .7em;border-radius:1em;border:var(--b) solid #3B2A5A;color:#fff;font-weight:700;-webkit-text-stroke:calc(var(--b)*0.8) #3B2A5A;paint-order:stroke fill;box-shadow:0 var(--b) 0 #3B2A5A}
+</style>
+<script type="importmap">{"imports":{"three":"./three.module.js"}}</script></head><body>
+<div id="ov"></div>
+<script type="module">
+import * as THREE from 'three';
+import { build, clips } from './forge.js';
+import { loadPet } from './load.js';
+const q = new URLSearchParams(location.search);
+const mode = q.get('mode') || 'thumb';
+const W = mode === 'icon' ? 512 : 1920, H = mode === 'icon' ? 512 : 1080;
+const R = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+R.setPixelRatio(1); R.setSize(W, H); R.shadowMap.enabled = true; R.shadowMap.type = THREE.PCFSoftShadowMap;
+R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = 1.1;
+document.body.prepend(R.domElement);
+const scene = new THREE.Scene();
+// ciel en dégradé
+const sky = document.createElement('canvas'); sky.width = 2; sky.height = 256;
+const g = sky.getContext('2d'); const gr = g.createLinearGradient(0, 0, 0, 256);
+const dark = mode === 'thumb2';
+gr.addColorStop(0, dark ? '#2a1a5e' : '#7fc8ff'); gr.addColorStop(0.65, dark ? '#a13ccf' : '#ffd1ea'); gr.addColorStop(1, dark ? '#ff7ac3' : '#fff3c9');
+g.fillStyle = gr; g.fillRect(0, 0, 2, 256);
+const tex = new THREE.CanvasTexture(sky); tex.colorSpace = THREE.SRGBColorSpace; scene.background = tex;
+scene.add(new THREE.HemisphereLight(0xffffff, 0xb08fc8, 1.7));
+const sun = new THREE.DirectionalLight(0xffffff, 2.4); sun.position.set(-8, 16, -10); sun.castShadow = true;
+sun.shadow.mapSize.set(4096, 4096); Object.assign(sun.shadow.camera, { left: -30, right: 30, top: 30, bottom: -30, far: 80 }); scene.add(sun);
+const rim = new THREE.DirectionalLight(dark ? 0xff9ae6 : 0xfff0c0, 1.2); rim.position.set(10, 6, 12); scene.add(rim);
+const M = (c, e) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.75, flatShading: true, emissive: e ? c : 0, emissiveIntensity: e ? 0.6 : 0 });
+const ground = new THREE.Mesh(new THREE.CircleGeometry(80, 64), M(dark ? 0x4b3e86 : 0xffb3cf)); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+// décor bonbons
+const rnd = (() => { let s = 9; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+function lolly(x, z, h, c) {
+  const st = new THREE.Mesh(new THREE.CylinderGeometry(h * 0.035, h * 0.035, h, 8), M(0xffffff)); st.position.set(x, h / 2, z); scene.add(st);
+  const d = new THREE.Mesh(new THREE.CylinderGeometry(h * 0.28, h * 0.28, h * 0.08, 24), M(c)); d.rotation.x = Math.PI / 2; d.position.set(x, h + h * 0.2, z); d.castShadow = true; scene.add(d);
+  const d2 = new THREE.Mesh(new THREE.TorusGeometry(h * 0.17, h * 0.035, 6, 24), M(0xffffff)); d2.position.set(x, h + h * 0.2, z - h * 0.05); scene.add(d2);
+}
+function gum(x, z, s, c) { const b = new THREE.Mesh(new THREE.SphereGeometry(s, 10, 8), M(c)); b.scale.y = 0.75; b.position.set(x, s * 0.5, z); b.castShadow = true; scene.add(b); }
+const C = [0xff8fb8, 0xb69cff, 0xffd54a, 0x7fd6ff, 0x7ee0b8, 0xff9a3c];
+for (let i = 0; i < 9; i++) lolly(-30 + i * 7.5 + rnd() * 3, 22 + rnd() * 10, 6 + rnd() * 5, C[i % 6]);
+for (let i = 0; i < 40; i++) gum(-28 + rnd() * 56, -6 + rnd() * 30, 0.5 + rnd() * 0.9, C[i % 6]);
+for (let i = 0; i < 18; i++) { const s = new THREE.Mesh(new THREE.OctahedronGeometry(0.25 + rnd() * 0.4), M(0xfff3b8, true)); s.position.set(-24 + rnd() * 48, 3 + rnd() * 12, -4 + rnd() * 18); scene.add(s); }
+// pets
+async function place(id, x, z, s, yaw, clip, t) {
+  const F = await loadPet(id); const rig = build(F); rig.root.scale.setScalar(s);
+  rig.root.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  if (clip) { const mx = new THREE.AnimationMixer(rig.root); mx.clipAction(clips(F, rig).find(c => c.name === clip)).play(); mx.update(t ?? 0.3); }
+  const grp = new THREE.Group(); grp.add(rig.root); grp.position.set(x, 0, z); grp.rotation.y = yaw; scene.add(grp);
+}
+const cam = new THREE.PerspectiveCamera(mode === 'icon' ? 34 : 30, W / H, 0.1, 400);
+const ov = document.getElementById('ov');
+if (mode === 'icon') {
+  await place('kraken', 0, 0, 1.05, 0.35, 'ability', 0.25);
+  await place('gumdrop_bunny', -4.6, -3.2, 1.0, 0.5, 'idle', 0.4);
+  await place('mochi_dragon', 4.8, -3.0, 1.0, -0.5, 'idle', 0.9);
+  cam.position.set(0, 7.5, -15.5); cam.lookAt(0, 3.2, 0);
+  ov.innerHTML = `<div class="t" style="--s:9px;--d:6px;font-size:74px;top:14px">SWEET PETS</div><div class="t" style="--s:7px;--d:5px;font-size:54px;bottom:18px;color:#FFD54A">FACTORY</div>`;
+} else if (mode === 'thumb') {
+  const L = [['pegasus', -15, 2, 1.0, 'idle'], ['fenrir', -9, -1, 1.0, 'idle'], ['kraken', -2, 2.5, 1.1, 'ability'], ['leviathan', 6, 2, 0.95, 'idle'], ['mammoth', 13, 1, 0.95, 'idle'], ['gumdrop_bunny', -5.5, -6.5, 1.0, 'move'], ['lollipop_fox', 2.6, -7.2, 1.0, 'idle'], ['golden_king', 9, -6.5, 1.0, 'idle'], ['cotton_cloud', -12, -6, 1.0, 'idle']];
+  for (const [id, x, z, s, c] of L) await place(id, x, z, s, -x * 0.03, c, 0.35);
+  cam.position.set(0, 9, -33); cam.lookAt(0, 3.4, 0);
+  ov.innerHTML = `<div class="t" style="--s:16px;--d:11px;font-size:150px;top:34px">SWEET PETS FACTORY</div>
+  <div class="tag" style="--b:7px;font-size:46px;left:60px;bottom:60px;background:#FF4F8B">53 PETS À COLLECTIONNER</div>
+  <div class="tag" style="--b:7px;font-size:46px;right:60px;bottom:60px;background:#FFC93C">✨ PETS DIVINS ✨</div>`;
+} else {
+  await place('hydra', -9, 1, 1.0, 0.3, 'ability', 0.3);
+  await place('ra_phoenix', 0.5, 3, 1.0, 0, "ability", 0.5);
+  await place('leviathan', 10, 1.5, 0.95, -0.3, 'ability', 0.2);
+  cam.position.set(0, 8, -27); cam.lookAt(0, 3.8, 0);
+  ov.innerHTML = `<div class="t" style="--s:14px;--d:10px;font-size:130px;top:40px;color:#FFD54A">PETS DIVINS</div>
+  <div class="t" style="--s:9px;--d:6px;font-size:62px;top:190px">1 chance sur 25 000 !</div>
+  <div class="tag" style="--b:7px;font-size:44px;left:50%;transform:translateX(-50%);bottom:56px;background:#8C7BFF">HYDRE · RA · LÉVIATHAN · KRAKEN</div>`;
+}
+R.render(scene, cam);
+await document.fonts.ready;
+document.title = 'done';
+</script></body></html>

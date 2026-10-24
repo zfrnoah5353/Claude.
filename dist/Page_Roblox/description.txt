@@ -1,0 +1,42 @@
+=== NOM DU JEU ===
+🍬 Sweet Pets Factory
+
+=== DESCRIPTION (français) ===
+🍭 Casse des tas de bonbons géants avec tes pets, ouvre des œufs et collectionne les 53 pets de la fabrique !
+
+✨ NOUVEAU : les pets DIVINS ! Hydre d'Olympe, Ra le Phénix Solaire, Kraken des Abysses et Léviathan Cosmique… seulement 1 chance sur 25 000 !
+
+🌍 4 mondes à débloquer : Candy Meadow, Choco Land, Ice Cream Island et Gummy Galaxy
+🐾 7 raretés, du Commun au Divin, avec des pets animés
+⭐ Fusionne 5 pets identiques pour un pet doré, puis arc-en-ciel
+💀 Bats le Gummy Golem dans son arène avec tout le serveur
+🌀 Fais des rebirths pour multiplier tes pièces
+🎁 Cadeau chaque jour, quêtes et index à compléter
+
+👍 Like le jeu et ajoute-le en favori pour les prochaines mises à jour !
+
+=== DESCRIPTION (anglais) ===
+🍭 Smash giant candy piles with your pets, hatch eggs and collect all 53 pets of the factory!
+
+✨ NEW: DIVINE pets! Olympus Hydra, Ra the Sun Phoenix, Abyss Kraken and Cosmic Leviathan… only a 1 in 25,000 chance!
+
+🌍 4 worlds to unlock: Candy Meadow, Choco Land, Ice Cream Island and Gummy Galaxy
+🐾 7 rarities from Common to Divine, with animated pets
+⭐ Fuse 5 identical pets into a Golden pet, then a Rainbow one
+💀 Defeat the Gummy Golem in its arena with the whole server
+🌀 Rebirth to multiply your coins
+🎁 Daily gift, quests and an index to complete
+
+👍 Like and favorite the game for upcoming updates!
+
+=== GENRE ===
+Simulation
+
+=== MOTS-CLÉS (pour les tags / la recherche) ===
+pet simulator, pets, eggs, hatch, candy, simulator, divine pets, mythology, boss, rebirth
+
+=== OÙ METTRE QUOI ===
+Creator Hub (create.roblox.com) › ton jeu :
+- Configuration › Informations de base : nom, description, genre.
+- Paramètres › Icône : icone_512.png
+- Paramètres › Miniatures : miniature_1.png puis miniature_2.png
