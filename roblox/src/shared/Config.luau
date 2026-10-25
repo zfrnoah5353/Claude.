@@ -315,6 +315,38 @@ Config.Passes = {
 -- et dans Studio tout le monde l'est pour pouvoir tester.
 Config.AdminIds = {} :: { number }
 
+-- Marteaux à bonbons (skins tirées au hasard) : bonus de dégâts de clic
+export type Hammer = { id: string, name: string, rarity: number, head: string, handle: string, accent: string, mat: string?, shape: string, bonus: number, desc: string }
+Config.Hammers = {
+	{ id = "wood", name = "Maillet en bois", rarity = 1, head = "B5835A", handle = "7A4E36", accent = "D9A066", shape = "mallet", bonus = 1.1, desc = "Le marteau de départ des apprentis confiseurs." },
+	{ id = "gum", name = "Marteau Gomme", rarity = 1, head = "FF8FB8", handle = "FFFFFF", accent = "FF5A8A", shape = "mallet", bonus = 1.15, desc = "Rebondit à chaque coup." },
+	{ id = "mint", name = "Marteau Menthe", rarity = 1, head = "7EE0B8", handle = "FFFFFF", accent = "3DBE8C", shape = "mallet", bonus = 1.2, desc = "Frais comme une pastille." },
+	{ id = "lolly", name = "Sucette Massue", rarity = 2, head = "FFD54A", handle = "FFFFFF", accent = "FF5A6E", shape = "lolly", bonus = 1.35, desc = "Une sucette géante qui fait mal." },
+	{ id = "cane", name = "Canne Sucrée", rarity = 2, head = "FF5A6E", handle = "FFFFFF", accent = "FFFFFF", shape = "cane", bonus = 1.4, desc = "Rayée rouge et blanc, crochet compris." },
+	{ id = "choco", name = "Marteau Praliné", rarity = 2, head = "6B4430", handle = "E8B64A", accent = "D9A066", shape = "mallet", bonus = 1.45, desc = "Tout en chocolat noir." },
+	{ id = "donut", name = "Donut Cogneur", rarity = 3, head = "E8A85A", handle = "FFFFFF", accent = "FF8FB8", shape = "donut", bonus = 1.7, desc = "Glaçage rose et vermicelles." },
+	{ id = "ice", name = "Cornet Glacé", rarity = 3, head = "BDE9FF", handle = "E8A85A", accent = "FFFFFF", mat = "Glass", shape = "cone", bonus = 1.8, desc = "Gèle les tas de bonbons." },
+	{ id = "jelly", name = "Marteau Gelée", rarity = 3, head = "B69CFF", handle = "6B5BD6", accent = "E2D8FF", mat = "Glass", shape = "mallet", bonus = 1.9, desc = "Translucide et tremblotant." },
+	{ id = "cupcake", name = "Massue Cupcake", rarity = 4, head = "FFB3CF", handle = "FFFFFF", accent = "E8344E", shape = "cupcake", bonus = 2.3, desc = "Avec sa cerise sur le dessus." },
+	{ id = "crystal", name = "Marteau Cristal", rarity = 4, head = "7FD6FF", handle = "C9C0FF", accent = "FFFFFF", mat = "Neon", shape = "crystal", bonus = 2.5, desc = "Brille dans le noir." },
+	{ id = "gold", name = "Marteau d'Or", rarity = 5, head = "FFD23F", handle = "8C5A2A", accent = "FFF3B8", mat = "Foil", shape = "mallet", bonus = 3.2, desc = "Pour les rois du bonbon." },
+	{ id = "comet", name = "Comète Cosmique", rarity = 5, head = "C04BD8", handle = "2A2350", accent = "7FD6FF", mat = "Neon", shape = "star", bonus = 3.5, desc = "Laisse une traînée d'étoiles." },
+	{ id = "rainbow", name = "Marteau Arc-en-ciel", rarity = 6, head = "FF8FB8", handle = "FFFFFF", accent = "FFD54A", mat = "Neon", shape = "rainbow", bonus = 5, desc = "Toutes les couleurs à chaque coup." },
+	{ id = "olympus", name = "Foudre d'Olympe", rarity = 6, head = "FFF3B8", handle = "E8B64A", accent = "7FD6FF", mat = "Neon", shape = "bolt", bonus = 6, desc = "Le marteau de Zeus en sucre d'orge." },
+} :: { Hammer }
+-- chances de tirage par rareté (en %), le reste va au Commun
+Config.HAMMER_ODDS = { [1] = 47.5, [2] = 30, [3] = 15, [4] = 6, [5] = 1.3, [6] = 0.2 }
+Config.HAMMER_ROLL_SECONDS = 25 -- prix d'un tirage = 25 s de gains (au moins 300 pièces)
+Config.HAMMER_REFUND = 0.25 -- un doublon rend 25 % du prix
+
+-- Vignettes des mondes et voyage : couleurs du ciel (haut, bas)
+Config.WorldSky = {
+	{ "7FC8FF", "FFD1EA" },
+	{ "F3B98A", "FFE6C8" },
+	{ "9FDCFF", "F2FBFF" },
+	{ "120E2A", "6B3FA0" },
+}
+
 Config.Potions = {
 	{ id = "coins", name = "Potion de pièces x2", color = hex("FFD54A"), gems = 10 },
 	{ id = "luck", name = "Potion de chance x2", color = hex("7EE0B8"), gems = 10 },

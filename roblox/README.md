@@ -82,6 +82,11 @@ L'assistant IA et la traduction utilisent l'API Claude. La partie Manuel et l'Ad
 3. Pour tester dans Studio : ajoute une **StringValue** nommée `ClaudeApiKey` dans **ServerStorage** et colle ta clé dans Value. Retire-la avant de publier ou de partager le fichier.
 4. Les requêtes HTTP sont déjà activées dans le fichier du jeu (sinon : Game Settings › Security › Allow HTTP Requests).
 
+## Voyager et marteaux à bonbons
+
+- **Mondes (C)** : chaque monde a sa carte avec une petite scène 3D, son numéro, ses bonus et un bouton **VOYAGER**. Le voyage se fait en wagon dans un tunnel arc-en-ciel, avec des traits de vitesse, puis un grand « ARRIVÉE ! ».
+- **Marteaux (H)** : 15 marteaux à collectionner, du Maillet en bois à la Foudre d'Olympe. Chacun multiplie la force de tes clics (de x1,1 à x6). Tu en tires avec des pièces (x1 ou x10, dont 1 offert), et un doublon te rend 25 % du prix. Le marteau équipé est dans la main de ton personnage et frappe à chaque clic. Les chances sont affichées dans la machine.
+
 ## Sons
 
 Les sons sont déjà dans le jeu, il n'y a rien à importer. Ce sont des sons publics de la bibliothèque Roblox (packs officiels Roblox, ProSoundEffects et APM), utilisables dans n'importe quel jeu. Comme dans les simulateurs de pets qui marchent, les pièces montent d'un demi-ton quand tu en ramasses à la suite, l'œuf siffle puis craque, et la révélation grossit avec la rareté.

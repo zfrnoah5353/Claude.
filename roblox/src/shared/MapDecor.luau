@@ -549,4 +549,56 @@ function Decor.build(theme: string, palette: { string }, seed: number): { Spec }
 	return ctx.out
 end
 
+-- Petite scène de vitrine d'un monde (vignettes du menu des mondes), centrée sur l'origine
+function Decor.diorama(theme: string, palette: { string }): { Spec }
+	local state = 12345
+	local ctx: Ctx = {
+		out = {},
+		rnd = function(): number
+			state = (state * 16807) % 2147483647
+			return state / 2147483647
+		end,
+	}
+	local P = palette
+	local groundC = { meadow = "FFB3CF", choco = "CC9E74", ice = "D6F0FF", galaxy = "3F3670" }
+	disc(ctx, 60, 2, 0, -1, 0, groundC[theme] or "FFB3CF")
+	disc(ctx, 64, 1.6, 0, -1.4, 0, P[1])
+	-- tas de bonbons au premier plan
+	for i = 1, 4 do
+		local x, z = -14 + i * 6 + rand(ctx, -2, 2), -10 + rand(ctx, -3, 3)
+		for _ = 1, 3 do
+			ball(ctx, rand(ctx, 2.6, 3.6), x + rand(ctx, -1.2, 1.2), 1.2, z + rand(ctx, -1.2, 1.2), pick(ctx, P))
+		end
+	end
+	if theme == "meadow" then
+		cupcakeHouse(ctx, -12, 8, 8, P[2], "FFFFFF", 160)
+		lollipop(ctx, 6, 10, 13, P[1], "FFFFFF")
+		candyCane(ctx, 16, 2, 12, 200, "FF5A6E")
+		gumdropTree(ctx, 0, 14, 11, P)
+		cottonTree(ctx, -22, -2, 10, "BDE9FF")
+		cloud(ctx, 10, 24, 16, 6, "FFFFFF")
+	elseif theme == "choco" then
+		chocoFountain(ctx, 0, 10)
+		truffleTree(ctx, -14, 6, 12)
+		truffleTree(ctx, 15, 8, 11)
+		chocoBar(ctx, 18, -4, 6, 30)
+		cookie(ctx, -20, -4, 6)
+	elseif theme == "ice" then
+		iceCone(ctx, -10, 8, 14, P)
+		iceCone(ctx, 10, 10, 12, P)
+		popsicle(ctx, 0, 14, 11, P[2])
+		crystal(ctx, 18, 0, 9, "BDE9FF", false)
+		hill(ctx, -20, -2, 8, "FFFFFF")
+		cloud(ctx, -6, 24, 16, 6, "FFFFFF")
+	else
+		planet(ctx, 0, 20, 14, 10, P[3], "FFF3B8")
+		crystal(ctx, -12, 6, 12, P[1], true)
+		crystal(ctx, 13, 8, 11, P[4], true)
+		star(ctx, -16, 20, 8, 4, "FFE27A")
+		star(ctx, 18, 22, 6, 3, "7FD6FF")
+		ufo(ctx, 16, 14, -2)
+	end
+	return ctx.out
+end
+
 return Decor

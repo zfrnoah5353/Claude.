@@ -16,6 +16,8 @@ local player = Players.LocalPlayer
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Config = require(Shared:WaitForChild("Config"))
 local PetModels = require(Shared:WaitForChild("PetModels"))
+local MapDecor = require(Shared:WaitForChild("MapDecor"))
+local HammerModels = require(Shared:WaitForChild("HammerModels"))
 local THUMB = 120 -- pièces max par vignette 3D de l'interface
 local UI = require(script:WaitForChild("UI"))
 local Remotes = ReplicatedStorage:WaitForChild("Remotes")
@@ -54,6 +56,7 @@ local SOUNDS: { [string]: { id: number, vol: number, start: number? } } = {
 	legend = { id = 1845411858, vol = 0.55, start = 0.24 }, -- APM « Top Prize »
 	divine = { id = 9047024260, vol = 0.6 }, -- APM « Epic Win - Stinger 1 »
 	burst = { id = 9116384485, vol = 0.5, start = 0.1 }, -- Magic Burst (avec divine)
+	travel = { id = 15675024286, vol = 0.55 }, -- Roblox_UI_Whoosh_01
 }
 local sweet = SoundService:FindFirstChild("SweetSounds")
 local soundObjs: { [string]: Sound } = {}
@@ -281,6 +284,7 @@ menuButton(UDim.new(0, 12), 150, "pets", "🐾", "Pets (P)", UI.PINK)
 menuButton(UDim.new(0, 12), 240, "index", "📖", "Index (I)", UI.LILAC)
 menuButton(UDim.new(0, 12), 330, "shop", "🛍️", "Boutique (B)", UI.GREEN)
 menuButton(UDim.new(0, 12), 420, "quests", "📜", "Quêtes (J)", UI.YELLOW)
+menuButton(UDim.new(0, 12), 510, "hammers", "🔨", "Marteaux (H)", UI.ORANGE)
 menuButton(UDim.new(1, -76), 150, "worlds", "🌍", "Mondes (C)", UI.MINT)
 menuButton(UDim.new(1, -76), 240, "gift", "🎁", "Cadeau (G)", UI.ORANGE)
 menuButton(UDim.new(1, -76), 330, "rebirth", "🌀", "Rebirth (R)", UI.PURPLE)
@@ -850,52 +854,434 @@ panels.quests = {
 }
 
 -- Mondes ------------------------------------------------------------------
-local THEME_ICON = { meadow = "🍬", choco = "🍫", ice = "🍦", galaxy = "🌌" }
+-- Vignettes 3D : chaque carte montre une petite scène du monde (MapDecor.diorama)
+local DMAT: { [string]: Enum.Material } = { Neon = Enum.Material.Neon, Glass = Enum.Material.Glass, Foil = Enum.Material.Foil, Metal = Enum.Material.Metal, Sand = Enum.Material.Sand, Snow = Enum.Material.Snow }
+local function specsToModel(specs: { any }): Model
+	local m = Instance.new("Model")
+	for _, sp in specs do
+		if (sp.t or 0) >= 1 then
+			continue
+		end
+		local p = Instance.new("Part")
+		p.Anchored = true
+		p.Size = Vector3.new(sp.size[1], sp.size[2], sp.size[3])
+		local cf = CFrame.new(sp.p[1], sp.p[2], sp.p[3])
+		if sp.r then
+			cf *= CFrame.Angles(math.rad(sp.r[1]), math.rad(sp.r[2]), math.rad(sp.r[3]))
+		end
+		p.CFrame = cf
+		p.Color = Color3.fromHex(sp.c)
+		p.Material = DMAT[sp.m or ""] or Enum.Material.SmoothPlastic
+		p.Transparency = sp.t or 0
+		p.TopSurface = Enum.SurfaceType.Smooth
+		p.BottomSurface = Enum.SurfaceType.Smooth
+		if sp.s == "ball" then
+			p.Shape = Enum.PartType.Ball
+		elseif sp.s == "cyl" then
+			p.Shape = Enum.PartType.Cylinder
+		end
+		p.Parent = m
+	end
+	return m
+end
+local dioramaCache: { [number]: { any } } = {}
+local function worldDiorama(i: number): Model
+	local w = Config.Worlds[i]
+	if not dioramaCache[i] then
+		local pal = {}
+		for _, c in w.candy do
+			table.insert(pal, c:ToHex())
+		end
+		dioramaCache[i] = MapDecor.diorama(w.theme, pal)
+	end
+	return specsToModel(dioramaCache[i])
+end
+
+local function headerChip(parent: Instance, text: string, color: Color3, x: number, w: number)
+	local f = UI.box(parent, { Size = UDim2.fromOffset(w, 38), Position = UDim2.fromOffset(x, 0), Color = color, Radius = 16 })
+	UI.text(f, { Text = text, TextSize = 17, Color = UI.WHITE, Outline = 2 })
+end
+
+local function teamPower(): number
+	local sum = 0
+	for _, p in S.pets do
+		if p.eq then
+			sum += p.power
+		end
+	end
+	return sum
+end
+
+local travel: (number, string) -> ()
 
 panels.worlds = {
 	title = "Mondes",
 	color = UI.MINT,
 	w = 1100,
-	h = 470,
+	h = 650,
 	sig = function()
 		local nw = Config.Worlds[S.maxWorld + 1]
 		return string.format("%d,%d,%s", S.world, S.maxWorld, tostring(nw ~= nil and S.coins >= nw.unlock))
 	end,
 	build = function(c)
-		local cw = (1100 - 56 - 3 * 16) / 4
+		headerChip(c, string.format("MONDES OUVERTS %d / %d", S.maxWorld, #Config.Worlds), UI.SKY, 0, 250)
+		headerChip(c, "PUISSANCE DE L'ÉQUIPE " .. fmt(teamPower()), UI.ORANGE, 262, 330)
+		local cw, ch = 514, 254
 		for i, w in Config.Worlds do
-			local f = UI.box(c, { Size = UDim2.fromOffset(cw, 380), Position = UDim2.fromOffset((i - 1) * (cw + 16), 8), Color = w.ground, Radius = 22 })
-			local tc = if w.theme == "galaxy" then UI.WHITE else UI.INK
-			local pic = UI.new("Frame", { BackgroundColor3 = w.plaza, Size = UDim2.new(1, -28, 0, 150), Position = UDim2.fromOffset(14, 14), Parent = f })
-			UI.corner(pic, 16)
-			UI.stroke(pic, 3)
-			UI.text(pic, { Text = if i > S.maxWorld then "🔒" else (THEME_ICON :: any)[w.theme], TextSize = 70 })
-			UI.text(f, { Text = w.name, TextSize = 22, Color = tc, Size = UDim2.new(1, 0, 0, 28), Position = UDim2.fromOffset(0, 176) })
-			UI.text(f, { Text = "Pièces x" .. w.coinMult, TextSize = 17, Color = tc, Size = UDim2.new(1, 0, 0, 22), Position = UDim2.fromOffset(0, 210) })
-			UI.text(f, { Text = "Bonbons x" .. fmt(w.scale) .. " plus durs", TextSize = 15, Color = tc, Size = UDim2.new(1, 0, 0, 20), Position = UDim2.fromOffset(0, 234) })
-			if i > 1 then
-				UI.text(f, { Text = "Prix : " .. fmt(w.unlock) .. " pièces", TextSize = 15, Color = tc, Size = UDim2.new(1, 0, 0, 20), Position = UDim2.fromOffset(0, 258) })
+			local col, row = (i - 1) % 2, (i - 1) // 2
+			local card = UI.new("Frame", { BackgroundColor3 = UI.WHITE, ClipsDescendants = true, Size = UDim2.fromOffset(cw, ch), Position = UDim2.fromOffset(col * (cw + 16), 52 + row * (ch + 14)), Parent = c })
+			UI.corner(card, 22)
+			UI.stroke(card, 4, w.banner)
+			local sky = Config.WorldSky[i]
+			UI.new("UIGradient", { Rotation = 90, Color = ColorSequence.new(Color3.fromHex(sky[1]), Color3.fromHex(sky[2])), Parent = card })
+			local vp = UI.new("ViewportFrame", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Ambient = Color3.fromRGB(190, 180, 200), LightColor = Color3.new(1, 1, 1), LightDirection = Vector3.new(-0.5, -1, 0.4), Parent = card })
+			local model = worldDiorama(i)
+			model.Parent = vp
+			local cam = UI.new("Camera", { FieldOfView = 38, CFrame = CFrame.lookAt(Vector3.new(25, 21, -44), Vector3.new(2, 6, 2)), Parent = vp })
+			vp.CurrentCamera = cam
+			-- ombre en bas pour lire le texte
+			local shade = UI.new("Frame", { BackgroundColor3 = Color3.fromHex("1B1030"), BorderSizePixel = 0, Size = UDim2.new(1, 0, 0.5, 0), Position = UDim2.fromScale(0, 0.5), ZIndex = 2, Parent = card })
+			UI.new("UIGradient", { Rotation = 90, Transparency = NumberSequence.new(1, 0.35), Parent = shade })
+			local badge = UI.new("Frame", { BackgroundColor3 = w.banner, Size = UDim2.fromOffset(40, 40), Position = UDim2.fromOffset(12, 12), ZIndex = 3, Parent = card })
+			UI.corner(badge, 20)
+			UI.stroke(badge, 3)
+			UI.text(badge, { Text = tostring(i), TextSize = 22, Color = UI.WHITE, Outline = 2, ZIndex = 4 })
+			UI.text(card, { Text = w.name, TextSize = 32, Color = UI.WHITE, Outline = 3, AlignX = L, Size = UDim2.new(1, -220, 0, 38), Position = UDim2.new(0, 16, 1, -86), ZIndex = 3 })
+			UI.text(card, { Text = "Pièces x" .. w.coinMult .. " · bonbons x" .. fmt(w.scale) .. " plus durs", TextSize = 16, Color = UI.WHITE, Outline = 2, AlignX = L, Size = UDim2.new(1, -220, 0, 22), Position = UDim2.new(0, 16, 1, -46), ZIndex = 3 })
+			local locked = i > S.maxWorld
+			if locked then
+				local dim = UI.new("Frame", { BackgroundColor3 = Color3.fromHex("1B1030"), BackgroundTransparency = 0.45, Size = UDim2.fromScale(1, 1), ZIndex = 2, Parent = card })
+				UI.text(dim, { Text = "🔒", TextSize = 60, Size = UDim2.new(1, 0, 0.6, 0), ZIndex = 3 })
 			end
-			local bpos = UDim2.new(0, 16, 1, -70)
-			local bsize = UDim2.new(1, -32, 0, 52)
+			local bsize, bpos = UDim2.fromOffset(180, 52), UDim2.new(1, -196, 1, -66)
+			local holder = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), ZIndex = 5, Parent = card })
 			if i == S.world then
-				UI.button(f, { Text = "Tu es ici", Size = bsize, Position = bpos, Enabled = false })
-			elseif i <= S.maxWorld then
-				UI.button(f, { Text = "Voyager", Color = UI.SKY, Size = bsize, Position = bpos }, function()
-					send("teleport", i)
-					closePanel()
+				UI.button(holder, { Text = "TU ES ICI", Size = bsize, Position = bpos, Enabled = false, ZIndex = 5 })
+			elseif not locked then
+				UI.button(holder, { Text = "VOYAGER", Color = UI.SKY, Size = bsize, Position = bpos, TextSize = 22, ZIndex = 5 }, function()
+					travel(i, "teleport")
 				end)
 			elseif i == S.maxWorld + 1 then
-				UI.button(f, { Text = "Débloquer " .. fmt(w.unlock), Color = UI.GREEN, Size = bsize, Position = bpos, TextSize = 18, Enabled = S.coins >= w.unlock }, function()
-					send("unlock")
-					closePanel()
+				UI.button(holder, { Text = "🪙 " .. fmt(w.unlock), Color = UI.GREEN, Size = bsize, Position = bpos, TextSize = 20, Enabled = S.coins >= w.unlock, ZIndex = 5 }, function()
+					travel(i, "unlock")
 				end)
 			else
-				UI.button(f, { Text = "Verrouillé", Size = bsize, Position = bpos, Enabled = false })
+				UI.button(holder, { Text = "VERROUILLÉ", Size = bsize, Position = bpos, Enabled = false, ZIndex = 5 })
 			end
 		end
 	end,
 }
+
+-- Voyage : trajet en wagon dans un tunnel arc-en-ciel, puis « ARRIVÉE ! »
+local TUN = Vector3.new(0, 3000, 0)
+local tunnel: Model? = nil
+local tunnelRings: { BasePart } = {}
+local cart: Model? = nil
+local function buildTunnel()
+	local m = Instance.new("Model")
+	m.Name = "TravelTunnel"
+	local function part(size: Vector3, cf: CFrame, color: Color3, mat: Enum.Material?, shape: Enum.PartType?): BasePart
+		local p = Instance.new("Part")
+		p.Anchored = true
+		p.CanCollide = false
+		p.CanQuery = false
+		p.CanTouch = false
+		p.CastShadow = false
+		p.Size = size
+		p.CFrame = cf
+		p.Color = color
+		p.Material = mat or Enum.Material.SmoothPlastic
+		if shape then
+			p.Shape = shape
+		end
+		p.Parent = m
+		return p
+	end
+	for k = 0, 36 do
+		local z = -k * 11
+		for j = 0, 11 do
+			local a = j / 12 * math.pi * 2
+			local p = part(Vector3.new(5.6, 1.3, 1.3), CFrame.new(TUN + Vector3.new(math.cos(a) * 11, 6 + math.sin(a) * 11, z)) * CFrame.Angles(0, 0, a + math.pi / 2), Color3.new(1, 1, 1), Enum.Material.Neon)
+			p:SetAttribute("K", k)
+			table.insert(tunnelRings, p)
+		end
+	end
+	for _, x in { -2.2, 2.2 } do
+		part(Vector3.new(0.5, 0.5, 420), CFrame.new(TUN + Vector3.new(x, 0.2, -200)), Color3.fromHex("FFF6E6"), Enum.Material.Neon)
+	end
+	for k = 0, 70 do
+		part(Vector3.new(6.4, 0.3, 0.9), CFrame.new(TUN + Vector3.new(0, -0.1, -k * 6)), Color3.fromHex("8C5A2A"))
+	end
+	local r = Random.new(3)
+	for _ = 1, 60 do
+		local a = r:NextNumber(0, math.pi * 2)
+		local d = r:NextNumber(3, 8)
+		part(Vector3.one * r:NextNumber(0.5, 1.3), CFrame.new(TUN + Vector3.new(math.cos(a) * d, 6 + math.sin(a) * d, -r:NextNumber(10, 400))), Color3.fromHSV(r:NextNumber(), 0.5, 1), Enum.Material.Neon, Enum.PartType.Ball)
+	end
+	-- wagon
+	local c = Instance.new("Model")
+	c.Name = "Cart"
+	local function cpart(size: Vector3, off: Vector3, color: string, shape: Enum.PartType?)
+		local p = part(size, CFrame.new(TUN + off), Color3.fromHex(color), nil, shape)
+		p.Parent = c
+	end
+	cpart(Vector3.new(5, 2.4, 6), Vector3.new(0, 1.8, 0), "FF8FB8")
+	cpart(Vector3.new(5.4, 0.6, 6.4), Vector3.new(0, 3.1, 0), "FFFFFF")
+	cpart(Vector3.new(4.2, 0.4, 5.2), Vector3.new(0, 2.9, 0), "B3263A")
+	for _, x in { -2.3, 2.3 } do
+		for _, z in { -2, 2 } do
+			cpart(Vector3.new(0.6, 1.5, 1.5), Vector3.new(x, 0.75, z), "FFD54A", Enum.PartType.Cylinder)
+		end
+	end
+	c.Parent = m
+	cart = c
+	m.Parent = workspace
+	tunnel = m
+end
+
+local traveling = false
+local function speedLines(parent: Instance): { Frame }
+	local list = {}
+	for i = 1, 26 do
+		local a = i / 26 * math.pi * 2
+		local f = UI.new("Frame", { BackgroundColor3 = UI.WHITE, BorderSizePixel = 0, AnchorPoint = Vector2.new(0.5, 0.5), Size = UDim2.fromOffset(4, 120), Rotation = math.deg(a) + 90, Position = UDim2.fromScale(0.5, 0.5), BackgroundTransparency = 0.3, ZIndex = 21, Parent = parent })
+		f:SetAttribute("A", a)
+		table.insert(list, f)
+	end
+	return list
+end
+
+travel = function(wi: number, action: string)
+	if traveling then
+		return
+	end
+	traveling = true
+	closePanel()
+	if not tunnel then
+		buildTunnel()
+	end
+	local w = Config.Worlds[wi]
+	for _, p in tunnelRings do
+		p.Color = w.candy[((p:GetAttribute("K") :: number) % #w.candy) + 1]
+	end
+	local cam = workspace.CurrentCamera
+	cam.CameraType = Enum.CameraType.Scriptable
+	local fov0 = cam.FieldOfView
+	cam.FieldOfView = 85
+	local ov = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), ZIndex = 20, Parent = gui })
+	local lines = speedLines(ov)
+	local title = UI.text(ov, { Text = "VOYAGE VERS", TextSize = 34, Color = UI.WHITE, Outline = 3, Size = UDim2.new(1, 0, 0, 40), Position = UDim2.new(0, 0, 0.18, 0), ZIndex = 22 })
+	local name = UI.text(ov, { Text = string.upper(w.name), TextSize = 78, Color = w.banner, Outline = 5, Size = UDim2.new(1, 0, 0, 90), Position = UDim2.new(0, 0, 0.18, 44), ZIndex = 22 })
+	local nameScale = UI.new("UIScale", { Scale = 0.6, Parent = name })
+	TweenService:Create(nameScale, TweenInfo.new(0.5, Enum.EasingStyle.Back), { Scale = 1 }):Play()
+	play("travel")
+	send(action, wi)
+	local t0 = os.clock()
+	local DUR = 2.6
+	local arrived = false
+	local conn
+	conn = RunService.RenderStepped:Connect(function()
+		local t = os.clock() - t0
+		local u = math.clamp(t / DUR, 0, 1)
+		local z = -(u ^ 1.6) * 330
+		local wob = math.sin(t * 9) * 0.25
+		if cart then
+			cart:PivotTo(CFrame.new(TUN + Vector3.new(0, 0, z - 9)))
+		end
+		cam.CFrame = CFrame.new(TUN + Vector3.new(wob, 5.2 + math.sin(t * 13) * 0.15, z)) * CFrame.Angles(math.rad(-6), 0, math.rad(wob * 3))
+		for i, f in lines do
+			local a = f:GetAttribute("A") :: number
+			local d = ((t * 2.2 + i * 0.13) % 1)
+			f.Position = UDim2.new(0.5 + math.cos(a) * (0.15 + d * 0.5), 0, 0.5 + math.sin(a) * (0.15 + d * 0.5) * 1.6, 0)
+			f.BackgroundTransparency = 0.2 + d * 0.7
+		end
+		if not arrived and t > DUR * 0.62 then
+			arrived = true
+			title.Text = "ARRIVÉE !"
+			nameScale.Scale = 1.25
+			TweenService:Create(nameScale, TweenInfo.new(0.4, Enum.EasingStyle.Back), { Scale = 1 }):Play()
+			play("reveal_rare")
+		end
+		if t >= DUR then
+			conn:Disconnect()
+			local flash = UI.new("Frame", { BackgroundColor3 = UI.WHITE, Size = UDim2.fromScale(1, 1), ZIndex = 25, Parent = gui })
+			TweenService:Create(flash, TweenInfo.new(0.5), { BackgroundTransparency = 1 }):Play()
+			Debris:AddItem(flash, 0.6)
+			ov:Destroy()
+			cam.CameraType = Enum.CameraType.Custom
+			cam.FieldOfView = fov0
+			local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+			if hum then
+				cam.CameraSubject = hum
+			end
+			toast(w.name .. " !", w.banner)
+			traveling = false
+		end
+	end)
+end
+
+-- Marteaux à bonbons ----------------------------------------------------------
+local hammerSel: string? = nil
+local lastRoll: { any } = {}
+local rollStamp = 0
+
+local function hammerViewport(parent: Instance, id: string, size: UDim2, pos: UDim2, spin: boolean, dark: boolean?): ViewportFrame
+	local vp = UI.new("ViewportFrame", { BackgroundTransparency = 1, Size = size, Position = pos, Ambient = Color3.fromRGB(200, 195, 210), LightColor = Color3.new(1, 1, 1), LightDirection = Vector3.new(-0.4, -0.8, 0.6), ZIndex = 3, Parent = parent })
+	local m = HammerModels.build(id, 1, true)
+	if dark then
+		for _, p in m:GetDescendants() do
+			if p:IsA("BasePart") then
+				p.Color = Color3.fromHex("3A3358")
+				p.Material = Enum.Material.SmoothPlastic
+			elseif p:IsA("ParticleEmitter") then
+				p.Enabled = false
+			end
+		end
+	end
+	m.Parent = vp
+	local cam = UI.new("Camera", { FieldOfView = 30, Parent = vp })
+	vp.CurrentCamera = cam
+	local function place(a: number)
+		cam.CFrame = CFrame.lookAt(Vector3.new(math.sin(a) * 11, 3.2, -math.cos(a) * 11), Vector3.new(0, 2.6, 0))
+	end
+	place(0.5)
+	if spin then
+		local conn
+		conn = RunService.RenderStepped:Connect(function()
+			if not vp.Parent then
+				conn:Disconnect()
+				return
+			end
+			place(os.clock() * 0.8)
+		end)
+	end
+	return vp
+end
+
+local function ownedCount(): number
+	local n = 0
+	for _, h in Config.Hammers do
+		if S.hammers[h.id] then
+			n += 1
+		end
+	end
+	return n
+end
+
+panels.hammers = {
+	title = "Marteaux à bonbons",
+	color = UI.ORANGE,
+	w = 1120,
+	h = 650,
+	sig = function()
+		return table.concat({ tostring(S.hammer), tostring(ownedCount()), tostring(hammerSel), tostring(rollStamp), tostring(S.coins >= S.hammerPrice), tostring(S.coins >= S.hammerPrice * 9) }, ",")
+	end,
+	build = function(c)
+		local sel = hammerSel or S.hammer
+		local hd = HammerModels.def(sel)
+		local owned = S.hammers[sel] == true
+		local rar = Config.Rarities[hd.rarity]
+		headerChip(c, string.format("COLLECTION %d / %d", ownedCount(), #Config.Hammers), UI.PURPLE, 0, 250)
+		headerChip(c, "ÉQUIPÉ : " .. string.upper(HammerModels.def(S.hammer).name), UI.PINK, 262, 380)
+		-- aperçu
+		local prev = UI.new("Frame", { BackgroundColor3 = UI.lighten(rar.color, 0.55), Size = UDim2.fromOffset(330, 520), Position = UDim2.fromOffset(0, 52), Parent = c })
+		UI.corner(prev, 22)
+		UI.stroke(prev, 4, rar.color)
+		UI.new("UIGradient", { Rotation = 90, Color = ColorSequence.new(UI.lighten(rar.color, 0.7), rar.color), Parent = prev })
+		local chipR = UI.box(prev, { Size = UDim2.fromOffset(130, 30), Position = UDim2.fromOffset(12, 12), Color = rar.color, Radius = 14 })
+		UI.text(chipR, { Text = string.upper(rar.name), TextSize = 15, Color = UI.WHITE, Outline = 2 })
+		hammerViewport(prev, sel, UDim2.new(1, 0, 0, 280), UDim2.fromOffset(0, 40), true, not owned)
+		UI.text(prev, { Text = if owned then hd.name else "???", TextSize = 26, Color = UI.WHITE, Outline = 3, Size = UDim2.new(1, -20, 0, 32), Position = UDim2.fromOffset(10, 326) })
+		UI.text(prev, { Text = "Clics x" .. hd.bonus, TextSize = 22, Color = UI.YELLOW, Outline = 2.5, Size = UDim2.new(1, -20, 0, 28), Position = UDim2.fromOffset(10, 362) })
+		UI.text(prev, { Text = if owned then hd.desc else "Pas encore trouvé : tente ta chance !", TextSize = 15, Wrap = true, Color = UI.WHITE, Outline = 1.5, Size = UDim2.new(1, -30, 0, 44), Position = UDim2.fromOffset(15, 394) })
+		local bpos, bsize = UDim2.new(0, 20, 1, -70), UDim2.new(1, -40, 0, 52)
+		if S.hammer == sel then
+			UI.button(prev, { Text = "✅ ÉQUIPÉ", Size = bsize, Position = bpos, Enabled = false })
+		elseif owned then
+			UI.button(prev, { Text = "ÉQUIPER", Color = UI.GREEN, Size = bsize, Position = bpos, TextSize = 22 }, function()
+				send("hammerEquip", sel)
+			end)
+		else
+			UI.button(prev, { Text = "🔒 À TROUVER", Size = bsize, Position = bpos, Enabled = false })
+		end
+		-- machine à tirages
+		local gx = 346
+		local box = UI.new("Frame", { BackgroundColor3 = UI.WHITE, Size = UDim2.fromOffset(718, 196), Position = UDim2.fromOffset(gx, 52), Parent = c })
+		UI.corner(box, 22)
+		UI.stroke(box, 4, UI.ORANGE)
+		UI.new("UIGradient", { Rotation = 0, Color = ColorSequence.new(Color3.fromHex("FFF1DC"), Color3.fromHex("FFE0F0")), Parent = box })
+		local tag = UI.box(box, { Size = UDim2.fromOffset(220, 30), Position = UDim2.fromOffset(14, 12), Color = UI.ORANGE, Radius = 14 })
+		UI.text(tag, { Text = "MACHINE À MARTEAUX", TextSize = 15, Color = UI.WHITE, Outline = 2 })
+		UI.text(box, { Text = "1 tirage : 🪙 " .. fmt(S.hammerPrice) .. "    10 tirages : 🪙 " .. fmt(S.hammerPrice * 9) .. " (1 offert)", TextSize = 19, AlignX = L, Size = UDim2.new(1, -230, 0, 26), Position = UDim2.fromOffset(16, 50) })
+		UI.text(box, { Text = "Un doublon te rend 25 % du prix. Le prix suit tes gains.", TextSize = 14, AlignX = L, Color = UI.MUTED, Size = UDim2.new(1, -230, 0, 20), Position = UDim2.fromOffset(16, 78) })
+		local parts = {}
+		for r = 1, 6 do
+			table.insert(parts, string.format('<font color="#%s">%s %s %%</font>', Config.Rarities[r].color:ToHex(), Config.Rarities[r].name, tostring(Config.HAMMER_ODDS[r])))
+		end
+		UI.text(box, { Text = table.concat(parts, "  ·  "), Rich = true, TextSize = 14, Wrap = true, AlignX = L, Size = UDim2.new(1, -230, 0, 36), Position = UDim2.fromOffset(16, 100) })
+		UI.button(box, { Text = "TIRER x1", Color = UI.YELLOW, Size = UDim2.fromOffset(190, 54), Position = UDim2.new(1, -204, 0, 14), TextSize = 22, Enabled = S.coins >= S.hammerPrice }, function()
+			send("hammerRoll", 1)
+		end)
+		UI.button(box, { Text = "TIRER x10", Color = UI.ORANGE, Size = UDim2.fromOffset(190, 54), Position = UDim2.new(1, -204, 0, 78), TextSize = 22, Enabled = S.coins >= S.hammerPrice * 9 }, function()
+			send("hammerRoll", 10)
+		end)
+		-- derniers résultats
+		for k, r in lastRoll do
+			local d = HammerModels.def(r.id)
+			local cell = UI.new("Frame", { BackgroundColor3 = UI.lighten(Config.Rarities[d.rarity].color, 0.6), Size = UDim2.fromOffset(44, 44), Position = UDim2.fromOffset(16 + (k - 1) * 50, 142), Parent = box })
+			UI.corner(cell, 10)
+			UI.stroke(cell, 2.5, Config.Rarities[d.rarity].color)
+			hammerViewport(cell, r.id, UDim2.fromScale(1, 1), UDim2.new(), false)
+			if r.new then
+				UI.text(cell, { Text = "NEW", TextSize = 11, Color = UI.YELLOW, Outline = 1.5, Size = UDim2.new(1, 0, 0, 12), Position = UDim2.fromOffset(0, -2), ZIndex = 5 })
+			end
+		end
+		-- collection
+		local grid = scroller(c, UDim2.fromOffset(726, 316), UDim2.fromOffset(gx, 258))
+		UI.new("UIGridLayout", { CellSize = UDim2.fromOffset(134, 148), CellPadding = UDim2.fromOffset(10, 10), SortOrder = Enum.SortOrder.LayoutOrder, Parent = grid })
+		UI.new("UIPadding", { PaddingTop = UDim.new(0, 4), PaddingLeft = UDim.new(0, 4), Parent = grid })
+		for k, h in Config.Hammers do
+			local has = S.hammers[h.id] == true
+			local rc = Config.Rarities[h.rarity].color
+			local b = UI.new("TextButton", { Text = "", AutoButtonColor = true, BackgroundColor3 = if has then UI.lighten(rc, 0.7) else Color3.fromHex("E4E0F2"), LayoutOrder = k, Parent = grid })
+			UI.corner(b, 16)
+			UI.stroke(b, if sel == h.id then 5 else 3, rc)
+			hammerViewport(b, h.id, UDim2.new(1, 0, 0, 104), UDim2.fromOffset(0, 4), false, not has)
+			UI.text(b, { Text = if has then h.name else "???", TextSize = 13, Wrap = true, Size = UDim2.new(1, -8, 0, 32), Position = UDim2.new(0, 4, 1, -38), ZIndex = 4 })
+			if S.hammer == h.id then
+				UI.text(b, { Text = "✅", TextSize = 18, Size = UDim2.fromOffset(24, 24), Position = UDim2.fromOffset(4, 4), ZIndex = 4 })
+			end
+			b.Activated:Connect(function()
+				play("click")
+				hammerSel = h.id
+				renderPanel()
+			end)
+		end
+	end,
+}
+
+-- coup de marteau quand on tape un tas (visible pour soi)
+local swingT = 0
+local function swingHammer()
+	local char = player.Character
+	local held = char and char:FindFirstChild("HeldHammer")
+	local handle = held and held:FindFirstChild("Handle")
+	local grip = handle and handle:FindFirstChild("Grip") :: Weld?
+	if not grip then
+		return
+	end
+	local base = grip:GetAttribute("Base") :: CFrame?
+	if not base then
+		base = grip.C0
+		grip:SetAttribute("Base", base)
+	end
+	if os.clock() - swingT < 0.12 then
+		return
+	end
+	swingT = os.clock()
+	grip.C0 = base * CFrame.Angles(math.rad(-70), 0, 0)
+	TweenService:Create(grip, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { C0 = base }):Play()
+end
 
 -- Cadeau du jour ----------------------------------------------------------
 panels.gift = {
@@ -1505,6 +1891,7 @@ Fx.OnClientEvent:Connect(function(kind: string, data: any)
 		toast(data.text, if data.color then Color3.fromHex(data.color) else nil)
 	elseif kind == "tap" then
 		play("tap")
+		swingHammer()
 		local txt = "-" .. fmt(data.dmg)
 		local col, size = UI.WHITE, 26
 		if data.weak then
@@ -1549,6 +1936,24 @@ Fx.OnClientEvent:Connect(function(kind: string, data: any)
 		local root = hrp()
 		if root then
 			floatText(root.Position + Vector3.new(0, 6, 0), data.name .. " niveau " .. data.lvl .. " !", UI.MINT, 24)
+		end
+	elseif kind == "hammerRoll" then
+		lastRoll = data.results
+		rollStamp += 1
+		local best, bestId = 0, nil
+		for _, r in data.results do
+			local d = HammerModels.def(r.id)
+			if d.rarity > best then
+				best, bestId = d.rarity, r.id
+			end
+		end
+		hammerSel = bestId
+		play(if best >= Config.MYTHIC then "legend" elseif best >= 4 then "reveal_rare" else "reveal")
+		if data.refund > 0 then
+			toast("Doublons : +" .. fmt(data.refund) .. " pièces rendues", UI.YELLOW)
+		end
+		if current.name ~= "hammers" then
+			openPanel("hammers")
 		end
 	elseif kind == "bought" then
 		play("buy")
@@ -2075,6 +2480,7 @@ local keys = {
 	[Enum.KeyCode.G] = "gift",
 	[Enum.KeyCode.R] = "rebirth",
 	[Enum.KeyCode.K] = "admin",
+	[Enum.KeyCode.H] = "hammers",
 }
 UserInputService.InputBegan:Connect(function(input, processed)
 	if processed or not S then

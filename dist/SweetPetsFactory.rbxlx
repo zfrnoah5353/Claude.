@@ -380,6 +380,38 @@ Config.Passes = {
 -- et dans Studio tout le monde l'est pour pouvoir tester.
 Config.AdminIds = {} :: { number }
 
+-- Marteaux à bonbons (skins tirées au hasard) : bonus de dégâts de clic
+export type Hammer = { id: string, name: string, rarity: number, head: string, handle: string, accent: string, mat: string?, shape: string, bonus: number, desc: string }
+Config.Hammers = {
+	{ id = "wood", name = "Maillet en bois", rarity = 1, head = "B5835A", handle = "7A4E36", accent = "D9A066", shape = "mallet", bonus = 1.1, desc = "Le marteau de départ des apprentis confiseurs." },
+	{ id = "gum", name = "Marteau Gomme", rarity = 1, head = "FF8FB8", handle = "FFFFFF", accent = "FF5A8A", shape = "mallet", bonus = 1.15, desc = "Rebondit à chaque coup." },
+	{ id = "mint", name = "Marteau Menthe", rarity = 1, head = "7EE0B8", handle = "FFFFFF", accent = "3DBE8C", shape = "mallet", bonus = 1.2, desc = "Frais comme une pastille." },
+	{ id = "lolly", name = "Sucette Massue", rarity = 2, head = "FFD54A", handle = "FFFFFF", accent = "FF5A6E", shape = "lolly", bonus = 1.35, desc = "Une sucette géante qui fait mal." },
+	{ id = "cane", name = "Canne Sucrée", rarity = 2, head = "FF5A6E", handle = "FFFFFF", accent = "FFFFFF", shape = "cane", bonus = 1.4, desc = "Rayée rouge et blanc, crochet compris." },
+	{ id = "choco", name = "Marteau Praliné", rarity = 2, head = "6B4430", handle = "E8B64A", accent = "D9A066", shape = "mallet", bonus = 1.45, desc = "Tout en chocolat noir." },
+	{ id = "donut", name = "Donut Cogneur", rarity = 3, head = "E8A85A", handle = "FFFFFF", accent = "FF8FB8", shape = "donut", bonus = 1.7, desc = "Glaçage rose et vermicelles." },
+	{ id = "ice", name = "Cornet Glacé", rarity = 3, head = "BDE9FF", handle = "E8A85A", accent = "FFFFFF", mat = "Glass", shape = "cone", bonus = 1.8, desc = "Gèle les tas de bonbons." },
+	{ id = "jelly", name = "Marteau Gelée", rarity = 3, head = "B69CFF", handle = "6B5BD6", accent = "E2D8FF", mat = "Glass", shape = "mallet", bonus = 1.9, desc = "Translucide et tremblotant." },
+	{ id = "cupcake", name = "Massue Cupcake", rarity = 4, head = "FFB3CF", handle = "FFFFFF", accent = "E8344E", shape = "cupcake", bonus = 2.3, desc = "Avec sa cerise sur le dessus." },
+	{ id = "crystal", name = "Marteau Cristal", rarity = 4, head = "7FD6FF", handle = "C9C0FF", accent = "FFFFFF", mat = "Neon", shape = "crystal", bonus = 2.5, desc = "Brille dans le noir." },
+	{ id = "gold", name = "Marteau d'Or", rarity = 5, head = "FFD23F", handle = "8C5A2A", accent = "FFF3B8", mat = "Foil", shape = "mallet", bonus = 3.2, desc = "Pour les rois du bonbon." },
+	{ id = "comet", name = "Comète Cosmique", rarity = 5, head = "C04BD8", handle = "2A2350", accent = "7FD6FF", mat = "Neon", shape = "star", bonus = 3.5, desc = "Laisse une traînée d'étoiles." },
+	{ id = "rainbow", name = "Marteau Arc-en-ciel", rarity = 6, head = "FF8FB8", handle = "FFFFFF", accent = "FFD54A", mat = "Neon", shape = "rainbow", bonus = 5, desc = "Toutes les couleurs à chaque coup." },
+	{ id = "olympus", name = "Foudre d'Olympe", rarity = 6, head = "FFF3B8", handle = "E8B64A", accent = "7FD6FF", mat = "Neon", shape = "bolt", bonus = 6, desc = "Le marteau de Zeus en sucre d'orge." },
+} :: { Hammer }
+-- chances de tirage par rareté (en %), le reste va au Commun
+Config.HAMMER_ODDS = { [1] = 47.5, [2] = 30, [3] = 15, [4] = 6, [5] = 1.3, [6] = 0.2 }
+Config.HAMMER_ROLL_SECONDS = 25 -- prix d'un tirage = 25 s de gains (au moins 300 pièces)
+Config.HAMMER_REFUND = 0.25 -- un doublon rend 25 % du prix
+
+-- Vignettes des mondes et voyage : couleurs du ciel (haut, bas)
+Config.WorldSky = {
+	{ "7FC8FF", "FFD1EA" },
+	{ "F3B98A", "FFE6C8" },
+	{ "9FDCFF", "F2FBFF" },
+	{ "120E2A", "6B3FA0" },
+}
+
 Config.Potions = {
 	{ id = "coins", name = "Potion de pièces x2", color = hex("FFD54A"), gems = 10 },
 	{ id = "luck", name = "Potion de chance x2", color = hex("7EE0B8"), gems = 10 },
@@ -520,6 +552,161 @@ return Config
         </Properties>
       </Item>
       <Item class="ModuleScript" referent="7">
+        <Properties>
+          <string name="Name">HammerModels</string>
+          <string name="Source"><![CDATA[--!strict
+-- Modèles des marteaux à bonbons. La poignée part de l'origine (la main) vers +Y,
+-- la tête est en haut. Utilisé dans la main des joueurs et dans les vignettes.
+
+local Config = require(script.Parent.Config)
+
+local HammerModels = {}
+
+local function hex(h: string): Color3
+	return Color3.fromHex(h)
+end
+
+local MAT: { [string]: Enum.Material } = {
+	Glass = Enum.Material.Glass,
+	Neon = Enum.Material.Neon,
+	Foil = Enum.Material.Foil,
+}
+
+function HammerModels.def(id: string): Config.Hammer
+	for _, h in Config.Hammers do
+		if h.id == id then
+			return h
+		end
+	end
+	return Config.Hammers[1]
+end
+
+-- scale : 1 = taille dans la main (environ 3,6 studs de long)
+function HammerModels.build(id: string, scale: number?, anchored: boolean?): Model
+	local h = HammerModels.def(id)
+	local s = scale or 1
+	local model = Instance.new("Model")
+	model.Name = "Hammer_" .. h.id
+	local headMat = if h.mat then MAT[h.mat] else Enum.Material.SmoothPlastic
+
+	local function add(shape: string, size: Vector3, cf: CFrame, color: string, mat: Enum.Material?): BasePart
+		local p = Instance.new("Part")
+		p.Size = size * s
+		p.CFrame = CFrame.new(cf.Position * s) * cf.Rotation
+		p.Color = hex(color)
+		p.Material = mat or Enum.Material.SmoothPlastic
+		p.Anchored = anchored == true
+		p.CanCollide = false
+		p.CanQuery = false
+		p.CanTouch = false
+		p.Massless = true
+		p.CastShadow = false
+		p.TopSurface = Enum.SurfaceType.Smooth
+		p.BottomSurface = Enum.SurfaceType.Smooth
+		if shape == "ball" then
+			p.Shape = Enum.PartType.Ball
+		elseif shape == "cyl" then
+			p.Shape = Enum.PartType.Cylinder
+		end
+		p.Parent = model
+		return p
+	end
+	local UP = CFrame.Angles(0, 0, math.rad(90)) -- cylindre vertical
+	local FACE = CFrame.Angles(0, math.rad(90), 0) -- disque face à l'avant (-Z)
+
+	-- poignée
+	local handle = add("cyl", Vector3.new(2.6, 0.32, 0.32), CFrame.new(0, 1.2, 0) * UP, h.handle)
+	handle.Name = "Handle"
+	add("cyl", Vector3.new(0.3, 0.42, 0.42), CFrame.new(0, 0.05, 0) * UP, h.accent)
+	add("cyl", Vector3.new(0.3, 0.42, 0.42), CFrame.new(0, 2.3, 0) * UP, h.accent)
+	local top = 2.9
+
+	if h.shape == "mallet" or h.shape == "rainbow" then
+		add("cyl", Vector3.new(1.7, 1.05, 1.05), CFrame.new(0, top, 0), h.head, headMat)
+		for _, x in { -0.85, 0.85 } do
+			add("cyl", Vector3.new(0.22, 1.2, 1.2), CFrame.new(x, top, 0), h.accent, headMat)
+		end
+		if h.shape == "rainbow" then
+			local cols = { "FF5A6E", "FF9A3C", "FFD54A", "7EE0B8", "7FD6FF", "B69CFF" }
+			for i, c in cols do
+				add("cyl", Vector3.new(0.24, 1.1, 1.1), CFrame.new(-0.7 + (i - 1) * 0.28, top, 0), c, Enum.Material.Neon)
+			end
+		end
+	elseif h.shape == "lolly" then
+		add("cyl", Vector3.new(0.3, 1.9, 1.9), CFrame.new(0, top + 0.3, 0) * FACE, h.head, headMat)
+		add("cyl", Vector3.new(0.34, 1.25, 1.25), CFrame.new(0, top + 0.3, 0) * FACE, h.accent)
+		add("cyl", Vector3.new(0.38, 0.6, 0.6), CFrame.new(0, top + 0.3, 0) * FACE, h.head, headMat)
+	elseif h.shape == "cane" then
+		for i = 0, 5 do
+			add("cyl", Vector3.new(0.45, 0.5, 0.5), CFrame.new(0, 2.5 + i * 0.4, 0) * UP, if i % 2 == 0 then h.head else h.accent)
+		end
+		for k = 1, 6 do
+			local a = math.pi * k / 6
+			add("ball", Vector3.one * 0.52, CFrame.new(0.5 - math.cos(a) * 0.5, 4.8 + math.sin(a) * 0.5, 0), if k % 2 == 0 then h.head else h.accent)
+		end
+	elseif h.shape == "donut" then
+		for i = 0, 11 do
+			local a = i / 12 * math.pi * 2
+			local p = CFrame.new(math.cos(a) * 0.7, top + 0.4 + math.sin(a) * 0.7, 0)
+			add("ball", Vector3.one * 0.62, p, h.head, headMat)
+			add("ball", Vector3.one * 0.46, p * CFrame.new(0, 0, -0.18), h.accent)
+		end
+	elseif h.shape == "cone" then
+		for i = 0, 3 do
+			add("cyl", Vector3.new(0.3, 0.35 + i * 0.22, 0.35 + i * 0.22), CFrame.new(0, 2.4 + i * 0.3, 0) * UP, "E8A85A")
+		end
+		add("ball", Vector3.one * 1.2, CFrame.new(0, 3.75, 0), h.head, headMat)
+		add("ball", Vector3.one * 0.95, CFrame.new(0, 4.5, 0), h.accent)
+		add("ball", Vector3.one * 0.3, CFrame.new(0, 5.05, 0), "E8344E")
+	elseif h.shape == "cupcake" then
+		add("cyl", Vector3.new(0.8, 1.2, 1.2), CFrame.new(0, top, 0) * UP, h.accent)
+		for i = 0, 5 do
+			local a = i / 6 * math.pi * 2
+			add("ball", Vector3.one * 0.7, CFrame.new(math.cos(a) * 0.4, top + 0.6, math.sin(a) * 0.4), h.head)
+		end
+		add("ball", Vector3.one * 0.8, CFrame.new(0, top + 1.0, 0), h.head)
+		add("ball", Vector3.one * 0.38, CFrame.new(0, top + 1.5, 0), "E8344E")
+	elseif h.shape == "crystal" then
+		for i = 0, 2 do
+			add("block", Vector3.new(0.5, 1.8, 0.5), CFrame.new(0, top + 0.4, 0) * CFrame.Angles(0, math.rad(i * 60), math.rad(18 * (i - 1))), h.head, headMat)
+		end
+		add("ball", Vector3.one * 0.7, CFrame.new(0, top, 0), h.accent, Enum.Material.Neon)
+	elseif h.shape == "star" then
+		for i = 0, 4 do
+			add("block", Vector3.new(0.5, 1.9, 0.3), CFrame.new(0, top + 0.5, 0) * CFrame.Angles(0, 0, math.rad(i * 72)), h.head, headMat)
+		end
+		add("ball", Vector3.one * 0.8, CFrame.new(0, top + 0.5, 0), h.accent, Enum.Material.Neon)
+	elseif h.shape == "bolt" then
+		local zig = { { 0.0, 2.6, 25 }, { 0.3, 3.3, -30 }, { -0.1, 4.0, 25 }, { 0.25, 4.7, -30 } }
+		for _, z in zig do
+			add("block", Vector3.new(0.4, 0.9, 0.35), CFrame.new(z[1], z[2], 0) * CFrame.Angles(0, 0, math.rad(z[3])), h.head, headMat)
+		end
+		add("ball", Vector3.one * 0.6, CFrame.new(0.1, 5.2, 0), h.accent, Enum.Material.Neon)
+	end
+
+	-- brillance pour les plus rares
+	if h.rarity >= 5 then
+		local pe = Instance.new("ParticleEmitter")
+		pe.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+		pe.Color = ColorSequence.new(hex(h.head), hex(h.accent))
+		pe.LightEmission = 1
+		pe.Rate = 10
+		pe.Lifetime = NumberRange.new(0.5, 1)
+		pe.Speed = NumberRange.new(0.5, 1.5)
+		pe.SpreadAngle = Vector2.new(180, 180)
+		pe.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.3 * s), NumberSequenceKeypoint.new(1, 0) })
+		local head = model:GetChildren()[#model:GetChildren()] :: BasePart
+		pe.Parent = head
+	end
+	model.PrimaryPart = handle
+	return model
+end
+
+return HammerModels
+]]></string>
+        </Properties>
+      </Item>
+      <Item class="ModuleScript" referent="8">
         <Properties>
           <string name="Name">MapDecor</string>
           <string name="Source"><![CDATA[--!strict
@@ -1073,11 +1260,63 @@ function Decor.build(theme: string, palette: { string }, seed: number): { Spec }
 	return ctx.out
 end
 
+-- Petite scène de vitrine d'un monde (vignettes du menu des mondes), centrée sur l'origine
+function Decor.diorama(theme: string, palette: { string }): { Spec }
+	local state = 12345
+	local ctx: Ctx = {
+		out = {},
+		rnd = function(): number
+			state = (state * 16807) % 2147483647
+			return state / 2147483647
+		end,
+	}
+	local P = palette
+	local groundC = { meadow = "FFB3CF", choco = "CC9E74", ice = "D6F0FF", galaxy = "3F3670" }
+	disc(ctx, 60, 2, 0, -1, 0, groundC[theme] or "FFB3CF")
+	disc(ctx, 64, 1.6, 0, -1.4, 0, P[1])
+	-- tas de bonbons au premier plan
+	for i = 1, 4 do
+		local x, z = -14 + i * 6 + rand(ctx, -2, 2), -10 + rand(ctx, -3, 3)
+		for _ = 1, 3 do
+			ball(ctx, rand(ctx, 2.6, 3.6), x + rand(ctx, -1.2, 1.2), 1.2, z + rand(ctx, -1.2, 1.2), pick(ctx, P))
+		end
+	end
+	if theme == "meadow" then
+		cupcakeHouse(ctx, -12, 8, 8, P[2], "FFFFFF", 160)
+		lollipop(ctx, 6, 10, 13, P[1], "FFFFFF")
+		candyCane(ctx, 16, 2, 12, 200, "FF5A6E")
+		gumdropTree(ctx, 0, 14, 11, P)
+		cottonTree(ctx, -22, -2, 10, "BDE9FF")
+		cloud(ctx, 10, 24, 16, 6, "FFFFFF")
+	elseif theme == "choco" then
+		chocoFountain(ctx, 0, 10)
+		truffleTree(ctx, -14, 6, 12)
+		truffleTree(ctx, 15, 8, 11)
+		chocoBar(ctx, 18, -4, 6, 30)
+		cookie(ctx, -20, -4, 6)
+	elseif theme == "ice" then
+		iceCone(ctx, -10, 8, 14, P)
+		iceCone(ctx, 10, 10, 12, P)
+		popsicle(ctx, 0, 14, 11, P[2])
+		crystal(ctx, 18, 0, 9, "BDE9FF", false)
+		hill(ctx, -20, -2, 8, "FFFFFF")
+		cloud(ctx, -6, 24, 16, 6, "FFFFFF")
+	else
+		planet(ctx, 0, 20, 14, 10, P[3], "FFF3B8")
+		crystal(ctx, -12, 6, 12, P[1], true)
+		crystal(ctx, 13, 8, 11, P[4], true)
+		star(ctx, -16, 20, 8, 4, "FFE27A")
+		star(ctx, 18, 22, 6, 3, "7FD6FF")
+		ufo(ctx, 16, 14, -2)
+	end
+	return ctx.out
+end
+
 return Decor
 ]]></string>
         </Properties>
       </Item>
-      <Item class="ModuleScript" referent="8">
+      <Item class="ModuleScript" referent="9">
         <Properties>
           <string name="Name">PetModels</string>
           <string name="Source"><![CDATA[--!strict
@@ -1419,11 +1658,11 @@ return PetModels
 ]]></string>
         </Properties>
       </Item>
-      <Item class="Folder" referent="9">
+      <Item class="Folder" referent="10">
         <Properties>
           <string name="Name">PetPlans</string>
         </Properties>
-        <Item class="ModuleScript" referent="10">
+        <Item class="ModuleScript" referent="11">
           <Properties>
             <string name="Name">anubis</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1431,7 +1670,7 @@ return [==[{"parts":[{"color":"F2EEE6","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="11">
+        <Item class="ModuleScript" referent="12">
           <Properties>
             <string name="Name">astro_pup</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1439,7 +1678,7 @@ return [==[{"parts":[{"color":"E0E6FF","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="12">
+        <Item class="ModuleScript" referent="13">
           <Properties>
             <string name="Name">berry_bunny</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1447,7 +1686,7 @@ return [==[{"parts":[{"color":"C86BD8","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="13">
+        <Item class="ModuleScript" referent="14">
           <Properties>
             <string name="Name">brownie_dragon</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1455,7 +1694,7 @@ return [==[{"parts":[{"color":"4A2C20","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="14">
+        <Item class="ModuleScript" referent="15">
           <Properties>
             <string name="Name">caramel_bear</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1463,7 +1702,7 @@ return [==[{"parts":[{"color":"E0A040","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="15">
+        <Item class="ModuleScript" referent="16">
           <Properties>
             <string name="Name">cerberus</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1471,7 +1710,7 @@ return [==[{"parts":[{"color":"F5E6FF","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="16">
+        <Item class="ModuleScript" referent="17">
           <Properties>
             <string name="Name">cherry_bear</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1479,7 +1718,7 @@ return [==[{"parts":[{"color":"E8344E","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="17">
+        <Item class="ModuleScript" referent="18">
           <Properties>
             <string name="Name">choco_bear</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1487,7 +1726,7 @@ return [==[{"parts":[{"color":"A8704B","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="18">
+        <Item class="ModuleScript" referent="19">
           <Properties>
             <string name="Name">choco_phantom</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1495,7 +1734,7 @@ return [==[{"parts":[{"color":"3A2418","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="19">
+        <Item class="ModuleScript" referent="20">
           <Properties>
             <string name="Name">cocoa_fox</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1503,7 +1742,7 @@ return [==[{"parts":[{"color":"C47A3D","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="20">
+        <Item class="ModuleScript" referent="21">
           <Properties>
             <string name="Name">comet_fox</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1511,7 +1750,7 @@ return [==[{"parts":[{"color":"FF6A3C","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="21">
+        <Item class="ModuleScript" referent="22">
           <Properties>
             <string name="Name">cosmic_cat</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1519,7 +1758,7 @@ return [==[{"parts":[{"color":"4846A8","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="22">
+        <Item class="ModuleScript" referent="23">
           <Properties>
             <string name="Name">cotton_cloud</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1527,7 +1766,7 @@ return [==[{"parts":[{"color":"FFFFFF","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="23">
+        <Item class="ModuleScript" referent="24">
           <Properties>
             <string name="Name">cupcake_pup</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1535,7 +1774,7 @@ return [==[{"parts":[{"color":"FFC97A","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="24">
+        <Item class="ModuleScript" referent="25">
           <Properties>
             <string name="Name">donut_unicorn</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1543,7 +1782,7 @@ return [==[{"parts":[{"color":"FFF1F8","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="25">
+        <Item class="ModuleScript" referent="26">
           <Properties>
             <string name="Name">fenrir</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1551,7 +1790,7 @@ return [==[{"parts":[{"color":"2A1F2E","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="26">
+        <Item class="ModuleScript" referent="27">
           <Properties>
             <string name="Name">frosty_cloud</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1559,7 +1798,7 @@ return [==[{"parts":[{"color":"F0FAFF","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="27">
+        <Item class="ModuleScript" referent="28">
           <Properties>
             <string name="Name">frozen_king</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1567,7 +1806,7 @@ return [==[{"parts":[{"color":"8FD8FF","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="28">
+        <Item class="ModuleScript" referent="29">
           <Properties>
             <string name="Name">fudge_dragon</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1575,7 +1814,7 @@ return [==[{"parts":[{"color":"5A3424","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="29">
+        <Item class="ModuleScript" referent="30">
           <Properties>
             <string name="Name">galaxy_bear</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1583,7 +1822,7 @@ return [==[{"parts":[{"color":"3A3266","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="30">
+        <Item class="ModuleScript" referent="31">
           <Properties>
             <string name="Name">golden_king</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1591,7 +1830,7 @@ return [==[{"parts":[{"color":"FFD23F","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="31">
+        <Item class="ModuleScript" referent="32">
           <Properties>
             <string name="Name">grape_cat</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1599,7 +1838,7 @@ return [==[{"parts":[{"color":"8E6BE8","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="32">
+        <Item class="ModuleScript" referent="33">
           <Properties>
             <string name="Name">griffin</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1607,7 +1846,7 @@ return [==[{"parts":[{"color":"C89A50","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="33">
+        <Item class="ModuleScript" referent="34">
           <Properties>
             <string name="Name">gumdrop_bunny</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1615,7 +1854,7 @@ return [==[{"parts":[{"color":"FF9EC4","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="34">
+        <Item class="ModuleScript" referent="35">
           <Properties>
             <string name="Name">gummy_golem</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1623,7 +1862,7 @@ return [==[{"parts":[{"color":"6FD66F","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="35">
+        <Item class="ModuleScript" referent="36">
           <Properties>
             <string name="Name">hydra</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1631,7 +1870,7 @@ return [==[{"parts":[{"color":"6B3FA0","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="36">
+        <Item class="ModuleScript" referent="37">
           <Properties>
             <string name="Name">ice_unicorn</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1639,7 +1878,7 @@ return [==[{"parts":[{"color":"CFF3FF","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="37">
+        <Item class="ModuleScript" referent="38">
           <Properties>
             <string name="Name">jelly_cat</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1647,7 +1886,7 @@ return [==[{"parts":[{"color":"7FD6FF","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="38">
+        <Item class="ModuleScript" referent="39">
           <Properties>
             <string name="Name">kraken</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1655,7 +1894,7 @@ return [==[{"parts":[{"color":"2A8C8A","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="39">
+        <Item class="ModuleScript" referent="40">
           <Properties>
             <string name="Name">leviathan</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1663,7 +1902,7 @@ return [==[{"parts":[{"color":"2E9AA0","mat":"plastic","alpha":0,"bone":0,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="40">
+        <Item class="ModuleScript" referent="41">
           <Properties>
             <string name="Name">lollipop_fox</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1671,7 +1910,7 @@ return [==[{"parts":[{"color":"FF8A4C","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="41">
+        <Item class="ModuleScript" referent="42">
           <Properties>
             <string name="Name">longdragon</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1679,7 +1918,7 @@ return [==[{"parts":[{"color":"3DBE8C","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="42">
+        <Item class="ModuleScript" referent="43">
           <Properties>
             <string name="Name">mammoth</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1687,7 +1926,7 @@ return [==[{"parts":[{"color":"7A4A2A","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="43">
+        <Item class="ModuleScript" referent="44">
           <Properties>
             <string name="Name">meteor_unicorn</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1695,7 +1934,7 @@ return [==[{"parts":[{"color":"FFB86B","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="44">
+        <Item class="ModuleScript" referent="45">
           <Properties>
             <string name="Name">mint_cat</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1703,7 +1942,7 @@ return [==[{"parts":[{"color":"7EE0B8","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="45">
+        <Item class="ModuleScript" referent="46">
           <Properties>
             <string name="Name">mocha_cat</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1711,7 +1950,7 @@ return [==[{"parts":[{"color":"B08060","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="46">
+        <Item class="ModuleScript" referent="47">
           <Properties>
             <string name="Name">mochi_dragon</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1719,7 +1958,7 @@ return [==[{"parts":[{"color":"B69CFF","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="47">
+        <Item class="ModuleScript" referent="48">
           <Properties>
             <string name="Name">nebula_dragon</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1727,7 +1966,7 @@ return [==[{"parts":[{"color":"C04BD8","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="48">
+        <Item class="ModuleScript" referent="49">
           <Properties>
             <string name="Name">pegasus</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1735,7 +1974,7 @@ return [==[{"parts":[{"color":"FFF6FB","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="49">
+        <Item class="ModuleScript" referent="50">
           <Properties>
             <string name="Name">popsicle_dragon</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1743,7 +1982,7 @@ return [==[{"parts":[{"color":"FF9A3C","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="50">
+        <Item class="ModuleScript" referent="51">
           <Properties>
             <string name="Name">ra_phoenix</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1751,7 +1990,7 @@ return [==[{"parts":[{"color":"FF5A1F","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="51">
+        <Item class="ModuleScript" referent="52">
           <Properties>
             <string name="Name">razz_dragon</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1759,7 +1998,7 @@ return [==[{"parts":[{"color":"FF5A8A","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="52">
+        <Item class="ModuleScript" referent="53">
           <Properties>
             <string name="Name">sorbet_fox</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1767,7 +2006,7 @@ return [==[{"parts":[{"color":"FF7A9A","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="53">
+        <Item class="ModuleScript" referent="54">
           <Properties>
             <string name="Name">sphinx</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1775,7 +2014,7 @@ return [==[{"parts":[{"color":"D9A066","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="54">
+        <Item class="ModuleScript" referent="55">
           <Properties>
             <string name="Name">split_unicorn</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1783,7 +2022,7 @@ return [==[{"parts":[{"color":"FFE27A","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="55">
+        <Item class="ModuleScript" referent="56">
           <Properties>
             <string name="Name">star_bunny</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1791,7 +2030,7 @@ return [==[{"parts":[{"color":"6B5BD6","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="56">
+        <Item class="ModuleScript" referent="57">
           <Properties>
             <string name="Name">sugar_phantom</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1799,7 +2038,7 @@ return [==[{"parts":[{"color":"4B3A8C","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="57">
+        <Item class="ModuleScript" referent="58">
           <Properties>
             <string name="Name">sundae_pup</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1807,7 +2046,7 @@ return [==[{"parts":[{"color":"FFB3C8","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="58">
+        <Item class="ModuleScript" referent="59">
           <Properties>
             <string name="Name">supernova_king</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1815,7 +2054,7 @@ return [==[{"parts":[{"color":"FF5A6E","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="59">
+        <Item class="ModuleScript" referent="60">
           <Properties>
             <string name="Name">toffee_unicorn</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1823,7 +2062,7 @@ return [==[{"parts":[{"color":"F5D6A8","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="60">
+        <Item class="ModuleScript" referent="61">
           <Properties>
             <string name="Name">truffle_pup</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1831,7 +2070,7 @@ return [==[{"parts":[{"color":"7A4E36","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="61">
+        <Item class="ModuleScript" referent="62">
           <Properties>
             <string name="Name">vanilla_bunny</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1839,7 +2078,7 @@ return [==[{"parts":[{"color":"FFF6E0","mat":"plastic","alpha":0,"bone":1,"shape
 ]]></string>
           </Properties>
         </Item>
-        <Item class="ModuleScript" referent="62">
+        <Item class="ModuleScript" referent="63">
           <Properties>
             <string name="Name">void_dragon</string>
             <string name="Source"><![CDATA[-- Plan généré par tools/web (rbxexport) : pièces, os et animations du pet, en JSON.
@@ -1848,7 +2087,7 @@ return [==[{"parts":[{"color":"2A2350","mat":"plastic","alpha":0,"bone":1,"shape
           </Properties>
         </Item>
       </Item>
-      <Item class="ModuleScript" referent="63">
+      <Item class="ModuleScript" referent="64">
         <Properties>
           <string name="Name">PetShapes</string>
           <string name="Source"><![CDATA[--!nonstrict
@@ -3033,11 +3272,11 @@ return Shapes
       </Item>
     </Item>
   </Item>
-  <Item class="ServerScriptService" referent="64">
+  <Item class="ServerScriptService" referent="65">
     <Properties>
       <string name="Name">ServerScriptService</string>
     </Properties>
-    <Item class="Script" referent="65">
+    <Item class="Script" referent="66">
       <Properties>
         <string name="Name">GameServer</string>
         <token name="RunContext">0</token>
@@ -3056,6 +3295,7 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Config = require(Shared:WaitForChild("Config"))
 local PetModels = require(Shared:WaitForChild("PetModels"))
 local MapDecor = require(Shared:WaitForChild("MapDecor"))
+local HammerModels = require(Shared:WaitForChild("HammerModels"))
 
 local rng = Random.new()
 
@@ -3484,6 +3724,8 @@ local function defaultData()
 		autoDelete = 0,
 		lastSeen = 0,
 		receipts = {},
+		hammers = { wood = true },
+		hammer = "wood",
 	}
 end
 
@@ -3592,7 +3834,7 @@ local function teamDps(prof: Profile): number
 end
 
 local function tapDamage(prof: Profile): number
-	return math.max(3, teamDps(prof) * 0.25) * (1 + 0.5 * up(prof, "tap"))
+	return math.max(3, teamDps(prof) * 0.25) * (1 + 0.5 * up(prof, "tap")) * HammerModels.def(prof.data.hammer).bonus
 end
 
 local function coinPerHP(w: number): number
@@ -3869,6 +4111,9 @@ local function sendState(plr: Player)
 		giftStreak = d.giftStreak,
 		giftCoins = roundNice(math.max(500, estimatedCps(prof) * 180)),
 		indexClaim = d.indexClaim,
+		hammers = d.hammers,
+		hammer = d.hammer,
+		hammerPrice = math.floor(math.max(300, estimatedCps(prof) * Config.HAMMER_ROLL_SECONDS)),
 		indexCount = indexCount(d),
 		stats = d.stats,
 		autoCollect = d.autoCollect,
@@ -4849,6 +5094,108 @@ handlers.leaveBoss = function(plr, prof)
 	leaveBoss(plr)
 end
 
+---------------------------------------------------------------------------
+-- Marteaux à bonbons : tirages, équipement, marteau dans la main
+---------------------------------------------------------------------------
+local hammersByRarity: { [number]: { string } } = {}
+for _, h in Config.Hammers do
+	hammersByRarity[h.rarity] = hammersByRarity[h.rarity] or {}
+	table.insert(hammersByRarity[h.rarity], h.id)
+end
+
+local function rollHammer(): string
+	local x = rng:NextNumber() * 100
+	for r = 6, 2, -1 do
+		local odds = Config.HAMMER_ODDS[r] or 0
+		if x < odds and hammersByRarity[r] then
+			local list = hammersByRarity[r]
+			return list[rng:NextInteger(1, #list)]
+		end
+		x -= odds
+	end
+	local list = hammersByRarity[1]
+	return list[rng:NextInteger(1, #list)]
+end
+
+local function attachHammer(plr: Player)
+	local prof = profiles[plr]
+	local char = plr.Character
+	if not prof or not char then
+		return
+	end
+	local old = char:FindFirstChild("HeldHammer")
+	if old then
+		old:Destroy()
+	end
+	local hand = (char:FindFirstChild("RightHand") or char:FindFirstChild("Right Arm") or char:WaitForChild("RightHand", 5)) :: BasePart?
+	if not hand then
+		return
+	end
+	local model = HammerModels.build(prof.data.hammer, 0.8, false)
+	model.Name = "HeldHammer"
+	local grip = hand.CFrame * CFrame.new(0, -0.2, -0.1) * CFrame.Angles(math.rad(-90), 0, 0)
+	local handle = model.PrimaryPart :: BasePart
+	for _, part in model:GetChildren() do
+		if part:IsA("BasePart") then
+			part.CFrame = grip * part.CFrame
+		end
+	end
+	for _, part in model:GetChildren() do
+		if part:IsA("BasePart") and part ~= handle then
+			local wc = Instance.new("WeldConstraint")
+			wc.Part0 = handle
+			wc.Part1 = part
+			wc.Parent = part
+		end
+	end
+	local weld = Instance.new("Weld")
+	weld.Name = "Grip"
+	weld.Part0 = hand
+	weld.Part1 = handle
+	weld.C0 = hand.CFrame:ToObjectSpace(handle.CFrame)
+	weld.Parent = handle
+	model.Parent = char
+end
+
+handlers.hammerRoll = function(plr, prof, n)
+	local d = prof.data
+	local count = if n == 10 then 10 else 1
+	local price = math.floor(math.max(300, estimatedCps(prof) * Config.HAMMER_ROLL_SECONDS))
+	local cost = if count == 10 then price * 9 else price
+	if not spend(plr, prof, cost, false) then
+		return
+	end
+	local results = {}
+	local refund = 0
+	for _ = 1, count do
+		local id = rollHammer()
+		local isNew = not d.hammers[id]
+		if isNew then
+			d.hammers[id] = true
+		else
+			refund += math.floor(price * Config.HAMMER_REFUND)
+		end
+		table.insert(results, { id = id, new = isNew })
+		local hd = HammerModels.def(id)
+		if hd.rarity >= 5 and isNew then
+			Fx:FireAllClients("toast", { text = plr.DisplayName .. " a tiré le " .. hd.name .. " (" .. Config.Rarities[hd.rarity].name .. ") !", color = "FFB020" })
+		end
+	end
+	if refund > 0 then
+		addCoins(prof, refund, false)
+	end
+	prof.full = true
+	Fx:FireClient(plr, "hammerRoll", { results = results, refund = refund })
+end
+
+handlers.hammerEquip = function(plr, prof, id)
+	if type(id) == "string" and prof.data.hammers[id] then
+		prof.data.hammer = id
+		prof.full = true
+		attachHammer(plr)
+	end
+end
+
 Action.OnServerEvent:Connect(function(plr: Player, name: any, arg: any)
 	local prof = profiles[plr]
 	if not prof or type(name) ~= "string" then
@@ -4983,6 +5330,7 @@ local function onCharacter(plr: Player, char: Model)
 	char:PivotTo(worldSpawn(prof.data.world))
 	setWalkSpeed(plr)
 	refreshEquipped(plr)
+	attachHammer(plr)
 end
 
 local function onPlayer(plr: Player)
@@ -5221,7 +5569,7 @@ RunService.Heartbeat:Connect(function(dt)
 end)
 ]]></string>
       </Properties>
-      <Item class="ModuleScript" referent="66">
+      <Item class="ModuleScript" referent="67">
         <Properties>
           <string name="Name">Admin</string>
           <string name="Source"><![CDATA[-- Panneau admin (côté serveur) : actions manuelles, assistant IA (Claude), événements
@@ -5911,27 +6259,27 @@ return Admin
       </Item>
     </Item>
   </Item>
-  <Item class="SoundService" referent="67">
+  <Item class="SoundService" referent="68">
     <Properties>
       <string name="Name">SoundService</string>
     </Properties>
-    <Item class="Folder" referent="68">
+    <Item class="Folder" referent="69">
       <Properties>
         <string name="Name">SweetSounds</string>
       </Properties>
     </Item>
   </Item>
-  <Item class="StarterPlayer" referent="69">
+  <Item class="StarterPlayer" referent="70">
     <Properties>
       <string name="Name">StarterPlayer</string>
       <float name="CameraMaxZoomDistance">90</float>
       <float name="CharacterWalkSpeed">22</float>
     </Properties>
-    <Item class="StarterPlayerScripts" referent="70">
+    <Item class="StarterPlayerScripts" referent="71">
       <Properties>
         <string name="Name">StarterPlayerScripts</string>
       </Properties>
-      <Item class="LocalScript" referent="71">
+      <Item class="LocalScript" referent="72">
         <Properties>
           <string name="Name">Client</string>
           <string name="Source"><![CDATA[-- Sweet Pets Factory : côté joueur
@@ -5952,6 +6300,8 @@ local player = Players.LocalPlayer
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Config = require(Shared:WaitForChild("Config"))
 local PetModels = require(Shared:WaitForChild("PetModels"))
+local MapDecor = require(Shared:WaitForChild("MapDecor"))
+local HammerModels = require(Shared:WaitForChild("HammerModels"))
 local THUMB = 120 -- pièces max par vignette 3D de l'interface
 local UI = require(script:WaitForChild("UI"))
 local Remotes = ReplicatedStorage:WaitForChild("Remotes")
@@ -5990,6 +6340,7 @@ local SOUNDS: { [string]: { id: number, vol: number, start: number? } } = {
 	legend = { id = 1845411858, vol = 0.55, start = 0.24 }, -- APM « Top Prize »
 	divine = { id = 9047024260, vol = 0.6 }, -- APM « Epic Win - Stinger 1 »
 	burst = { id = 9116384485, vol = 0.5, start = 0.1 }, -- Magic Burst (avec divine)
+	travel = { id = 15675024286, vol = 0.55 }, -- Roblox_UI_Whoosh_01
 }
 local sweet = SoundService:FindFirstChild("SweetSounds")
 local soundObjs: { [string]: Sound } = {}
@@ -6217,6 +6568,7 @@ menuButton(UDim.new(0, 12), 150, "pets", "🐾", "Pets (P)", UI.PINK)
 menuButton(UDim.new(0, 12), 240, "index", "📖", "Index (I)", UI.LILAC)
 menuButton(UDim.new(0, 12), 330, "shop", "🛍️", "Boutique (B)", UI.GREEN)
 menuButton(UDim.new(0, 12), 420, "quests", "📜", "Quêtes (J)", UI.YELLOW)
+menuButton(UDim.new(0, 12), 510, "hammers", "🔨", "Marteaux (H)", UI.ORANGE)
 menuButton(UDim.new(1, -76), 150, "worlds", "🌍", "Mondes (C)", UI.MINT)
 menuButton(UDim.new(1, -76), 240, "gift", "🎁", "Cadeau (G)", UI.ORANGE)
 menuButton(UDim.new(1, -76), 330, "rebirth", "🌀", "Rebirth (R)", UI.PURPLE)
@@ -6786,52 +7138,434 @@ panels.quests = {
 }
 
 -- Mondes ------------------------------------------------------------------
-local THEME_ICON = { meadow = "🍬", choco = "🍫", ice = "🍦", galaxy = "🌌" }
+-- Vignettes 3D : chaque carte montre une petite scène du monde (MapDecor.diorama)
+local DMAT: { [string]: Enum.Material } = { Neon = Enum.Material.Neon, Glass = Enum.Material.Glass, Foil = Enum.Material.Foil, Metal = Enum.Material.Metal, Sand = Enum.Material.Sand, Snow = Enum.Material.Snow }
+local function specsToModel(specs: { any }): Model
+	local m = Instance.new("Model")
+	for _, sp in specs do
+		if (sp.t or 0) >= 1 then
+			continue
+		end
+		local p = Instance.new("Part")
+		p.Anchored = true
+		p.Size = Vector3.new(sp.size[1], sp.size[2], sp.size[3])
+		local cf = CFrame.new(sp.p[1], sp.p[2], sp.p[3])
+		if sp.r then
+			cf *= CFrame.Angles(math.rad(sp.r[1]), math.rad(sp.r[2]), math.rad(sp.r[3]))
+		end
+		p.CFrame = cf
+		p.Color = Color3.fromHex(sp.c)
+		p.Material = DMAT[sp.m or ""] or Enum.Material.SmoothPlastic
+		p.Transparency = sp.t or 0
+		p.TopSurface = Enum.SurfaceType.Smooth
+		p.BottomSurface = Enum.SurfaceType.Smooth
+		if sp.s == "ball" then
+			p.Shape = Enum.PartType.Ball
+		elseif sp.s == "cyl" then
+			p.Shape = Enum.PartType.Cylinder
+		end
+		p.Parent = m
+	end
+	return m
+end
+local dioramaCache: { [number]: { any } } = {}
+local function worldDiorama(i: number): Model
+	local w = Config.Worlds[i]
+	if not dioramaCache[i] then
+		local pal = {}
+		for _, c in w.candy do
+			table.insert(pal, c:ToHex())
+		end
+		dioramaCache[i] = MapDecor.diorama(w.theme, pal)
+	end
+	return specsToModel(dioramaCache[i])
+end
+
+local function headerChip(parent: Instance, text: string, color: Color3, x: number, w: number)
+	local f = UI.box(parent, { Size = UDim2.fromOffset(w, 38), Position = UDim2.fromOffset(x, 0), Color = color, Radius = 16 })
+	UI.text(f, { Text = text, TextSize = 17, Color = UI.WHITE, Outline = 2 })
+end
+
+local function teamPower(): number
+	local sum = 0
+	for _, p in S.pets do
+		if p.eq then
+			sum += p.power
+		end
+	end
+	return sum
+end
+
+local travel: (number, string) -> ()
 
 panels.worlds = {
 	title = "Mondes",
 	color = UI.MINT,
 	w = 1100,
-	h = 470,
+	h = 650,
 	sig = function()
 		local nw = Config.Worlds[S.maxWorld + 1]
 		return string.format("%d,%d,%s", S.world, S.maxWorld, tostring(nw ~= nil and S.coins >= nw.unlock))
 	end,
 	build = function(c)
-		local cw = (1100 - 56 - 3 * 16) / 4
+		headerChip(c, string.format("MONDES OUVERTS %d / %d", S.maxWorld, #Config.Worlds), UI.SKY, 0, 250)
+		headerChip(c, "PUISSANCE DE L'ÉQUIPE " .. fmt(teamPower()), UI.ORANGE, 262, 330)
+		local cw, ch = 514, 254
 		for i, w in Config.Worlds do
-			local f = UI.box(c, { Size = UDim2.fromOffset(cw, 380), Position = UDim2.fromOffset((i - 1) * (cw + 16), 8), Color = w.ground, Radius = 22 })
-			local tc = if w.theme == "galaxy" then UI.WHITE else UI.INK
-			local pic = UI.new("Frame", { BackgroundColor3 = w.plaza, Size = UDim2.new(1, -28, 0, 150), Position = UDim2.fromOffset(14, 14), Parent = f })
-			UI.corner(pic, 16)
-			UI.stroke(pic, 3)
-			UI.text(pic, { Text = if i > S.maxWorld then "🔒" else (THEME_ICON :: any)[w.theme], TextSize = 70 })
-			UI.text(f, { Text = w.name, TextSize = 22, Color = tc, Size = UDim2.new(1, 0, 0, 28), Position = UDim2.fromOffset(0, 176) })
-			UI.text(f, { Text = "Pièces x" .. w.coinMult, TextSize = 17, Color = tc, Size = UDim2.new(1, 0, 0, 22), Position = UDim2.fromOffset(0, 210) })
-			UI.text(f, { Text = "Bonbons x" .. fmt(w.scale) .. " plus durs", TextSize = 15, Color = tc, Size = UDim2.new(1, 0, 0, 20), Position = UDim2.fromOffset(0, 234) })
-			if i > 1 then
-				UI.text(f, { Text = "Prix : " .. fmt(w.unlock) .. " pièces", TextSize = 15, Color = tc, Size = UDim2.new(1, 0, 0, 20), Position = UDim2.fromOffset(0, 258) })
+			local col, row = (i - 1) % 2, (i - 1) // 2
+			local card = UI.new("Frame", { BackgroundColor3 = UI.WHITE, ClipsDescendants = true, Size = UDim2.fromOffset(cw, ch), Position = UDim2.fromOffset(col * (cw + 16), 52 + row * (ch + 14)), Parent = c })
+			UI.corner(card, 22)
+			UI.stroke(card, 4, w.banner)
+			local sky = Config.WorldSky[i]
+			UI.new("UIGradient", { Rotation = 90, Color = ColorSequence.new(Color3.fromHex(sky[1]), Color3.fromHex(sky[2])), Parent = card })
+			local vp = UI.new("ViewportFrame", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), Ambient = Color3.fromRGB(190, 180, 200), LightColor = Color3.new(1, 1, 1), LightDirection = Vector3.new(-0.5, -1, 0.4), Parent = card })
+			local model = worldDiorama(i)
+			model.Parent = vp
+			local cam = UI.new("Camera", { FieldOfView = 38, CFrame = CFrame.lookAt(Vector3.new(25, 21, -44), Vector3.new(2, 6, 2)), Parent = vp })
+			vp.CurrentCamera = cam
+			-- ombre en bas pour lire le texte
+			local shade = UI.new("Frame", { BackgroundColor3 = Color3.fromHex("1B1030"), BorderSizePixel = 0, Size = UDim2.new(1, 0, 0.5, 0), Position = UDim2.fromScale(0, 0.5), ZIndex = 2, Parent = card })
+			UI.new("UIGradient", { Rotation = 90, Transparency = NumberSequence.new(1, 0.35), Parent = shade })
+			local badge = UI.new("Frame", { BackgroundColor3 = w.banner, Size = UDim2.fromOffset(40, 40), Position = UDim2.fromOffset(12, 12), ZIndex = 3, Parent = card })
+			UI.corner(badge, 20)
+			UI.stroke(badge, 3)
+			UI.text(badge, { Text = tostring(i), TextSize = 22, Color = UI.WHITE, Outline = 2, ZIndex = 4 })
+			UI.text(card, { Text = w.name, TextSize = 32, Color = UI.WHITE, Outline = 3, AlignX = L, Size = UDim2.new(1, -220, 0, 38), Position = UDim2.new(0, 16, 1, -86), ZIndex = 3 })
+			UI.text(card, { Text = "Pièces x" .. w.coinMult .. " · bonbons x" .. fmt(w.scale) .. " plus durs", TextSize = 16, Color = UI.WHITE, Outline = 2, AlignX = L, Size = UDim2.new(1, -220, 0, 22), Position = UDim2.new(0, 16, 1, -46), ZIndex = 3 })
+			local locked = i > S.maxWorld
+			if locked then
+				local dim = UI.new("Frame", { BackgroundColor3 = Color3.fromHex("1B1030"), BackgroundTransparency = 0.45, Size = UDim2.fromScale(1, 1), ZIndex = 2, Parent = card })
+				UI.text(dim, { Text = "🔒", TextSize = 60, Size = UDim2.new(1, 0, 0.6, 0), ZIndex = 3 })
 			end
-			local bpos = UDim2.new(0, 16, 1, -70)
-			local bsize = UDim2.new(1, -32, 0, 52)
+			local bsize, bpos = UDim2.fromOffset(180, 52), UDim2.new(1, -196, 1, -66)
+			local holder = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), ZIndex = 5, Parent = card })
 			if i == S.world then
-				UI.button(f, { Text = "Tu es ici", Size = bsize, Position = bpos, Enabled = false })
-			elseif i <= S.maxWorld then
-				UI.button(f, { Text = "Voyager", Color = UI.SKY, Size = bsize, Position = bpos }, function()
-					send("teleport", i)
-					closePanel()
+				UI.button(holder, { Text = "TU ES ICI", Size = bsize, Position = bpos, Enabled = false, ZIndex = 5 })
+			elseif not locked then
+				UI.button(holder, { Text = "VOYAGER", Color = UI.SKY, Size = bsize, Position = bpos, TextSize = 22, ZIndex = 5 }, function()
+					travel(i, "teleport")
 				end)
 			elseif i == S.maxWorld + 1 then
-				UI.button(f, { Text = "Débloquer " .. fmt(w.unlock), Color = UI.GREEN, Size = bsize, Position = bpos, TextSize = 18, Enabled = S.coins >= w.unlock }, function()
-					send("unlock")
-					closePanel()
+				UI.button(holder, { Text = "🪙 " .. fmt(w.unlock), Color = UI.GREEN, Size = bsize, Position = bpos, TextSize = 20, Enabled = S.coins >= w.unlock, ZIndex = 5 }, function()
+					travel(i, "unlock")
 				end)
 			else
-				UI.button(f, { Text = "Verrouillé", Size = bsize, Position = bpos, Enabled = false })
+				UI.button(holder, { Text = "VERROUILLÉ", Size = bsize, Position = bpos, Enabled = false, ZIndex = 5 })
 			end
 		end
 	end,
 }
+
+-- Voyage : trajet en wagon dans un tunnel arc-en-ciel, puis « ARRIVÉE ! »
+local TUN = Vector3.new(0, 3000, 0)
+local tunnel: Model? = nil
+local tunnelRings: { BasePart } = {}
+local cart: Model? = nil
+local function buildTunnel()
+	local m = Instance.new("Model")
+	m.Name = "TravelTunnel"
+	local function part(size: Vector3, cf: CFrame, color: Color3, mat: Enum.Material?, shape: Enum.PartType?): BasePart
+		local p = Instance.new("Part")
+		p.Anchored = true
+		p.CanCollide = false
+		p.CanQuery = false
+		p.CanTouch = false
+		p.CastShadow = false
+		p.Size = size
+		p.CFrame = cf
+		p.Color = color
+		p.Material = mat or Enum.Material.SmoothPlastic
+		if shape then
+			p.Shape = shape
+		end
+		p.Parent = m
+		return p
+	end
+	for k = 0, 36 do
+		local z = -k * 11
+		for j = 0, 11 do
+			local a = j / 12 * math.pi * 2
+			local p = part(Vector3.new(5.6, 1.3, 1.3), CFrame.new(TUN + Vector3.new(math.cos(a) * 11, 6 + math.sin(a) * 11, z)) * CFrame.Angles(0, 0, a + math.pi / 2), Color3.new(1, 1, 1), Enum.Material.Neon)
+			p:SetAttribute("K", k)
+			table.insert(tunnelRings, p)
+		end
+	end
+	for _, x in { -2.2, 2.2 } do
+		part(Vector3.new(0.5, 0.5, 420), CFrame.new(TUN + Vector3.new(x, 0.2, -200)), Color3.fromHex("FFF6E6"), Enum.Material.Neon)
+	end
+	for k = 0, 70 do
+		part(Vector3.new(6.4, 0.3, 0.9), CFrame.new(TUN + Vector3.new(0, -0.1, -k * 6)), Color3.fromHex("8C5A2A"))
+	end
+	local r = Random.new(3)
+	for _ = 1, 60 do
+		local a = r:NextNumber(0, math.pi * 2)
+		local d = r:NextNumber(3, 8)
+		part(Vector3.one * r:NextNumber(0.5, 1.3), CFrame.new(TUN + Vector3.new(math.cos(a) * d, 6 + math.sin(a) * d, -r:NextNumber(10, 400))), Color3.fromHSV(r:NextNumber(), 0.5, 1), Enum.Material.Neon, Enum.PartType.Ball)
+	end
+	-- wagon
+	local c = Instance.new("Model")
+	c.Name = "Cart"
+	local function cpart(size: Vector3, off: Vector3, color: string, shape: Enum.PartType?)
+		local p = part(size, CFrame.new(TUN + off), Color3.fromHex(color), nil, shape)
+		p.Parent = c
+	end
+	cpart(Vector3.new(5, 2.4, 6), Vector3.new(0, 1.8, 0), "FF8FB8")
+	cpart(Vector3.new(5.4, 0.6, 6.4), Vector3.new(0, 3.1, 0), "FFFFFF")
+	cpart(Vector3.new(4.2, 0.4, 5.2), Vector3.new(0, 2.9, 0), "B3263A")
+	for _, x in { -2.3, 2.3 } do
+		for _, z in { -2, 2 } do
+			cpart(Vector3.new(0.6, 1.5, 1.5), Vector3.new(x, 0.75, z), "FFD54A", Enum.PartType.Cylinder)
+		end
+	end
+	c.Parent = m
+	cart = c
+	m.Parent = workspace
+	tunnel = m
+end
+
+local traveling = false
+local function speedLines(parent: Instance): { Frame }
+	local list = {}
+	for i = 1, 26 do
+		local a = i / 26 * math.pi * 2
+		local f = UI.new("Frame", { BackgroundColor3 = UI.WHITE, BorderSizePixel = 0, AnchorPoint = Vector2.new(0.5, 0.5), Size = UDim2.fromOffset(4, 120), Rotation = math.deg(a) + 90, Position = UDim2.fromScale(0.5, 0.5), BackgroundTransparency = 0.3, ZIndex = 21, Parent = parent })
+		f:SetAttribute("A", a)
+		table.insert(list, f)
+	end
+	return list
+end
+
+travel = function(wi: number, action: string)
+	if traveling then
+		return
+	end
+	traveling = true
+	closePanel()
+	if not tunnel then
+		buildTunnel()
+	end
+	local w = Config.Worlds[wi]
+	for _, p in tunnelRings do
+		p.Color = w.candy[((p:GetAttribute("K") :: number) % #w.candy) + 1]
+	end
+	local cam = workspace.CurrentCamera
+	cam.CameraType = Enum.CameraType.Scriptable
+	local fov0 = cam.FieldOfView
+	cam.FieldOfView = 85
+	local ov = UI.new("Frame", { BackgroundTransparency = 1, Size = UDim2.fromScale(1, 1), ZIndex = 20, Parent = gui })
+	local lines = speedLines(ov)
+	local title = UI.text(ov, { Text = "VOYAGE VERS", TextSize = 34, Color = UI.WHITE, Outline = 3, Size = UDim2.new(1, 0, 0, 40), Position = UDim2.new(0, 0, 0.18, 0), ZIndex = 22 })
+	local name = UI.text(ov, { Text = string.upper(w.name), TextSize = 78, Color = w.banner, Outline = 5, Size = UDim2.new(1, 0, 0, 90), Position = UDim2.new(0, 0, 0.18, 44), ZIndex = 22 })
+	local nameScale = UI.new("UIScale", { Scale = 0.6, Parent = name })
+	TweenService:Create(nameScale, TweenInfo.new(0.5, Enum.EasingStyle.Back), { Scale = 1 }):Play()
+	play("travel")
+	send(action, wi)
+	local t0 = os.clock()
+	local DUR = 2.6
+	local arrived = false
+	local conn
+	conn = RunService.RenderStepped:Connect(function()
+		local t = os.clock() - t0
+		local u = math.clamp(t / DUR, 0, 1)
+		local z = -(u ^ 1.6) * 330
+		local wob = math.sin(t * 9) * 0.25
+		if cart then
+			cart:PivotTo(CFrame.new(TUN + Vector3.new(0, 0, z - 9)))
+		end
+		cam.CFrame = CFrame.new(TUN + Vector3.new(wob, 5.2 + math.sin(t * 13) * 0.15, z)) * CFrame.Angles(math.rad(-6), 0, math.rad(wob * 3))
+		for i, f in lines do
+			local a = f:GetAttribute("A") :: number
+			local d = ((t * 2.2 + i * 0.13) % 1)
+			f.Position = UDim2.new(0.5 + math.cos(a) * (0.15 + d * 0.5), 0, 0.5 + math.sin(a) * (0.15 + d * 0.5) * 1.6, 0)
+			f.BackgroundTransparency = 0.2 + d * 0.7
+		end
+		if not arrived and t > DUR * 0.62 then
+			arrived = true
+			title.Text = "ARRIVÉE !"
+			nameScale.Scale = 1.25
+			TweenService:Create(nameScale, TweenInfo.new(0.4, Enum.EasingStyle.Back), { Scale = 1 }):Play()
+			play("reveal_rare")
+		end
+		if t >= DUR then
+			conn:Disconnect()
+			local flash = UI.new("Frame", { BackgroundColor3 = UI.WHITE, Size = UDim2.fromScale(1, 1), ZIndex = 25, Parent = gui })
+			TweenService:Create(flash, TweenInfo.new(0.5), { BackgroundTransparency = 1 }):Play()
+			Debris:AddItem(flash, 0.6)
+			ov:Destroy()
+			cam.CameraType = Enum.CameraType.Custom
+			cam.FieldOfView = fov0
+			local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+			if hum then
+				cam.CameraSubject = hum
+			end
+			toast(w.name .. " !", w.banner)
+			traveling = false
+		end
+	end)
+end
+
+-- Marteaux à bonbons ----------------------------------------------------------
+local hammerSel: string? = nil
+local lastRoll: { any } = {}
+local rollStamp = 0
+
+local function hammerViewport(parent: Instance, id: string, size: UDim2, pos: UDim2, spin: boolean, dark: boolean?): ViewportFrame
+	local vp = UI.new("ViewportFrame", { BackgroundTransparency = 1, Size = size, Position = pos, Ambient = Color3.fromRGB(200, 195, 210), LightColor = Color3.new(1, 1, 1), LightDirection = Vector3.new(-0.4, -0.8, 0.6), ZIndex = 3, Parent = parent })
+	local m = HammerModels.build(id, 1, true)
+	if dark then
+		for _, p in m:GetDescendants() do
+			if p:IsA("BasePart") then
+				p.Color = Color3.fromHex("3A3358")
+				p.Material = Enum.Material.SmoothPlastic
+			elseif p:IsA("ParticleEmitter") then
+				p.Enabled = false
+			end
+		end
+	end
+	m.Parent = vp
+	local cam = UI.new("Camera", { FieldOfView = 30, Parent = vp })
+	vp.CurrentCamera = cam
+	local function place(a: number)
+		cam.CFrame = CFrame.lookAt(Vector3.new(math.sin(a) * 11, 3.2, -math.cos(a) * 11), Vector3.new(0, 2.6, 0))
+	end
+	place(0.5)
+	if spin then
+		local conn
+		conn = RunService.RenderStepped:Connect(function()
+			if not vp.Parent then
+				conn:Disconnect()
+				return
+			end
+			place(os.clock() * 0.8)
+		end)
+	end
+	return vp
+end
+
+local function ownedCount(): number
+	local n = 0
+	for _, h in Config.Hammers do
+		if S.hammers[h.id] then
+			n += 1
+		end
+	end
+	return n
+end
+
+panels.hammers = {
+	title = "Marteaux à bonbons",
+	color = UI.ORANGE,
+	w = 1120,
+	h = 650,
+	sig = function()
+		return table.concat({ tostring(S.hammer), tostring(ownedCount()), tostring(hammerSel), tostring(rollStamp), tostring(S.coins >= S.hammerPrice), tostring(S.coins >= S.hammerPrice * 9) }, ",")
+	end,
+	build = function(c)
+		local sel = hammerSel or S.hammer
+		local hd = HammerModels.def(sel)
+		local owned = S.hammers[sel] == true
+		local rar = Config.Rarities[hd.rarity]
+		headerChip(c, string.format("COLLECTION %d / %d", ownedCount(), #Config.Hammers), UI.PURPLE, 0, 250)
+		headerChip(c, "ÉQUIPÉ : " .. string.upper(HammerModels.def(S.hammer).name), UI.PINK, 262, 380)
+		-- aperçu
+		local prev = UI.new("Frame", { BackgroundColor3 = UI.lighten(rar.color, 0.55), Size = UDim2.fromOffset(330, 520), Position = UDim2.fromOffset(0, 52), Parent = c })
+		UI.corner(prev, 22)
+		UI.stroke(prev, 4, rar.color)
+		UI.new("UIGradient", { Rotation = 90, Color = ColorSequence.new(UI.lighten(rar.color, 0.7), rar.color), Parent = prev })
+		local chipR = UI.box(prev, { Size = UDim2.fromOffset(130, 30), Position = UDim2.fromOffset(12, 12), Color = rar.color, Radius = 14 })
+		UI.text(chipR, { Text = string.upper(rar.name), TextSize = 15, Color = UI.WHITE, Outline = 2 })
+		hammerViewport(prev, sel, UDim2.new(1, 0, 0, 280), UDim2.fromOffset(0, 40), true, not owned)
+		UI.text(prev, { Text = if owned then hd.name else "???", TextSize = 26, Color = UI.WHITE, Outline = 3, Size = UDim2.new(1, -20, 0, 32), Position = UDim2.fromOffset(10, 326) })
+		UI.text(prev, { Text = "Clics x" .. hd.bonus, TextSize = 22, Color = UI.YELLOW, Outline = 2.5, Size = UDim2.new(1, -20, 0, 28), Position = UDim2.fromOffset(10, 362) })
+		UI.text(prev, { Text = if owned then hd.desc else "Pas encore trouvé : tente ta chance !", TextSize = 15, Wrap = true, Color = UI.WHITE, Outline = 1.5, Size = UDim2.new(1, -30, 0, 44), Position = UDim2.fromOffset(15, 394) })
+		local bpos, bsize = UDim2.new(0, 20, 1, -70), UDim2.new(1, -40, 0, 52)
+		if S.hammer == sel then
+			UI.button(prev, { Text = "✅ ÉQUIPÉ", Size = bsize, Position = bpos, Enabled = false })
+		elseif owned then
+			UI.button(prev, { Text = "ÉQUIPER", Color = UI.GREEN, Size = bsize, Position = bpos, TextSize = 22 }, function()
+				send("hammerEquip", sel)
+			end)
+		else
+			UI.button(prev, { Text = "🔒 À TROUVER", Size = bsize, Position = bpos, Enabled = false })
+		end
+		-- machine à tirages
+		local gx = 346
+		local box = UI.new("Frame", { BackgroundColor3 = UI.WHITE, Size = UDim2.fromOffset(718, 196), Position = UDim2.fromOffset(gx, 52), Parent = c })
+		UI.corner(box, 22)
+		UI.stroke(box, 4, UI.ORANGE)
+		UI.new("UIGradient", { Rotation = 0, Color = ColorSequence.new(Color3.fromHex("FFF1DC"), Color3.fromHex("FFE0F0")), Parent = box })
+		local tag = UI.box(box, { Size = UDim2.fromOffset(220, 30), Position = UDim2.fromOffset(14, 12), Color = UI.ORANGE, Radius = 14 })
+		UI.text(tag, { Text = "MACHINE À MARTEAUX", TextSize = 15, Color = UI.WHITE, Outline = 2 })
+		UI.text(box, { Text = "1 tirage : 🪙 " .. fmt(S.hammerPrice) .. "    10 tirages : 🪙 " .. fmt(S.hammerPrice * 9) .. " (1 offert)", TextSize = 19, AlignX = L, Size = UDim2.new(1, -230, 0, 26), Position = UDim2.fromOffset(16, 50) })
+		UI.text(box, { Text = "Un doublon te rend 25 % du prix. Le prix suit tes gains.", TextSize = 14, AlignX = L, Color = UI.MUTED, Size = UDim2.new(1, -230, 0, 20), Position = UDim2.fromOffset(16, 78) })
+		local parts = {}
+		for r = 1, 6 do
+			table.insert(parts, string.format('<font color="#%s">%s %s %%</font>', Config.Rarities[r].color:ToHex(), Config.Rarities[r].name, tostring(Config.HAMMER_ODDS[r])))
+		end
+		UI.text(box, { Text = table.concat(parts, "  ·  "), Rich = true, TextSize = 14, Wrap = true, AlignX = L, Size = UDim2.new(1, -230, 0, 36), Position = UDim2.fromOffset(16, 100) })
+		UI.button(box, { Text = "TIRER x1", Color = UI.YELLOW, Size = UDim2.fromOffset(190, 54), Position = UDim2.new(1, -204, 0, 14), TextSize = 22, Enabled = S.coins >= S.hammerPrice }, function()
+			send("hammerRoll", 1)
+		end)
+		UI.button(box, { Text = "TIRER x10", Color = UI.ORANGE, Size = UDim2.fromOffset(190, 54), Position = UDim2.new(1, -204, 0, 78), TextSize = 22, Enabled = S.coins >= S.hammerPrice * 9 }, function()
+			send("hammerRoll", 10)
+		end)
+		-- derniers résultats
+		for k, r in lastRoll do
+			local d = HammerModels.def(r.id)
+			local cell = UI.new("Frame", { BackgroundColor3 = UI.lighten(Config.Rarities[d.rarity].color, 0.6), Size = UDim2.fromOffset(44, 44), Position = UDim2.fromOffset(16 + (k - 1) * 50, 142), Parent = box })
+			UI.corner(cell, 10)
+			UI.stroke(cell, 2.5, Config.Rarities[d.rarity].color)
+			hammerViewport(cell, r.id, UDim2.fromScale(1, 1), UDim2.new(), false)
+			if r.new then
+				UI.text(cell, { Text = "NEW", TextSize = 11, Color = UI.YELLOW, Outline = 1.5, Size = UDim2.new(1, 0, 0, 12), Position = UDim2.fromOffset(0, -2), ZIndex = 5 })
+			end
+		end
+		-- collection
+		local grid = scroller(c, UDim2.fromOffset(726, 316), UDim2.fromOffset(gx, 258))
+		UI.new("UIGridLayout", { CellSize = UDim2.fromOffset(134, 148), CellPadding = UDim2.fromOffset(10, 10), SortOrder = Enum.SortOrder.LayoutOrder, Parent = grid })
+		UI.new("UIPadding", { PaddingTop = UDim.new(0, 4), PaddingLeft = UDim.new(0, 4), Parent = grid })
+		for k, h in Config.Hammers do
+			local has = S.hammers[h.id] == true
+			local rc = Config.Rarities[h.rarity].color
+			local b = UI.new("TextButton", { Text = "", AutoButtonColor = true, BackgroundColor3 = if has then UI.lighten(rc, 0.7) else Color3.fromHex("E4E0F2"), LayoutOrder = k, Parent = grid })
+			UI.corner(b, 16)
+			UI.stroke(b, if sel == h.id then 5 else 3, rc)
+			hammerViewport(b, h.id, UDim2.new(1, 0, 0, 104), UDim2.fromOffset(0, 4), false, not has)
+			UI.text(b, { Text = if has then h.name else "???", TextSize = 13, Wrap = true, Size = UDim2.new(1, -8, 0, 32), Position = UDim2.new(0, 4, 1, -38), ZIndex = 4 })
+			if S.hammer == h.id then
+				UI.text(b, { Text = "✅", TextSize = 18, Size = UDim2.fromOffset(24, 24), Position = UDim2.fromOffset(4, 4), ZIndex = 4 })
+			end
+			b.Activated:Connect(function()
+				play("click")
+				hammerSel = h.id
+				renderPanel()
+			end)
+		end
+	end,
+}
+
+-- coup de marteau quand on tape un tas (visible pour soi)
+local swingT = 0
+local function swingHammer()
+	local char = player.Character
+	local held = char and char:FindFirstChild("HeldHammer")
+	local handle = held and held:FindFirstChild("Handle")
+	local grip = handle and handle:FindFirstChild("Grip") :: Weld?
+	if not grip then
+		return
+	end
+	local base = grip:GetAttribute("Base") :: CFrame?
+	if not base then
+		base = grip.C0
+		grip:SetAttribute("Base", base)
+	end
+	if os.clock() - swingT < 0.12 then
+		return
+	end
+	swingT = os.clock()
+	grip.C0 = base * CFrame.Angles(math.rad(-70), 0, 0)
+	TweenService:Create(grip, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { C0 = base }):Play()
+end
 
 -- Cadeau du jour ----------------------------------------------------------
 panels.gift = {
@@ -7441,6 +8175,7 @@ Fx.OnClientEvent:Connect(function(kind: string, data: any)
 		toast(data.text, if data.color then Color3.fromHex(data.color) else nil)
 	elseif kind == "tap" then
 		play("tap")
+		swingHammer()
 		local txt = "-" .. fmt(data.dmg)
 		local col, size = UI.WHITE, 26
 		if data.weak then
@@ -7485,6 +8220,24 @@ Fx.OnClientEvent:Connect(function(kind: string, data: any)
 		local root = hrp()
 		if root then
 			floatText(root.Position + Vector3.new(0, 6, 0), data.name .. " niveau " .. data.lvl .. " !", UI.MINT, 24)
+		end
+	elseif kind == "hammerRoll" then
+		lastRoll = data.results
+		rollStamp += 1
+		local best, bestId = 0, nil
+		for _, r in data.results do
+			local d = HammerModels.def(r.id)
+			if d.rarity > best then
+				best, bestId = d.rarity, r.id
+			end
+		end
+		hammerSel = bestId
+		play(if best >= Config.MYTHIC then "legend" elseif best >= 4 then "reveal_rare" else "reveal")
+		if data.refund > 0 then
+			toast("Doublons : +" .. fmt(data.refund) .. " pièces rendues", UI.YELLOW)
+		end
+		if current.name ~= "hammers" then
+			openPanel("hammers")
 		end
 	elseif kind == "bought" then
 		play("buy")
@@ -8011,6 +8764,7 @@ local keys = {
 	[Enum.KeyCode.G] = "gift",
 	[Enum.KeyCode.R] = "rebirth",
 	[Enum.KeyCode.K] = "admin",
+	[Enum.KeyCode.H] = "hammers",
 }
 UserInputService.InputBegan:Connect(function(input, processed)
 	if processed or not S then
@@ -8122,7 +8876,7 @@ RunService.RenderStepped:Connect(function(dt)
 end)
 ]]></string>
         </Properties>
-        <Item class="ModuleScript" referent="72">
+        <Item class="ModuleScript" referent="73">
           <Properties>
             <string name="Name">UI</string>
             <string name="Source"><![CDATA[-- Petite boîte à outils d'interface : boutons « cartoon », textes avec contour,
@@ -8419,12 +9173,12 @@ return UI
       </Item>
     </Item>
   </Item>
-  <Item class="Workspace" referent="73">
+  <Item class="Workspace" referent="74">
     <Properties>
       <string name="Name">Workspace</string>
       <bool name="NeedsPivotMigration">false</bool>
     </Properties>
-    <Item class="SpawnLocation" referent="74">
+    <Item class="SpawnLocation" referent="75">
       <Properties>
         <string name="Name">SpawnLocation</string>
         <bool name="Anchored">true</bool>

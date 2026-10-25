@@ -13,6 +13,7 @@ local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Config = require(Shared:WaitForChild("Config"))
 local PetModels = require(Shared:WaitForChild("PetModels"))
 local MapDecor = require(Shared:WaitForChild("MapDecor"))
+local HammerModels = require(Shared:WaitForChild("HammerModels"))
 
 local rng = Random.new()
 
@@ -441,6 +442,8 @@ local function defaultData()
 		autoDelete = 0,
 		lastSeen = 0,
 		receipts = {},
+		hammers = { wood = true },
+		hammer = "wood",
 	}
 end
 
@@ -549,7 +552,7 @@ local function teamDps(prof: Profile): number
 end
 
 local function tapDamage(prof: Profile): number
-	return math.max(3, teamDps(prof) * 0.25) * (1 + 0.5 * up(prof, "tap"))
+	return math.max(3, teamDps(prof) * 0.25) * (1 + 0.5 * up(prof, "tap")) * HammerModels.def(prof.data.hammer).bonus
 end
 
 local function coinPerHP(w: number): number
@@ -826,6 +829,9 @@ local function sendState(plr: Player)
 		giftStreak = d.giftStreak,
 		giftCoins = roundNice(math.max(500, estimatedCps(prof) * 180)),
 		indexClaim = d.indexClaim,
+		hammers = d.hammers,
+		hammer = d.hammer,
+		hammerPrice = math.floor(math.max(300, estimatedCps(prof) * Config.HAMMER_ROLL_SECONDS)),
 		indexCount = indexCount(d),
 		stats = d.stats,
 		autoCollect = d.autoCollect,
@@ -1806,6 +1812,108 @@ handlers.leaveBoss = function(plr, prof)
 	leaveBoss(plr)
 end
 
+---------------------------------------------------------------------------
+-- Marteaux à bonbons : tirages, équipement, marteau dans la main
+---------------------------------------------------------------------------
+local hammersByRarity: { [number]: { string } } = {}
+for _, h in Config.Hammers do
+	hammersByRarity[h.rarity] = hammersByRarity[h.rarity] or {}
+	table.insert(hammersByRarity[h.rarity], h.id)
+end
+
+local function rollHammer(): string
+	local x = rng:NextNumber() * 100
+	for r = 6, 2, -1 do
+		local odds = Config.HAMMER_ODDS[r] or 0
+		if x < odds and hammersByRarity[r] then
+			local list = hammersByRarity[r]
+			return list[rng:NextInteger(1, #list)]
+		end
+		x -= odds
+	end
+	local list = hammersByRarity[1]
+	return list[rng:NextInteger(1, #list)]
+end
+
+local function attachHammer(plr: Player)
+	local prof = profiles[plr]
+	local char = plr.Character
+	if not prof or not char then
+		return
+	end
+	local old = char:FindFirstChild("HeldHammer")
+	if old then
+		old:Destroy()
+	end
+	local hand = (char:FindFirstChild("RightHand") or char:FindFirstChild("Right Arm") or char:WaitForChild("RightHand", 5)) :: BasePart?
+	if not hand then
+		return
+	end
+	local model = HammerModels.build(prof.data.hammer, 0.8, false)
+	model.Name = "HeldHammer"
+	local grip = hand.CFrame * CFrame.new(0, -0.2, -0.1) * CFrame.Angles(math.rad(-90), 0, 0)
+	local handle = model.PrimaryPart :: BasePart
+	for _, part in model:GetChildren() do
+		if part:IsA("BasePart") then
+			part.CFrame = grip * part.CFrame
+		end
+	end
+	for _, part in model:GetChildren() do
+		if part:IsA("BasePart") and part ~= handle then
+			local wc = Instance.new("WeldConstraint")
+			wc.Part0 = handle
+			wc.Part1 = part
+			wc.Parent = part
+		end
+	end
+	local weld = Instance.new("Weld")
+	weld.Name = "Grip"
+	weld.Part0 = hand
+	weld.Part1 = handle
+	weld.C0 = hand.CFrame:ToObjectSpace(handle.CFrame)
+	weld.Parent = handle
+	model.Parent = char
+end
+
+handlers.hammerRoll = function(plr, prof, n)
+	local d = prof.data
+	local count = if n == 10 then 10 else 1
+	local price = math.floor(math.max(300, estimatedCps(prof) * Config.HAMMER_ROLL_SECONDS))
+	local cost = if count == 10 then price * 9 else price
+	if not spend(plr, prof, cost, false) then
+		return
+	end
+	local results = {}
+	local refund = 0
+	for _ = 1, count do
+		local id = rollHammer()
+		local isNew = not d.hammers[id]
+		if isNew then
+			d.hammers[id] = true
+		else
+			refund += math.floor(price * Config.HAMMER_REFUND)
+		end
+		table.insert(results, { id = id, new = isNew })
+		local hd = HammerModels.def(id)
+		if hd.rarity >= 5 and isNew then
+			Fx:FireAllClients("toast", { text = plr.DisplayName .. " a tiré le " .. hd.name .. " (" .. Config.Rarities[hd.rarity].name .. ") !", color = "FFB020" })
+		end
+	end
+	if refund > 0 then
+		addCoins(prof, refund, false)
+	end
+	prof.full = true
+	Fx:FireClient(plr, "hammerRoll", { results = results, refund = refund })
+end
+
+handlers.hammerEquip = function(plr, prof, id)
+	if type(id) == "string" and prof.data.hammers[id] then
+		prof.data.hammer = id
+		prof.full = true
+		attachHammer(plr)
+	end
+end
+
 Action.OnServerEvent:Connect(function(plr: Player, name: any, arg: any)
 	local prof = profiles[plr]
 	if not prof or type(name) ~= "string" then
@@ -1940,6 +2048,7 @@ local function onCharacter(plr: Player, char: Model)
 	char:PivotTo(worldSpawn(prof.data.world))
 	setWalkSpeed(plr)
 	refreshEquipped(plr)
+	attachHammer(plr)
 end
 
 local function onPlayer(plr: Player)
