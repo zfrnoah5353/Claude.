@@ -1,0 +1,109 @@
+{
+  "name": "StealASweetEgg",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": {
+      "Shared": {
+        "$path": "src/shared"
+      },
+      "PetMeshes": {
+        "$className": "Folder"
+      }
+    },
+    "ServerScriptService": {
+      "GameServer": {
+        "$path": "src/server"
+      }
+    },
+    "StarterPlayer": {
+      "$properties": {
+        "CameraMaxZoomDistance": 110,
+        "CharacterWalkSpeed": 24,
+        "CharacterJumpPower": 50
+      },
+      "StarterPlayerScripts": {
+        "Client": {
+          "$path": "src/client"
+        }
+      }
+    },
+    "Lighting": {
+      "$properties": {
+        "ClockTime": 14,
+        "Brightness": 1.6,
+        "GlobalShadows": true,
+        "Ambient": [
+          0.2745,
+          0.2431,
+          0.3373
+        ],
+        "OutdoorAmbient": [
+          0.502,
+          0.4627,
+          0.549
+        ],
+        "ExposureCompensation": -0.25,
+        "EnvironmentDiffuseScale": 0.4,
+        "EnvironmentSpecularScale": 0.3
+      },
+      "Sky": {
+        "$className": "Atmosphere",
+        "$properties": {
+          "Density": 0.28,
+          "Offset": 0.1,
+          "Color": [
+            1.0,
+            0.8392,
+            0.902
+          ],
+          "Decay": [
+            0.5882,
+            0.4706,
+            0.6667
+          ],
+          "Glare": 0,
+          "Haze": 1
+        }
+      },
+      "Grade": {
+        "$className": "ColorCorrectionEffect",
+        "$properties": {
+          "Saturation": 0.18,
+          "Contrast": 0.08
+        }
+      }
+    },
+    "Workspace": {
+      "SpawnLocation": {
+        "$className": "SpawnLocation",
+        "$properties": {
+          "Anchored": true,
+          "Size": [
+            12,
+            1,
+            12
+          ],
+          "Position": [
+            0,
+            0.5,
+            0
+          ],
+          "Neutral": true,
+          "Transparency": 1,
+          "CanCollide": true,
+          "Duration": 0
+        }
+      }
+    },
+    "HttpService": {
+      "$properties": {
+        "HttpEnabled": false
+      }
+    },
+    "SoundService": {
+      "Sounds": {
+        "$className": "Folder"
+      }
+    }
+  }
+}
