@@ -119,5 +119,5 @@ export function toRoblox(F, { budget, target, body }) {
     parts.push(q);
   }
   const bones = F.bones.slice(1).map((b) => ({ name: b.name, parent: b.parent, pivot: T([b.pivot.x, b.pivot.y, b.pivot.z]), spin: b.spin ? { axis: b.spin.axis, speed: b.spin.speed } : undefined }));
-  return { parts, bones, anims: F.anims, factor: +f.toFixed(4), total: conv.reduce((s, c) => s + c.parts.length, 0) };
+  return { parts, bones, anims: F.anims, factor: +f.toFixed(5), y0: +y0.toFixed(5), total: conv.reduce((s, c) => s + c.parts.length, 0) };
 }

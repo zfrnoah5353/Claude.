@@ -17,6 +17,23 @@ local HammerModels = require(Shared:WaitForChild("HammerModels"))
 
 local rng = Random.new()
 
+-- Modèles Blender importés (pet_<id>) : où qu'ils soient dans Workspace, on les range
+-- dans ReplicatedStorage › PetMeshes pour que les joueurs puissent les copier.
+do
+	local folder = ReplicatedStorage:FindFirstChild("PetMeshes") or Instance.new("Folder")
+	folder.Name = "PetMeshes"
+	folder.Parent = ReplicatedStorage
+	for _, d in workspace:GetDescendants() do
+		-- l'import peut emboîter deux modèles du même nom : on ne déplace que le plus haut
+		if d:IsA("Model") and string.sub(d.Name, 1, 4) == "pet_" and Config.Pets[string.sub(d.Name, 5)] and not (d.Parent and d.Parent:FindFirstAncestor(d.Name)) and not (d.Parent and d.Parent.Name == d.Name) then
+			d.Parent = folder
+		end
+	end
+	if #folder:GetChildren() > 0 then
+		print(string.format("[SweetPets] %d modèles Blender trouvés", #folder:GetChildren()))
+	end
+end
+
 ---------------------------------------------------------------------------
 -- Remotes
 ---------------------------------------------------------------------------
@@ -1243,7 +1260,7 @@ local function spawnBoss()
 	boss.dmg = {}
 	boss.maxHp = 3000
 	boss.hp = boss.maxHp
-	local model = PetModels.build("gummy_golem", 0, false, 9)
+	local model = PetModels.build("gummy_golem", 0, false, 9, false, nil, true)
 	model.Name = "GummyGolem"
 	model:PivotTo(CFrame.new(GOLEM_POS + Vector3.new(0, 8.6, 0)))
 	local hit = part({ Parent = model, Name = "Hitbox", Size = Vector3.new(19, 18, 17), Position = GOLEM_POS + Vector3.new(0, 8.6, 0), Transparency = 1 })

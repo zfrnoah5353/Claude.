@@ -1611,7 +1611,7 @@ local function buildView(plr: Player, sig: string, start: Vector3): View
 		if def and Config.Pets[def] then
 			local t = tonumber(tier) or 0
 			local sc = Config.Pets[def].scale
-			local model = PetModels.build(def, t, shiny == "1", sc)
+			local model = PetModels.build(def, t, shiny == "1", sc, false, nil, true)
 			local rainbow = {}
 			for _, d in model:GetChildren() do
 				if d:IsA("BasePart") and t == 2 and d.Name == "Body" then

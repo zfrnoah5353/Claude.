@@ -45,6 +45,8 @@ local PlanFolder = script.Parent:FindFirstChild("PetPlans")
 local GOLD_HEX = "F2C14E"
 local plans: { [string]: any } = {}
 local rigs: { [string]: any } = {}
+local metas: { [string]: { factor: number, y0: number } } = {}
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local function toHex(c: Color3?): string?
 	return if c then c:ToHex() else nil
@@ -70,6 +72,9 @@ function PetModels.plan(defId: string): { any }
 		end
 		plans[defId] = data.parts
 		rigs[defId] = { bones = data.bones, clips = clips }
+		if data.factor and data.y0 then
+			metas[defId] = { factor = data.factor, y0 = data.y0 }
+		end
 		return data.parts
 	end
 	local colors = {
@@ -121,14 +126,139 @@ local function biggest(defId: string, maxParts: number): { any }
 	return list
 end
 
--- build(defId, tier, shiny, scale, locked, maxParts) -> Model centré sur l'origine, face vers -Z.
+-- build(defId, tier, shiny, scale, locked, maxParts, useMesh) -> Model centré sur l'origine, face vers -Z.
+-- useMesh : utilise le modèle Blender importé s'il existe (pets dans le monde).
 -- tier : 0 normal, 1 doré, 2 arc-en-ciel. locked : silhouette sombre (index).
 -- maxParts : limite le nombre de pièces (vignettes de l'interface).
 -- Les pièces marquées « Spin » (attribut Spin = "Y" ou "Z") tournent autour du pet ;
 -- leur position de départ par rapport au pet est gardée dans l'attribut Offset.
-function PetModels.build(defId: string, tier: number, shiny: boolean, scale: number, locked: boolean?, maxParts: number?): Model
+-- étincelles (shiny), lumière et particules des Mythiques et Divins
+local function addEffects(model: Model, def: any, anchorPart: BasePart, shiny: boolean, locked: boolean?, s: number)
+	if shiny and not locked then
+		local sp = Instance.new("Sparkles")
+		sp.SparkleColor = Color3.fromHex("FFF6C8")
+		sp.Parent = anchorPart
+	end
+	if def.rarity >= Config.MYTHIC and not locked then
+		local glow = def.glow or Config.Rarities[def.rarity].color
+		local light = Instance.new("PointLight")
+		light.Color = glow
+		light.Brightness = if def.rarity >= Config.DIVINE then 3 else 1.5
+		light.Range = 8 * s
+		light.Parent = anchorPart
+		local pe = Instance.new("ParticleEmitter")
+		pe.Texture = "rbxasset://textures/particles/sparkles_main.dds"
+		pe.Color = ColorSequence.new(glow, Color3.new(1, 1, 1))
+		pe.LightEmission = 1
+		pe.Rate = if def.rarity >= Config.DIVINE then 14 else 5
+		pe.Lifetime = NumberRange.new(0.8, 1.6)
+		pe.Speed = NumberRange.new(0.5, 1.5)
+		pe.SpreadAngle = Vector2.new(180, 180)
+		pe.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.35 * s), NumberSequenceKeypoint.new(1, 0) })
+		pe.Transparency = NumberSequence.new(0.2, 1)
+		pe.Parent = anchorPart
+		model:SetAttribute("Aura", def.rarity)
+	end
+end
+
+-- Modèle Blender importé (ReplicatedStorage › PetMeshes › pet_<id>) : maillages avec os.
+-- Les os RefO, RefX, RefY donnent l'échelle et l'orientation de l'import ; on replace le
+-- modèle exactement comme la version en pièces. Renvoie nil si le modèle manque.
+function PetModels.meshTemplate(defId: string): Model?
+	local folder = ReplicatedStorage:FindFirstChild("PetMeshes")
+	local tpl = folder and folder:FindFirstChild("pet_" .. defId)
+	return if tpl and tpl:IsA("Model") then tpl else nil
+end
+
+local function buildMesh(defId: string, tier: number, shiny: boolean, s: number): Model?
+	local def = Config.Pets[defId] or Config.Pets.gumdrop_bunny
+	PetModels.plan(defId)
+	local tpl = PetModels.meshTemplate(defId)
+	local meta = metas[defId]
+	if not tpl or not meta then
+		return nil
+	end
+	local m = tpl:Clone()
+	local bones: { [string]: Bone } = {}
+	for _, d in m:GetDescendants() do
+		if d:IsA("Bone") then
+			bones[d.Name] = d
+		end
+	end
+	local refO, refX, refY = bones.RefO, bones.RefX, bones.RefY
+	if not (refO and refX and refY) then
+		m:Destroy()
+		return nil
+	end
+	local first: BasePart? = nil
+	for _, d in m:GetDescendants() do
+		if d:IsA("BasePart") then
+			d.Anchored = true
+			d.CanCollide = false
+			d.CanQuery = false
+			d.CanTouch = false
+			d.Massless = true
+			local name = string.lower(d.Name)
+			local kind, hex = string.match(name, "^(%a+)_(%x%x%x%x%x%x)")
+			if kind == "neon" and hex then
+				d.Material = Enum.Material.Neon
+				d.Color = Color3.fromHex(hex)
+			elseif kind == "glass" and hex then
+				d.Material = Enum.Material.Glass
+				d.Transparency = 0.4
+				d.Color = Color3.fromHex(hex)
+			elseif string.sub(name, 1, 4) == "gold" then
+				d.Reflectance = 0.3
+			elseif not first then
+				first = d
+			end
+		end
+	end
+	local k = (refX.WorldPosition - refO.WorldPosition).Magnitude / 10
+	if k < 1e-5 then
+		m:Destroy()
+		return nil
+	end
+	m:ScaleTo(m:GetScale() * s * meta.factor / k)
+	local o = refO.WorldPosition
+	local ex = (refX.WorldPosition - o).Unit
+	local ey = (refY.WorldPosition - o).Unit
+	local ez = ex:Cross(ey).Unit
+	ey = ez:Cross(ex).Unit
+	local current = CFrame.fromMatrix(o, ex, ey, ez)
+	local target = CFrame.new(0, (-meta.y0 * meta.factor - 1.1) * s, 0)
+	m:PivotTo(target * current:Inverse() * m:GetPivot())
+	local root = makePart(m, "Root", Vector3.one * 0.2, CFrame.identity, def.body, "block")
+	root.Transparency = 1
+	m.PrimaryPart = root
+	m.Name = def.name
+	m:SetAttribute("Def", defId)
+	m:SetAttribute("Scale", s)
+	m:SetAttribute("Mesh", true)
+	if tier == 1 or tier == 2 then
+		-- doré / arc-en-ciel : halo de couleur (le maillage garde sa texture)
+		local l = Instance.new("PointLight")
+		l.Color = if tier == 1 then Color3.fromHex("FFD23F") else Color3.fromHex("FF9AE6")
+		l.Brightness = 2
+		l.Range = 7 * s
+		l.Parent = first or root
+		local sp = Instance.new("Sparkles")
+		sp.SparkleColor = l.Color
+		sp.Parent = first or root
+	end
+	addEffects(m, def, first or root, shiny, false, s)
+	return m
+end
+
+function PetModels.build(defId: string, tier: number, shiny: boolean, scale: number, locked: boolean?, maxParts: number?, useMesh: boolean?): Model
 	local def = Config.Pets[defId] or Config.Pets.gumdrop_bunny
 	local s = scale
+	if useMesh and not locked and not maxParts then
+		local m = buildMesh(defId, tier, shiny, s)
+		if m then
+			return m
+		end
+	end
 	local model = Instance.new("Model")
 	model.Name = def.name
 	local root = makePart(model, "Root", Vector3.one * 0.2, CFrame.identity, def.body, "block")
@@ -182,42 +312,52 @@ function PetModels.build(defId: string, tier: number, shiny: boolean, scale: num
 	end
 	model:SetAttribute("Def", defId)
 	model:SetAttribute("Scale", s)
-	local anchorPart = firstBody or root
-	if shiny and not locked then
-		local sp = Instance.new("Sparkles")
-		sp.SparkleColor = Color3.fromHex("FFF6C8")
-		sp.Parent = anchorPart
-	end
-	-- aura des créatures mythiques et divines
-	if def.rarity >= Config.MYTHIC and not locked then
-		local glow = def.glow or Config.Rarities[def.rarity].color
-		local light = Instance.new("PointLight")
-		light.Color = glow
-		light.Brightness = if def.rarity >= Config.DIVINE then 3 else 1.5
-		light.Range = 8 * s
-		light.Parent = anchorPart
-		local pe = Instance.new("ParticleEmitter")
-		pe.Texture = "rbxasset://textures/particles/sparkles_main.dds"
-		pe.Color = ColorSequence.new(glow, Color3.new(1, 1, 1))
-		pe.LightEmission = 1
-		pe.Rate = if def.rarity >= Config.DIVINE then 14 else 5
-		pe.Lifetime = NumberRange.new(0.8, 1.6)
-		pe.Speed = NumberRange.new(0.5, 1.5)
-		pe.SpreadAngle = Vector2.new(180, 180)
-		pe.Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.35 * s), NumberSequenceKeypoint.new(1, 0) })
-		pe.Transparency = NumberSequence.new(0.2, 1)
-		pe.Parent = anchorPart
-		model:SetAttribute("Aura", def.rarity)
-	end
+	addEffects(model, def, firstBody or root, shiny, locked, s)
 	return model
 end
 
 -- Prépare l'animation d'un modèle construit par build() (pose de repos à l'origine).
 -- Renvoie nil si le pet n'a ni os ni pièces qui tournent.
+local function clipsByBone(rig: any): any
+	local byBone = {}
+	for state, list in rig.clips or {} do
+		local m = {}
+		for _, tr in list do
+			m[tr.bone] = m[tr.bone] or {}
+			table.insert(m[tr.bone], tr)
+		end
+		byBone[state] = m
+	end
+	return byBone
+end
+
+local function spinOf(b: any): any
+	if b.spin then
+		return { axis = Vector3.new(b.spin.axis[1], b.spin.axis[2], b.spin.axis[3]).Unit, speed = b.spin.speed * math.pi }
+	end
+	return nil
+end
+
 function PetModels.animator(model: Model): any
 	local defId = model:GetAttribute("Def") :: string
 	local s = (model:GetAttribute("Scale") :: number?) or 1
 	local rig = PetModels.rig(defId)
+	if model:GetAttribute("Mesh") then
+		-- modèle Blender : on tourne directement les os (Bone.Transform)
+		local found: { [string]: Bone } = {}
+		for _, d in model:GetDescendants() do
+			if d:IsA("Bone") then
+				found[d.Name] = d
+			end
+		end
+		local rootCf = (model.PrimaryPart :: BasePart).CFrame
+		local list = {}
+		for i, b in rig.bones do
+			local inst = found[b.name]
+			list[i] = { inst = inst, rest = if inst then rootCf:ToObjectSpace(inst.WorldCFrame).Rotation else CFrame.identity, cur = CFrame.identity, spin = spinOf(b) }
+		end
+		return { mesh = true, model = model, bones = list, clips = clipsByBone(rig) }
+	end
 	local recs = {}
 	local animated = false
 	for _, b in rig.bones do
@@ -251,21 +391,40 @@ function PetModels.animator(model: Model): any
 		parts[i] = r.part
 	end
 	-- pistes rangées par état puis par os (évite de parcourir toutes les pistes pour chaque os)
-	local byBone = {}
-	for state, list in rig.clips or {} do
-		local m = {}
-		for _, tr in list do
-			m[tr.bone] = m[tr.bone] or {}
-			table.insert(m[tr.bone], tr)
-		end
-		byBone[state] = m
-	end
-	return { recs = recs, parts = parts, cfs = table.create(#recs), bones = bones, clips = byBone, G = {} }
+	return { recs = recs, parts = parts, cfs = table.create(#recs), bones = bones, clips = clipsByBone(rig), G = {} }
 end
 
 -- Pose le modèle à « pivot » pour l'état idle / move / ability à l'instant t.
 -- Les os passent en douceur d'un état à l'autre (dt = temps écoulé).
+local function boneTarget(tracks: any, i: number, t: number): CFrame
+	local target = CFrame.identity
+	local mine = tracks and tracks[i]
+	if mine then
+		for _, tr in mine do
+			local ang = math.rad(tr.base + tr.amp * math.sin(2 * math.pi * tr.freq * t + tr.phase))
+			target *= CFrame.fromAxisAngle(Vector3.new(tr.axis[1], tr.axis[2], tr.axis[3]), ang)
+		end
+	end
+	return target
+end
+
 function PetModels.pose(anim: any, pivot: CFrame, state: string, t: number, dt: number)
+	if anim.mesh then
+		local tracks = anim.clips and anim.clips[state]
+		local k = 1 - math.exp(-10 * dt)
+		for i, b in anim.bones do
+			if b.spin then
+				b.cur = CFrame.fromAxisAngle(b.spin.axis, b.spin.speed * t)
+			else
+				b.cur = b.cur:Lerp(boneTarget(tracks, i, t), k)
+			end
+			if b.inst then
+				b.inst.Transform = b.rest:Inverse() * b.cur * b.rest
+			end
+		end
+		anim.model:PivotTo(pivot)
+		return
+	end
 	local G = anim.G
 	G[0] = CFrame.identity
 	local tracks = anim.clips and anim.clips[state]

@@ -7,7 +7,7 @@ const BUDGET = [0, 150, 150, 160, 190, 240, 650, 900];
 window.plan = async (id, rarity, body) => {
   const F = await loadPet(id);
   const p = toRoblox(F, { budget: BUDGET[rarity], target: rarity >= 6 ? 4.4 : 3.4, body });
-  return JSON.stringify({ parts: p.parts, bones: p.bones, anims: p.anims, total: p.total });
+  return JSON.stringify({ parts: p.parts, bones: p.bones, anims: p.anims, total: p.total, factor: p.factor, y0: p.y0 });
 };
 document.title = 'ready';
 </script></body></html>

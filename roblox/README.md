@@ -48,6 +48,18 @@ Les 13 Mythiques et Divins sont des modèles détaillés à facettes, de 3 000 �
 
 Pour utiliser les fichiers 3D ailleurs dans Studio : onglet Accueil › **Import 3D** (3D Importer), puis choisis le `.glb` ou le `.obj`. Chaque maillage reste sous la limite de 20 000 triangles.
 
+### Modèles Blender (plus beaux, avec os)
+
+Les 53 pets existent aussi en version Blender : formes lisses, matières brillantes, un squelette pour l'animation et seulement 2 à 10 morceaux par pet. Ils sont dans `models/Blender/` (ou `dist/SweetPets_Modeles_Blender.zip`), un fichier `pet_<id>.fbx` par pet.
+
+Pour les mettre dans le jeu (une seule fois) :
+1. Ouvre `SweetPetsFactory.rbxlx` dans Studio.
+2. Onglet **Accueil › Importer**, sélectionne les 53 fichiers `pet_….fbx` d'un coup et lance l'import. Si Studio demande un type de squelette, choisis **Personnalisé** (pas R15).
+3. Les pets arrivent dans le Workspace. Sélectionne-les et glisse-les dans **ReplicatedStorage › PetMeshes** (si tu oublies, le jeu les y range tout seul au lancement).
+4. Enregistre avec **Ctrl + S**, puis republie.
+
+Le jeu utilise alors ces modèles pour les pets qui te suivent et pour le boss, et anime leurs os. Les pets sans modèle Blender, les vignettes et l'index gardent la version en pièces. Les scripts sont dans `tools/blender/` (`make_palette.py`, `build_pet.py`) et `tools/web/primexport.js`.
+
 ## Animations
 
 Les pets rares ont un squelette : ailes, têtes, mâchoires, queues, pattes, tentacules, cous. Ils ont 3 animations :

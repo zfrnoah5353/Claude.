@@ -5,6 +5,9 @@
     "ReplicatedStorage": {
       "Shared": {
         "$path": "src/shared"
+      },
+      "PetMeshes": {
+        "$className": "Folder"
       }
     },
     "ServerScriptService": {
