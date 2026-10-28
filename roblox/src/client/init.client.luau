@@ -1610,7 +1610,7 @@ local function buildView(plr: Player, sig: string, start: Vector3): View
 		local def, tier, shiny = string.match(entry, "^([%w_]+):(%d+):(%d)$")
 		if def and Config.Pets[def] then
 			local t = tonumber(tier) or 0
-			local sc = Config.Pets[def].scale
+			local sc = Config.Pets[def].scale * Config.PET_SIZE
 			local model = PetModels.build(def, t, shiny == "1", sc, false, nil, true)
 			local rainbow = {}
 			for _, d in model:GetChildren() do
@@ -1662,7 +1662,7 @@ local function updatePets(dt: number)
 			if inBoss and golem then
 				local gp = golem:GetPivot().Position
 				local ang = math.pi * (0.15 + 0.7 * (i - 0.5) / math.max(n, 1))
-				goal = Vector3.new(gp.X + math.cos(ang) * 16, floorY + lift, gp.Z + 11 + math.sin(ang) * 6)
+				goal = Vector3.new(gp.X + math.cos(ang) * 16 * Config.MAP_SCALE, floorY + lift, gp.Z + (11 + math.sin(ang) * 6) * Config.MAP_SCALE)
 				look = gp
 				attacking = true
 			elseif targets[i] and targets[i] ~= "0" and targets[i] ~= "" then
@@ -1670,7 +1670,7 @@ local function updatePets(dt: number)
 				if pile then
 					local pp = pile:GetPivot().Position
 					local ang = i / math.max(n, 1) * math.pi * 2 + now * 0.4
-					local r = 5.5 + (pv.scale - 1) * 3
+					local r = 4 + pv.scale * 2.5
 					goal = Vector3.new(pp.X + math.cos(ang) * r, floorY + lift, pp.Z + math.sin(ang) * r)
 					look = pp
 					attacking = true
@@ -1688,7 +1688,7 @@ local function updatePets(dt: number)
 				flat = flat.Unit
 				local right = Vector3.new(-flat.Z, 0, flat.X)
 				local gap = 3.2 * math.max(1, pv.scale * 0.9)
-				local g = base - flat * (4 + gap * 0.5 + row * 3.4 + math.abs(col) * 0.6) + right * (col * gap)
+				local g = base - flat * (4 + gap * 0.5 + row * 2.2 * pv.scale + math.abs(col) * 0.6) + right * (col * gap)
 				goal = g
 				look = g + flat
 			end
@@ -2576,7 +2576,7 @@ RunService.RenderStepped:Connect(function(dt)
 	local root = hrp()
 	if root then
 		for id, stand in eggStands do
-			if (stand.Position - root.Position).Magnitude < 20 then
+			if (stand.Position - root.Position).Magnitude < 20 * Config.MAP_SCALE then
 				nearEgg = id
 			end
 		end

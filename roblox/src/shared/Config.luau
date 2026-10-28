@@ -86,7 +86,10 @@ export type World = {
 	origin: Vector3,
 }
 
-Config.WORLD_SPACING = 700
+-- taille de la map (1 = taille d'origine) et des pets qui suivent le joueur
+Config.MAP_SCALE = 1.6
+Config.PET_SIZE = 1.7
+Config.WORLD_SPACING = 1000
 
 Config.Worlds = {
 	{

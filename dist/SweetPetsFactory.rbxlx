@@ -156,7 +156,10 @@ export type World = {
 	origin: Vector3,
 }
 
-Config.WORLD_SPACING = 700
+-- taille de la map (1 = taille d'origine) et des pets qui suivent le joueur
+Config.MAP_SCALE = 1.6
+Config.PET_SIZE = 1.7
+Config.WORLD_SPACING = 1000
 
 Config.Worlds = {
 	{
@@ -3566,13 +3569,29 @@ pileFolder.Parent = workspace
 local FIELD_X = MapDecor.FX
 local FIELD_Z0, FIELD_Z1 = MapDecor.Z0, MapDecor.Z1
 local PLAZA_Z = -115
+local MS = Config.MAP_SCALE
+
+-- agrandit tout le contenu d'un dossier autour du point o (pièces, effets, lumières)
+local function scaleFolder(folder: Instance, o: Vector3)
+	local tmp = Instance.new("Model")
+	local kids = folder:GetChildren()
+	for _, c in kids do
+		c.Parent = tmp
+	end
+	tmp.WorldPivot = CFrame.new(o)
+	tmp:ScaleTo(MS)
+	for _, c in kids do
+		c.Parent = folder
+	end
+	tmp:Destroy()
+end
 
 local eggStands: { [string]: Vector3 } = {}
 local prompts: { ProximityPrompt } = {}
 
 local function worldSpawn(w: number): CFrame
 	local o = Config.Worlds[w].origin
-	return CFrame.new(o + Vector3.new(0, 4, 30))
+	return CFrame.new(o + Vector3.new(0, 4, 30 * MS))
 end
 
 -- Décor (calculé par MapDecor) : une pièce par entrée, effets d'ambiance compris
@@ -3679,7 +3698,7 @@ local function addPrompt(parent: BasePart, action: string, object: string, kind:
 	pr.ObjectText = object
 	pr.KeyboardKeyCode = Enum.KeyCode.E
 	pr.HoldDuration = 0
-	pr.MaxActivationDistance = 14
+	pr.MaxActivationDistance = 14 * MS
 	pr.RequiresLineOfSight = false
 	pr:SetAttribute("Kind", kind)
 	pr:SetAttribute("Value", value)
@@ -3726,7 +3745,7 @@ local function buildWorld(w)
 	for i, eggId in w.eggs do
 		local egg = Config.Eggs[eggId]
 		local pos = o + Vector3.new(-30 + (i - 1) * 60, 0, PLAZA_Z)
-		eggStands[eggId] = pos
+		eggStands[eggId] = o + (pos - o) * MS
 		local ped = part({ Parent = folder, Name = "Stand_" .. eggId, Size = Vector3.new(3, 12, 12), CFrame = CFrame.new(pos + Vector3.new(0, 1.5, 0)) * CFrame.Angles(0, 0, math.rad(90)), Shape = Enum.PartType.Cylinder, Color = Color3.new(1, 1, 1) })
 		ped:SetAttribute("Egg", eggId)
 		local model = PetModels.egg(eggId, 2.2)
@@ -3767,6 +3786,7 @@ local function buildWorld(w)
 	deco({ Parent = folder, Size = Vector3.new(FIELD_X * 2 + 16, 0.12, FIELD_Z1 - FIELD_Z0 + 16), Position = o + Vector3.new(0, 0.1, (FIELD_Z0 + FIELD_Z1) / 2), Color = w.ground:Lerp(Color3.new(1, 1, 1), 0.25), Transparency = 0.3 })
 
 	buildDecor(w, folder)
+	scaleFolder(folder, o)
 end
 
 for _, w in Config.Worlds do
@@ -3785,7 +3805,7 @@ end
 for _, b in { { Vector3.new(0, 15, 76), Vector3.new(174, 34, 4) }, { Vector3.new(0, 15, -76), Vector3.new(174, 34, 4) }, { Vector3.new(86, 15, 0), Vector3.new(4, 34, 150) }, { Vector3.new(-86, 15, 0), Vector3.new(4, 34, 150) } } do
 	part({ Parent = arena, Size = b[2], Position = BO + b[1], Color = Color3.fromHex("6B5BD6"), Transparency = 0.6 })
 end
-local GOLEM_POS = BO + Vector3.new(0, 0, -30)
+local GOLEM_POS = BO + Vector3.new(0, 0, -30 * MS)
 
 -- Colisée du boss : gradins de spectateurs en gomme, piliers et torches, bannières, douves de sucre
 do
@@ -3859,7 +3879,8 @@ do
 	end
 end
 
-local ARENA_SPAWN = CFrame.new(BO + Vector3.new(0, 4, 45))
+scaleFolder(arena, BO)
+local ARENA_SPAWN = CFrame.new(BO + Vector3.new(0, 4, 45 * MS))
 
 ---------------------------------------------------------------------------
 -- Données des joueurs
@@ -4068,7 +4089,7 @@ local function setWalkSpeed(plr: Player)
 	local char = plr.Character
 	local hum = char and char:FindFirstChildOfClass("Humanoid")
 	if prof and hum then
-		hum.WalkSpeed = if os.clock() < prof.stunUntil then 0 else 22 * (1 + 0.08 * up(prof, "speed")) * (if hasPass(prof, "speed") then 1.4 else 1) * adminEvents.speed
+		hum.WalkSpeed = if os.clock() < prof.stunUntil then 0 else 22 * math.sqrt(MS) * (1 + 0.08 * up(prof, "speed")) * (if hasPass(prof, "speed") then 1.4 else 1) * adminEvents.speed
 	end
 end
 
@@ -4336,7 +4357,7 @@ type Pile = {
 local piles: { [number]: Pile } = {}
 local pileCount = { 0, 0, 0, 0 }
 local nextPileId = 1
-local PILE_SIZE = { 5, 8, 8 }
+local PILE_SIZE = { 6.5, 10.4, 10.4 }
 local CHEST_COLOR = { meadow = "FF8FB8", choco = "8A5A3C", ice = "7FD6FF", galaxy = "6B5BD6" }
 
 local tapPile: (Player, Pile) -> ()
@@ -4389,19 +4410,19 @@ local function spawnPile(wi: number)
 	local w = Config.Worlds[wi]
 	local o = w.origin
 	for _ = 1, 25 do
-		local pos = o + Vector3.new(rng:NextNumber(-FIELD_X, FIELD_X), 0, rng:NextNumber(FIELD_Z0, FIELD_Z1))
-		if (pos - (o + Vector3.new(0, 0, 30))).Magnitude < 14 or math.abs(pos.X - o.X) < 9 then
+		local pos = o + Vector3.new(rng:NextNumber(-FIELD_X, FIELD_X), 0, rng:NextNumber(FIELD_Z0, FIELD_Z1)) * MS
+		if (pos - (o + Vector3.new(0, 0, 30 * MS))).Magnitude < 14 * MS or math.abs(pos.X - o.X) < 9 * MS then
 			continue -- point d'apparition et chemin
 		end
 		local ok = true
 		for _, g in MapDecor.GROVES do
-			if (Vector3.new(pos.X - o.X, 0, pos.Z - o.Z) - Vector3.new(g[1], 0, g[2])).Magnitude < MapDecor.GROVE_R + 5 then
+			if (Vector3.new(pos.X - o.X, 0, pos.Z - o.Z) - Vector3.new(g[1], 0, g[2]) * MS).Magnitude < (MapDecor.GROVE_R + 5) * MS then
 				ok = false
 				break
 			end
 		end
 		for _, p in piles do
-			if p.world == wi and (p.pos - pos).Magnitude < 11 then
+			if p.world == wi and (p.pos - pos).Magnitude < 14 then
 				ok = false
 				break
 			end
@@ -4605,7 +4626,7 @@ local function hatch(plr: Player, eggId: string, auto: boolean): boolean
 	end
 	local hrp = hrpOf(plr)
 	local stand = eggStands[eggId]
-	if not hrp or not stand or (hrp.Position - stand).Magnitude > 24 then
+	if not hrp or not stand or (hrp.Position - stand).Magnitude > 24 * MS then
 		return false
 	end
 	local n = 1
@@ -4706,17 +4727,17 @@ local function spawnBoss()
 	boss.dmg = {}
 	boss.maxHp = 3000
 	boss.hp = boss.maxHp
-	local model = PetModels.build("gummy_golem", 0, false, 9, false, nil, true)
+	local model = PetModels.build("gummy_golem", 0, false, 9 * MS, false, nil, true)
 	model.Name = "GummyGolem"
-	model:PivotTo(CFrame.new(GOLEM_POS + Vector3.new(0, 8.6, 0)))
-	local hit = part({ Parent = model, Name = "Hitbox", Size = Vector3.new(19, 18, 17), Position = GOLEM_POS + Vector3.new(0, 8.6, 0), Transparency = 1 })
+	model:PivotTo(CFrame.new(GOLEM_POS + Vector3.new(0, 8.6 * MS, 0)))
+	local hit = part({ Parent = model, Name = "Hitbox", Size = Vector3.new(19, 18, 17) * MS, Position = GOLEM_POS + Vector3.new(0, 8.6 * MS, 0), Transparency = 1 })
 	local cd = Instance.new("ClickDetector")
 	cd.MaxActivationDistance = 120
 	cd.Parent = hit
 	cd.MouseClick:Connect(function(plr)
 		bossTap(plr, false)
 	end)
-	local weak = part({ Parent = model, Name = "Weak", Size = Vector3.one * 3.4, Shape = Enum.PartType.Ball, Position = GOLEM_POS + Vector3.new(4, 12, -9), Color = Color3.fromHex("FFD54A"), Material = Enum.Material.Neon, CanCollide = false })
+	local weak = part({ Parent = model, Name = "Weak", Size = Vector3.one * 3.4 * MS, Shape = Enum.PartType.Ball, Position = GOLEM_POS + Vector3.new(4, 12, -9) * MS, Color = Color3.fromHex("FFD54A"), Material = Enum.Material.Neon, CanCollide = false })
 	local wcd = Instance.new("ClickDetector")
 	wcd.MaxActivationDistance = 120
 	wcd.Parent = weak
@@ -4847,7 +4868,7 @@ local function updateBoss(dt: number)
 	if boss.weakT <= 0 and boss.weak then
 		boss.weakT = 4
 		local a = rng:NextNumber(0, math.pi * 2)
-		boss.weak.Position = GOLEM_POS + Vector3.new(math.cos(a) * 6, 10 + math.sin(a) * 4, -9)
+		boss.weak.Position = GOLEM_POS + Vector3.new(math.cos(a) * 6, 10 + math.sin(a) * 4, -9) * MS
 	end
 	-- attaque « écrasement » sur un joueur au hasard
 	if #fighters > 0 then
@@ -4857,7 +4878,7 @@ local function updateBoss(dt: number)
 			local hrp = hrpOf(target)
 			if hrp then
 				local pos = Vector3.new(hrp.Position.X, BO.Y + 0.2, hrp.Position.Z)
-				boss.warn = deco({ Parent = arena, Size = Vector3.new(0.3, 28, 28), CFrame = CFrame.new(pos) * CFrame.Angles(0, 0, math.rad(90)), Shape = Enum.PartType.Cylinder, Color = Color3.fromHex("FF3355"), Material = Enum.Material.Neon, Transparency = 0.5 })
+				boss.warn = deco({ Parent = arena, Size = Vector3.new(0.3, 28 * MS, 28 * MS), CFrame = CFrame.new(pos) * CFrame.Angles(0, 0, math.rad(90)), Shape = Enum.PartType.Cylinder, Color = Color3.fromHex("FF3355"), Material = Enum.Material.Neon, Transparency = 0.5 })
 				boss.warnT = 1.5
 			end
 			boss.slamT = rng:NextNumber(5, 7)
@@ -4873,7 +4894,7 @@ local function updateBoss(dt: number)
 				for _, plr in fighters do
 					local hrp = hrpOf(plr)
 					local prof = profiles[plr]
-					if hrp and prof and (Vector3.new(hrp.Position.X, center.Y, hrp.Position.Z) - center).Magnitude < 14 then
+					if hrp and prof and (Vector3.new(hrp.Position.X, center.Y, hrp.Position.Z) - center).Magnitude < 14 * MS then
 						prof.stunUntil = os.clock() + 2
 						prof.combo = 0
 						setWalkSpeed(plr)
@@ -4934,7 +4955,7 @@ local function petTick()
 			continue
 		end
 		local focus = if prof.focus then piles[prof.focus] else nil
-		if focus and (focus.dead or focus.world ~= d.world or (focus.pos - hrp.Position).Magnitude > 120) then
+		if focus and (focus.dead or focus.world ~= d.world or (focus.pos - hrp.Position).Magnitude > 120 * MS) then
 			focus = nil
 			prof.focus = nil
 		end
@@ -4942,13 +4963,13 @@ local function petTick()
 		for slot, p in prof.eq do
 			local tid = prof.targets[slot]
 			local t = if tid then piles[tid] else nil
-			if t and (t.dead or t.world ~= d.world or (t.pos - hrp.Position).Magnitude > 120) then
+			if t and (t.dead or t.world ~= d.world or (t.pos - hrp.Position).Magnitude > 120 * MS) then
 				t = nil
 			end
 			if focus then
 				t = focus
 			elseif not t and d.autoCollect then
-				local best, bd = nil, 50
+				local best, bd = nil, 50 * MS
 				for _, pile in piles do
 					if pile.world == d.world and (assigned[pile.id] or 0) < 2 then
 						local dist = (pile.pos - hrp.Position).Magnitude
@@ -5698,7 +5719,7 @@ RunService.Heartbeat:Connect(function(dt)
 	if spawnAcc >= 0.5 then
 		spawnAcc = 0
 		for wi = 1, #Config.Worlds do
-			if pileCount[wi] < 26 then
+			if pileCount[wi] < 44 then
 				spawnPile(wi)
 			end
 		end
@@ -8075,7 +8096,7 @@ local function buildView(plr: Player, sig: string, start: Vector3): View
 		local def, tier, shiny = string.match(entry, "^([%w_]+):(%d+):(%d)$")
 		if def and Config.Pets[def] then
 			local t = tonumber(tier) or 0
-			local sc = Config.Pets[def].scale
+			local sc = Config.Pets[def].scale * Config.PET_SIZE
 			local model = PetModels.build(def, t, shiny == "1", sc, false, nil, true)
 			local rainbow = {}
 			for _, d in model:GetChildren() do
@@ -8127,7 +8148,7 @@ local function updatePets(dt: number)
 			if inBoss and golem then
 				local gp = golem:GetPivot().Position
 				local ang = math.pi * (0.15 + 0.7 * (i - 0.5) / math.max(n, 1))
-				goal = Vector3.new(gp.X + math.cos(ang) * 16, floorY + lift, gp.Z + 11 + math.sin(ang) * 6)
+				goal = Vector3.new(gp.X + math.cos(ang) * 16 * Config.MAP_SCALE, floorY + lift, gp.Z + (11 + math.sin(ang) * 6) * Config.MAP_SCALE)
 				look = gp
 				attacking = true
 			elseif targets[i] and targets[i] ~= "0" and targets[i] ~= "" then
@@ -8135,7 +8156,7 @@ local function updatePets(dt: number)
 				if pile then
 					local pp = pile:GetPivot().Position
 					local ang = i / math.max(n, 1) * math.pi * 2 + now * 0.4
-					local r = 5.5 + (pv.scale - 1) * 3
+					local r = 4 + pv.scale * 2.5
 					goal = Vector3.new(pp.X + math.cos(ang) * r, floorY + lift, pp.Z + math.sin(ang) * r)
 					look = pp
 					attacking = true
@@ -8153,7 +8174,7 @@ local function updatePets(dt: number)
 				flat = flat.Unit
 				local right = Vector3.new(-flat.Z, 0, flat.X)
 				local gap = 3.2 * math.max(1, pv.scale * 0.9)
-				local g = base - flat * (4 + gap * 0.5 + row * 3.4 + math.abs(col) * 0.6) + right * (col * gap)
+				local g = base - flat * (4 + gap * 0.5 + row * 2.2 * pv.scale + math.abs(col) * 0.6) + right * (col * gap)
 				goal = g
 				look = g + flat
 			end
@@ -9041,7 +9062,7 @@ RunService.RenderStepped:Connect(function(dt)
 	local root = hrp()
 	if root then
 		for id, stand in eggStands do
-			if (stand.Position - root.Position).Magnitude < 20 then
+			if (stand.Position - root.Position).Magnitude < 20 * Config.MAP_SCALE then
 				nearEgg = id
 			end
 		end
