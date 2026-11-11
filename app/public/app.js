@@ -5,7 +5,9 @@ const $ = (s, el = document) => el.querySelector(s);
 const view = $('#view');
 let S = null;              // état venant du PC
 let liveView = true;       // la vue peut être rafraîchie automatiquement
-const IS_PC_APP = new URLSearchParams(location.search).get('app') === 'pc' || ['localhost', '127.0.0.1'].includes(location.hostname);
+// STANDALONE = appli Android : tout est sur le téléphone, marche en 4G / sans le PC
+const STANDALONE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) || !!window.REVISE_STANDALONE;
+const IS_PC_APP = !STANDALONE && (new URLSearchParams(location.search).get('app') === 'pc' || ['localhost', '127.0.0.1'].includes(location.hostname));
 const KIND = { cours: ['📘', 'Cours'], synthese: ['🗂️', 'Synthèse'], interro: ['📝', 'Interro'] };
 const GEN = { synthese: ['✨', 'Synthèse'], exercices: ['🏋️', 'Exercices'], flashcards: ['🃏', 'Flashcards'] };
 
@@ -13,6 +15,8 @@ const GEN = { synthese: ['✨', 'Synthèse'], exercices: ['🏋️', 'Exercices'
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const pin = () => { try { return localStorage.getItem('pin') || ''; } catch { return ''; } };
 const setPin = (v) => { try { localStorage.setItem('pin', v); } catch {} };
+// Le QR code du PC contient le code PIN : on le garde automatiquement
+(() => { const q = new URLSearchParams(location.search).get('pin'); if (q) { setPin(q); history.replaceState(null, '', location.pathname + location.hash); } })();
 
 function toast(msg, err = false) {
   const t = $('#toast');
@@ -25,6 +29,10 @@ function loading(on, text) {
 }
 
 async function api(path, opts = {}) {
+  if (STANDALONE) {
+    try { return await ReviseLocal.handle(opts.method || (opts.body ? 'POST' : 'GET'), path, opts.body); }
+    catch (e) { throw new Error(e.message || 'Erreur'); }
+  }
   const res = await fetch(path, {
     method: opts.method || (opts.body ? 'POST' : 'GET'),
     headers: { 'Content-Type': 'application/json', 'x-pin': pin() },
@@ -60,16 +68,40 @@ async function refresh(render = false) {
   }
 }
 
-// Synchronisation PC <-> téléphone : on regarde régulièrement si quelque chose a changé
+// Appli Android : synchro avec le PC dès qu'il est joignable (même Wi-Fi)
+async function syncPC(manual = false) {
+  if (!STANDALONE || !ReviseLocal.pairInfo()) {
+    if (manual) location.hash = '#/connect';
+    return;
+  }
+  try {
+    const r = await ReviseLocal.sync();
+    $('#sync').classList.remove('off');
+    $('#sync').title = 'Synchronisé avec le PC';
+    if (manual) toast('Synchronisé avec le PC ✅');
+    if (r.changed) { await refresh(); if (liveView) route(); }
+  } catch (e) {
+    $('#sync').classList.add('off');
+    $('#sync').title = 'PC pas joignable — tout marche quand même sur le tel';
+    if (manual) toast(e.message + ' — pas grave, tout reste sur ton tel et se synchronisera au prochain Wi-Fi.', true);
+  }
+}
+if (STANDALONE) {
+  setInterval(() => { if (!document.hidden) syncPC(); }, 30000);
+  $('#sync').onclick = () => syncPC(true);
+  $('#sync').style.cursor = 'pointer';
+}
+
+// Synchronisation PC <-> téléphone (navigateur) : on regarde régulièrement si quelque chose a changé
 setInterval(async () => {
-  if (document.hidden) return;
+  if (document.hidden || STANDALONE) return;
   try {
     const v = await api('/api/version');
     $('#sync').classList.remove('off');
     if (S && v.version !== S.version) { await refresh(); if (liveView) route(); }
   } catch { $('#sync').classList.add('off'); }
 }, 4000);
-document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(liveView); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { if (STANDALONE) syncPC(); else refresh(liveView); } });
 
 // ---------- mini Markdown ----------
 function inline(s) {
@@ -190,7 +222,12 @@ function viewWelcome() {
   <div class="card">
     <h1>Bienvenue sur ReviseIA 👋</h1>
     <p>Scanne tes cours, synthèses et interros, et l'IA te prépare des <b>synthèses</b>, des <b>exercices</b>, des <b>flashcards</b>, et corrige quand tu <b>récites</b> ton cours.</p>
-    ${IS_PC_APP
+    ${STANDALONE
+      ? `<p>Pour que l'IA marche sur ton tel (même en 4G, sans le PC), il faut ta <b>clé API Claude</b>.</p>
+         <a class="btn big" href="#/connect">🔗 La récupérer depuis mon PC (même Wi-Fi)</a>
+         <p class="muted small" style="text-align:center">ou</p>
+         <a class="btn big alt" href="#/settings">🔑 La coller moi-même</a>`
+      : IS_PC_APP
       ? `<p>Pour commencer, colle ta <b>clé API Claude</b> dans les réglages (une seule fois).</p><a class="btn big" href="#/settings">⚙️ Ouvrir les réglages</a>`
       : `<p>La clé API n'est pas encore réglée. Fais-le sur le <b>PC</b> dans ⚙️ Réglages, puis reviens ici.</p><button class="btn big" onclick="refresh(true)">🔄 C'est fait</button>`}
   </div>`;
@@ -340,12 +377,20 @@ function viewDoc(id) {
     <button class="btn alt" id="listen"><span>🔊</span>Écouter</button>
   </div>
   <div class="card md" id="content">${md(d.text)}</div>
-  ${d.images?.length ? `<details class="card"><summary>📷 Photos originales (${d.images.length})</summary><div class="thumbs">${d.images.map((im) => `<a href="/images/${im}${p}" target="_blank"><img src="/images/${im}${p}"></a>`).join('')}</div></details>` : ''}
+  ${d.images?.length ? `<details class="card" id="photos"><summary>📷 Photos originales (${d.images.length})</summary><div class="thumbs">${d.images.map((im) => STANDALONE ? `<img data-img="${im}" alt="">` : `<a href="/images/${im}${p}" target="_blank"><img src="/images/${im}${p}"></a>`).join('')}</div></details>` : ''}
   <div class="row">
     <button class="btn alt" id="edit">✏️ Corriger le texte</button>
     <button class="btn alt" id="del">🗑️ Supprimer</button>
   </div>`;
   $('#listen').onclick = () => speak(d.text, langOf(s));
+  if (!('speechSynthesis' in window)) $('#listen').hidden = true;
+  if (STANDALONE && $('#photos')) $('#photos').addEventListener('toggle', () => {
+    document.querySelectorAll('img[data-img]').forEach(async (img) => {
+      if (img.src) return;
+      const u = await ReviseLocal.imageUrl(img.dataset.img);
+      if (u) img.src = u; else img.alt = '(photo restée sur le PC)';
+    });
+  }, { once: true });
   $('#del').onclick = async () => {
     if (!confirm('Supprimer ce document ?')) return;
     await api('/api/docs/' + id, { method: 'DELETE' });
@@ -414,9 +459,10 @@ function viewGenerated(id) {
   const head = `<h1>${GEN[g.type]?.[0] || ''} ${esc(g.title)}</h1><p class="muted">${esc(s?.name)} · ${new Date(g.createdAt).toLocaleString('fr-BE')}</p>`;
   const foot = `<hr><div class="row"><a class="btn alt" href="#/s/${g.subjectId}">← ${esc(s?.name)}</a><button class="btn alt" id="delg">🗑️ Supprimer</button></div>`;
   if (g.type === 'synthese') {
-    view.innerHTML = `${head}<div class="row"><button class="btn alt" id="listen">🔊 Écouter</button><button class="btn alt" id="stop">⏹️ Stop</button><button class="btn alt" onclick="window.print()">🖨️ Imprimer</button><a class="btn alt" href="#/recite/${g.subjectId}?d=${g.docIds.join(',')}">🎤 Réciter</a></div><div class="card md">${md(g.content)}</div>${foot}`;
+    view.innerHTML = `${head}<div class="row"><button class="btn alt" id="listen">🔊 Écouter</button><button class="btn alt" id="stop">⏹️ Stop</button>${STANDALONE ? '' : '<button class="btn alt" onclick="window.print()">🖨️ Imprimer</button>'}<a class="btn alt" href="#/recite/${g.subjectId}?d=${g.docIds.join(',')}">🎤 Réciter</a></div><div class="card md">${md(g.content)}</div>${foot}`;
     $('#listen').onclick = () => speak(g.content, langOf(s));
     $('#stop').onclick = stopSpeak;
+    if (!('speechSynthesis' in window)) { $('#listen').hidden = true; $('#stop').hidden = true; }
   } else if (g.type === 'exercices') {
     view.innerHTML = head + '<div id="exs"></div>' + foot;
     runExercises(g, s);
@@ -519,9 +565,9 @@ function runFlashcards(g, s) {
       <div class="progress"><div style="width:${(known.size / g.content.length) * 100}%"></div></div>
       <div class="flash" id="card"><div class="inner"><div class="face front">${md(c.front)}</div><div class="face back">${md(c.back)}</div></div></div>
       <p class="muted small" style="text-align:center">Touche la carte pour la retourner</p>
-      <div class="row" style="justify-content:center"><button class="btn ko" id="no">🔁 À revoir</button><button class="btn alt" id="say">🔊</button><button class="btn ok" id="yes">✅ Je savais</button></div>`;
+      <div class="row" style="justify-content:center"><button class="btn ko" id="no">🔁 À revoir</button>${'speechSynthesis' in window ? '<button class="btn alt" id="say">🔊</button>' : ''}<button class="btn ok" id="yes">✅ Je savais</button></div>`;
     $('#card').onclick = () => $('#card').classList.toggle('flip');
-    $('#say').onclick = () => speak($('#card').classList.contains('flip') ? c.back : c.front, lang);
+    if ($('#say')) $('#say').onclick = () => speak($('#card').classList.contains('flip') ? c.back : c.front, lang);
     $('#yes').onclick = () => { const i = queue.shift(); if (!known.has(i) && !c._missed) first++; known.add(i); show(); };
     $('#no').onclick = () => { const i = queue.shift(); c._missed = true; queue.splice(Math.min(3, queue.length), 0, i); tries++; show(); };
   };
@@ -543,7 +589,7 @@ function viewRecite(sid) {
     <div style="text-align:center;margin:10px 0">
       ${canDictate
         ? `<button class="btn mic" id="mic" title="Parler">🎤</button><p class="muted small" id="micTxt">Appuie et parle</p>`
-        : `<p class="small">🎙️ <b>Pour parler :</b> ${IS_PC_APP ? 'appuie sur <b>Windows + H</b> dans la zone de texte (dictée Windows).' : 'touche la zone de texte puis le <b>micro 🎤 de ton clavier</b>.'}</p>`}
+        : `<p class="small">🎙️ <b>Pour parler :</b> ${IS_PC_APP && !STANDALONE ? 'appuie sur <b>Windows + H</b> dans la zone de texte (dictée Windows).' : 'touche la zone de texte puis le <b>micro 🎤 de ton clavier</b>.'}</p>`}
     </div>
     <textarea id="txt" placeholder="Ta récitation apparaît ici (tu peux aussi écrire)…" style="min-height:220px"></textarea>
     <button class="btn big" id="go" style="margin-top:12px">✨ Corriger ma récitation</button>
@@ -610,6 +656,7 @@ function viewAsk(sid) {
 
 // --- Réglages ---
 function viewSettings() {
+  if (STANDALONE) return viewSettingsPhone();
   if (!IS_PC_APP) {
     view.innerHTML = `<div class="card"><h2>⚙️ Réglages</h2><p>Les réglages (clé API, code PIN) se font sur le <b>PC</b>.</p><label>Code PIN de ce téléphone</label><input type="text" id="pin" value="${esc(pin())}"><button class="btn" style="margin-top:10px" id="sp">Enregistrer</button></div>`;
     $('#sp').onclick = () => { setPin($('#pin').value.trim()); refresh(true); toast('OK ✅'); };
@@ -642,6 +689,7 @@ function viewSettings() {
 
 // --- Relier le téléphone ---
 async function viewConnect() {
+  if (STANDALONE) return viewPair();
   if (!IS_PC_APP) {
     view.innerHTML = `<div class="card"><h2>📱 Tu es sur le téléphone ✅</h2><p>Ce téléphone est relié au PC. Tout ce que tu scannes ici apparaît sur le PC, et inversement.</p><p class="small muted">Astuce : menu du navigateur → <b>« Ajouter à l'écran d'accueil »</b> pour l'avoir comme une vraie appli.</p></div>`;
     return;
@@ -657,9 +705,78 @@ async function viewConnect() {
     ${c.urls.length > 1 ? `<p class="small muted">Autres adresses possibles : ${c.urls.slice(1).map(esc).join(' · ')}</p>` : ''}
     ${c.pin ? `<p>🔒 Code PIN à entrer sur le téléphone : <b>${esc(c.pin)}</b></p>` : ''}
     <p class="small">3. Sur le téléphone : menu ⋮ / partager → <b>« Ajouter à l'écran d'accueil »</b>. Tu as l'appli ReviseIA sur ton tel ! 🎉</p>
+  </div>
+  <div class="card" style="text-align:center">
+    <h2>🤖 Appli Android (marche en 4G, sans le PC)</h2>
+    <p>Dans l'appli ReviseIA du téléphone → 🔗 <b>Relier au PC</b>, tape :</p>
+    <p class="big-url">${esc(c.host || '?')}</p>
+    <p>code : <b style="font-size:1.3rem">${esc(c.pin || '')}</b></p>
+    <p class="small muted">Ensuite tout se synchronise tout seul dès que le tel est sur le même Wi-Fi que le PC.</p>
     <p class="small muted">Si Windows demande l'autorisation du pare-feu au 1er lancement, clique « Autoriser » (réseaux privés). Le PC doit être allumé avec ReviseIA ouvert.</p>
   </div>`;
 }
 
+// --- Appli Android : réglages et liaison au PC ---
+function viewSettingsPhone() {
+  const pi = ReviseLocal.pairInfo();
+  view.innerHTML = `
+  <h1>⚙️ Réglages</h1>
+  <div class="card">
+    <h3>🔑 Clé API Claude ${S.settings.hasKey ? '<span class="badge" style="color:var(--ok)">✔ enregistrée</span>' : ''}</h3>
+    <p class="small muted">${S.settings.hasKey ? "C'est bon, l'IA marche sur ton tel (4G ou Wi-Fi)." : 'Le plus simple : <a href="#/connect">la récupérer depuis le PC</a>. Sinon crée-la sur <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> et colle-la ici.'}</p>
+    <input type="password" id="key" placeholder="${S.settings.hasKey ? '•••••••• (laisser vide pour garder)' : 'sk-ant-...'}">
+    <h3 style="margin-top:20px">🧠 Qualité de l'IA</h3>
+    <select id="model">
+      <option value="opus" ${S.settings.model !== 'haiku' ? 'selected' : ''}>Meilleure qualité (Claude Opus 5.5)</option>
+      <option value="haiku" ${S.settings.model === 'haiku' ? 'selected' : ''}>Économique (Claude Haiku 5.5) — moins de crédit et de 4G</option>
+    </select>
+    <button class="btn big" id="save" style="margin-top:16px">💾 Enregistrer</button>
+  </div>
+  <div class="card">
+    <h3>💻 PC</h3>
+    <p>${pi ? `Relié au PC <b>${esc(pi.host)}</b>.` : 'Pas encore relié au PC.'}</p>
+    <div class="row"><a class="btn alt" href="#/connect">🔗 ${pi ? 'Changer' : 'Relier au PC'}</a>${pi ? '<button class="btn alt" id="syncnow">🔄 Synchroniser</button>' : ''}</div>
+  </div>`;
+  $('#save').onclick = async () => {
+    await api('/api/settings', { body: { apiKey: $('#key').value, model: $('#model').value } });
+    await refresh(); toast('Enregistré ✅'); location.hash = '#/';
+  };
+  if ($('#syncnow')) $('#syncnow').onclick = () => syncPC(true);
+}
+
+function viewPair() {
+  const pi = ReviseLocal.pairInfo();
+  view.innerHTML = `
+  <h1>🔗 Relier au PC</h1>
+  <div class="card">
+    <p>Sur le PC, ouvre ReviseIA et clique sur 📱 : l'adresse et le code sont écrits en bas.</p>
+    <p class="small muted">Le téléphone et le PC doivent être sur le <b>même Wi-Fi</b> juste pour cette étape. Après, l'appli marche partout (4G, bus…) et se resynchronise toute seule quand tu rentres.</p>
+    <label>Adresse du PC</label>
+    <input type="text" id="host" inputmode="decimal" placeholder="ex : 192.168.1.23" value="${esc(pi?.host || '')}">
+    <label>Code</label>
+    <input type="text" id="pcpin" inputmode="numeric" placeholder="ex : 4821" value="${esc(pi?.pin || '')}">
+    <button class="btn big" id="go" style="margin-top:16px">🔗 Relier</button>
+  </div>`;
+  $('#go').onclick = async () => {
+    const host = $('#host').value.trim(), code = $('#pcpin').value.trim();
+    if (!host || !code) return toast("Remplis l'adresse et le code", true);
+    loading(true, 'Connexion au PC et synchronisation…');
+    try {
+      await ReviseLocal.setPair(host, code);
+      await refresh();
+      toast('Relié au PC ✅ Tes cours sont synchronisés');
+      location.hash = '#/';
+    } catch (e) { toast(e.message, true); }
+    finally { loading(false); }
+  };
+}
+
 // ---------- démarrage ----------
-refresh(true);
+if (STANDALONE) {
+  $('#connectBtn').textContent = '🔗';
+  $('#connectBtn').title = 'Relier au PC';
+  $('#sync').classList.add('off');
+  ReviseLocal.ready.then(() => refresh(true)).then(() => syncPC());
+} else {
+  refresh(true);
+}

@@ -1,4 +1,4 @@
-name: Construire ReviseIA (.exe Windows)
+name: Construire ReviseIA (.exe Windows + .apk Android)
 
 on:
   push:
@@ -23,18 +23,46 @@ jobs:
       - run: npx electron-builder --win portable nsis --x64 --publish never -c.win.signAndEditExecutable=true
       - uses: actions/upload-artifact@v4
         with:
-          name: ReviseIA-Windows
+          name: windows
           path: |
             app/dist/ReviseIA-Portable.exe
             app/dist/ReviseIA-Installation.exe
+
+  android:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - run: bash scripts/build-android.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: app/dist/ReviseIA.apk
+
+  release:
+    needs: [windows, android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+          merge-multiple: true
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.${{ github.run_number }}
-          name: ReviseIA v1.0.${{ github.run_number }}
+          tag_name: v1.1.${{ github.run_number }}
+          name: ReviseIA v1.1.${{ github.run_number }}
           target_commitish: ${{ github.sha }}
           body: |
-            **Télécharge `ReviseIA-Installation.exe`** (installe + raccourci bureau) ou `ReviseIA-Portable.exe` (rien à installer, double-clic).
-            Puis sur le PC : ⚙️ Réglages → colle ta clé API Claude. Ensuite 📱 → scanne le QR code avec ton téléphone.
-          files: |
-            app/dist/ReviseIA-Portable.exe
-            app/dist/ReviseIA-Installation.exe
+            **PC :** `ReviseIA-Installation.exe` (installe + raccourci bureau) ou `ReviseIA-Portable.exe` (double-clic, rien à installer).
+            **Téléphone Android :** `ReviseIA.apk` — marche en 4G et sans le PC, se synchronise au Wi-Fi de la maison.
+          files: out/*

@@ -1,0 +1,7 @@
+{
+  "appId": "com.reviseia.app",
+  "appName": "ReviseIA",
+  "webDir": "www",
+  "server": { "androidScheme": "http", "cleartext": true },
+  "android": { "allowMixedContent": true }
+}

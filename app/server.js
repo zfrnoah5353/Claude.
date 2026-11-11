@@ -1,50 +1,33 @@
-// Serveur local de ReviseIA : sert l'appli (PC + téléphone sur le même Wi-Fi) et l'API.
+// Serveur local de ReviseIA (PC) : sert l'appli, l'API, et la synchro avec l'appli Android.
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const crypto = require('crypto');
 const QRCode = require('qrcode');
-const { AI } = require('./ai');
-
-const DEFAULT_SUBJECTS = [
-  ['Français', '📖', '#e74c3c'],
-  ['Math', '📐', '#3498db'],
-  ['Latin', '🏛️', '#9b59b6'],
-  ['Anglais', '🇬🇧', '#1abc9c'],
-  ['NDLS', '🇳🇱', '#e67e22'],
-  ['Sciences', '🔬', '#27ae60'],
-  ['Géo', '🌍', '#16a085'],
-  ['Histoire', '📜', '#c0392b'],
-];
+const { createCore, emptyDb, normalizeDb, applyData, exportData } = require('./core');
 
 const MIME = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
   '.webp': 'image/webp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.webmanifest': 'application/manifest+json',
 };
-
-const id = () => crypto.randomBytes(8).toString('hex');
+const IMG_NAME = /^[a-f0-9]{16}\.(jpg|png|webp)$/;
 
 function startServer({ dataDir, port = 4777, publicDir = path.join(__dirname, 'public') } = {}) {
-  fs.mkdirSync(path.join(dataDir, 'images'), { recursive: true });
+  const imgDir = path.join(dataDir, 'images');
+  fs.mkdirSync(imgDir, { recursive: true });
   const dbFile = path.join(dataDir, 'data.json');
 
-  let db;
-  try { db = JSON.parse(fs.readFileSync(dbFile, 'utf8')); } catch { db = null; }
-  if (!db) {
-    db = {
-      settings: { apiKey: process.env.ANTHROPIC_API_KEY || '', pin: '', model: 'opus' },
-      subjects: DEFAULT_SUBJECTS.map(([name, emoji, color]) => ({ id: id(), name, emoji, color })),
-      docs: [], generated: [], results: [], version: 1,
-    };
-  }
-  db.settings = Object.assign({ apiKey: '', pin: '', model: 'opus' }, db.settings);
-  ['docs', 'generated', 'results'].forEach((k) => (db[k] = db[k] || []));
+  let db = null;
+  try { db = JSON.parse(fs.readFileSync(dbFile, 'utf8')); } catch {}
+  db = normalizeDb(db || emptyDb());
+  if (!db.settings.apiKey && process.env.ANTHROPIC_API_KEY) db.settings.apiKey = process.env.ANTHROPIC_API_KEY;
+  // Code de liaison du téléphone (créé automatiquement, modifiable dans les réglages)
+  if (!db.settings.pin) db.settings.pin = String(crypto.randomInt(1000, 10000));
 
   let saveTimer = null;
-  const save = () => {
-    db.version = (db.version || 0) + 1;
+  const persist = () => {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
       const tmp = dbFile + '.tmp';
@@ -52,23 +35,33 @@ function startServer({ dataDir, port = 4777, publicDir = path.join(__dirname, 'p
       fs.renameSync(tmp, dbFile);
     }, 200);
   };
-  save();
 
-  const ai = new AI(() => db.settings);
+  function writeImage(name, dataUrl) {
+    const m = /^data:image\/(jpeg|png|webp);base64,(.*)$/s.exec(dataUrl || '');
+    if (!m) throw Object.assign(new Error('Image invalide'), { status: 400 });
+    fs.writeFileSync(path.join(imgDir, name), Buffer.from(m[2], 'base64'));
+  }
 
-  const isLocal = (req) => {
-    const a = req.socket.remoteAddress || '';
-    return a === '127.0.0.1' || a === '::1' || a === '::ffff:127.0.0.1';
-  };
+  const core = createCore({
+    db,
+    persist,
+    saveImage: async (dataUrl) => {
+      const ext = /^data:image\/(jpeg|png|webp)/.exec(dataUrl)?.[1] || 'jpeg';
+      const name = crypto.randomBytes(8).toString('hex') + '.' + (ext === 'jpeg' ? 'jpg' : ext);
+      writeImage(name, dataUrl);
+      return name;
+    },
+    deleteImage: async (name) => { if (IMG_NAME.test(name)) fs.rm(path.join(imgDir, name), () => {}); },
+  });
+  core.changed();
+
+  const isLocal = (req) => ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress || '');
 
   function lanUrls() {
     const urls = [];
     for (const list of Object.values(os.networkInterfaces())) {
-      for (const n of list || []) {
-        if (n.family === 'IPv4' && !n.internal) urls.push(`http://${n.address}:${port}`);
-      }
+      for (const n of list || []) if (n.family === 'IPv4' && !n.internal) urls.push(`http://${n.address}:${port}`);
     }
-    // Les adresses 192.168.* d'abord (Wi-Fi maison habituel)
     return urls.sort((a, b) => (b.includes('192.168.') ? 1 : 0) - (a.includes('192.168.') ? 1 : 0));
   }
 
@@ -82,7 +75,7 @@ function startServer({ dataDir, port = 4777, publicDir = path.join(__dirname, 'p
     let size = 0;
     req.on('data', (c) => {
       size += c.length;
-      if (size > 80 * 1024 * 1024) { reject(Object.assign(new Error('Fichier trop gros'), { status: 413 })); req.destroy(); }
+      if (size > 200 * 1024 * 1024) { reject(Object.assign(new Error('Trop gros'), { status: 413 })); req.destroy(); }
       else chunks.push(c);
     });
     req.on('end', () => {
@@ -93,187 +86,53 @@ function startServer({ dataDir, port = 4777, publicDir = path.join(__dirname, 'p
     req.on('error', reject);
   });
 
-  const subjectOf = (sid) => {
-    const s = db.subjects.find((x) => x.id === sid);
-    if (!s) throw Object.assign(new Error('Matière introuvable'), { status: 404 });
-    return s;
-  };
-  const docsOf = (ids) => (ids || []).map((d) => db.docs.find((x) => x.id === d)).filter(Boolean);
-
-  function publicState() {
-    return {
-      version: db.version,
-      subjects: db.subjects,
-      docs: db.docs,
-      generated: db.generated,
-      results: db.results.slice(-300),
-      settings: { hasKey: !!db.settings.apiKey, hasPin: !!db.settings.pin, model: db.settings.model },
-    };
-  }
-
-  function saveImage(dataUrl) {
-    const m = /^data:image\/(jpeg|png|webp);base64,(.*)$/s.exec(dataUrl);
-    if (!m) throw Object.assign(new Error('Image invalide'), { status: 400 });
-    const name = id() + '.' + (m[1] === 'jpeg' ? 'jpg' : m[1]);
-    fs.writeFileSync(path.join(dataDir, 'images', name), Buffer.from(m[2], 'base64'));
-    return name;
-  }
-
   async function api(req, res, url) {
     const p = url.pathname;
-    const method = req.method;
+    const local = isLocal(req);
+    if (p === '/api/ping') return send(res, 200, { ok: true, app: 'ReviseIA' });
+    if (!local && req.headers['x-pin'] !== db.settings.pin) return send(res, 401, { error: 'PIN', message: 'Code PIN requis' });
 
-    // Code PIN (pour que personne d'autre sur le Wi-Fi n'accède à tes cours)
-    if (db.settings.pin && !isLocal(req) && req.headers['x-pin'] !== db.settings.pin && p !== '/api/ping') {
-      return send(res, 401, { error: 'PIN', message: 'Code PIN requis' });
-    }
-
-    if (p === '/api/ping') return send(res, 200, { ok: true, pin: !!db.settings.pin });
-    if (p === '/api/state' && method === 'GET') return send(res, 200, publicState());
-    if (p === '/api/version' && method === 'GET') return send(res, 200, { version: db.version });
-
-    if (p === '/api/connect' && method === 'GET') {
+    if (p === '/api/connect' && req.method === 'GET') {
       const urls = lanUrls();
-      const qr = urls[0] ? await QRCode.toDataURL(urls[0], { margin: 1, width: 320 }) : null;
-      return send(res, 200, { urls, qr, pin: isLocal(req) ? db.settings.pin : undefined });
+      const link = urls[0] ? `${urls[0]}/?pin=${encodeURIComponent(db.settings.pin)}` : null;
+      const qr = link ? await QRCode.toDataURL(link, { margin: 1, width: 320 }) : null;
+      return send(res, 200, { urls, qr, pin: local ? db.settings.pin : undefined, host: urls[0]?.replace(/^http:\/\/|:\d+$/g, '') });
     }
 
-    if (p === '/api/settings' && method === 'POST') {
-      if (!isLocal(req)) return send(res, 403, { message: 'Les réglages se changent sur le PC.' });
-      const b = await readBody(req);
-      if (typeof b.apiKey === 'string' && b.apiKey.trim()) db.settings.apiKey = b.apiKey.trim();
-      if (typeof b.pin === 'string') db.settings.pin = b.pin.trim();
-      if (b.model === 'opus' || b.model === 'haiku') db.settings.model = b.model;
-      save();
-      return send(res, 200, publicState());
+    // --- Synchro avec l'appli Android ---
+    if (p === '/api/sync/manifest' && req.method === 'GET') {
+      return send(res, 200, { images: fs.readdirSync(imgDir).filter((n) => IMG_NAME.test(n)) });
     }
-
-    // --- Matières ---
-    if (p === '/api/subjects' && method === 'POST') {
+    if (p === '/api/sync' && req.method === 'POST') {
       const b = await readBody(req);
-      if (!b.name) return send(res, 400, { message: 'Nom manquant' });
-      const s = { id: id(), name: String(b.name).slice(0, 40), emoji: b.emoji || '📚', color: b.color || '#7f8c8d' };
-      db.subjects.push(s); save();
-      return send(res, 200, s);
-    }
-    let m;
-    if ((m = /^\/api\/subjects\/(\w+)$/.exec(p)) && method === 'DELETE') {
-      db.subjects = db.subjects.filter((s) => s.id !== m[1]);
-      db.docs = db.docs.filter((d) => d.subjectId !== m[1]);
-      db.generated = db.generated.filter((g) => g.subjectId !== m[1]);
-      save();
-      return send(res, 200, { ok: true });
-    }
-
-    // --- Documents (scans) ---
-    if (p === '/api/docs' && method === 'POST') {
-      const b = await readBody(req);
-      const subject = subjectOf(b.subjectId);
-      const kind = ['cours', 'synthese', 'interro'].includes(b.kind) ? b.kind : 'cours';
-      const images = Array.isArray(b.images) ? b.images.slice(0, 20) : [];
-      let title = b.title || '';
-      let text = b.text || '';
-      if (images.length) {
-        const t = await ai.transcribe({ images, subject: subject.name, kind });
-        title = title || t.title;
-        text = text ? text + '\n\n' + t.text : t.text;
+      for (const [name, dataUrl] of Object.entries(b.images || {})) {
+        if (IMG_NAME.test(name) && !fs.existsSync(path.join(imgDir, name))) writeImage(name, dataUrl);
       }
-      if (!text) return send(res, 400, { message: 'Ajoute au moins une photo ou du texte.' });
-      const doc = {
-        id: id(), subjectId: subject.id, kind, title: title || 'Document', text,
-        images: images.map(saveImage), createdAt: Date.now(),
-      };
-      db.docs.push(doc); save();
-      return send(res, 200, doc);
-    }
-    if ((m = /^\/api\/docs\/(\w+)$/.exec(p))) {
-      const doc = db.docs.find((d) => d.id === m[1]);
-      if (!doc) return send(res, 404, { message: 'Document introuvable' });
-      if (method === 'PUT') {
-        const b = await readBody(req);
-        if (typeof b.text === 'string') doc.text = b.text;
-        if (typeof b.title === 'string') doc.title = b.title;
-        if (['cours', 'synthese', 'interro'].includes(b.kind)) doc.kind = b.kind;
-        save();
-        return send(res, 200, doc);
-      }
-      if (method === 'DELETE') {
-        for (const img of doc.images || []) fs.rm(path.join(dataDir, 'images', img), () => {});
-        db.docs = db.docs.filter((d) => d.id !== doc.id); save();
-        return send(res, 200, { ok: true });
-      }
+      if (b.data) applyData(db, b.data);
+      core.changed();
+      return send(res, 200, { data: exportData(db), settings: { apiKey: db.settings.apiKey, model: db.settings.model }, version: db.version });
     }
 
-    // --- Génération IA ---
-    if (p === '/api/generate' && method === 'POST') {
-      const b = await readBody(req);
-      const subject = subjectOf(b.subjectId);
-      const docs = docsOf(b.docIds);
-      const o = b.options || {};
-      let item = { id: id(), subjectId: subject.id, docIds: docs.map((d) => d.id), type: b.type, createdAt: Date.now() };
-      if (b.type === 'synthese') {
-        const text = await ai.summary({ subject: subject.name, docs, style: o.style });
-        const t = /^#+\s*(.+)$/m.exec(text);
-        item = { ...item, title: (t ? t[1] : 'Synthèse').replace(/[*#]/g, '').trim().slice(0, 120), content: text };
-      } else if (b.type === 'exercices') {
-        const r = await ai.exercises({ subject: subject.name, docs, count: Math.min(+o.count || 10, 30), difficulty: o.difficulty || 'moyen' });
-        item = { ...item, title: r.title, content: r.exercises };
-      } else if (b.type === 'flashcards') {
-        const r = await ai.flashcards({ subject: subject.name, docs, count: Math.min(+o.count || 20, 60) });
-        item = { ...item, title: r.title, content: r.cards };
-      } else {
-        return send(res, 400, { message: 'Type inconnu' });
-      }
-      db.generated.push(item); save();
-      return send(res, 200, item);
-    }
-    if ((m = /^\/api\/generated\/(\w+)$/.exec(p)) && method === 'DELETE') {
-      db.generated = db.generated.filter((g) => g.id !== m[1]); save();
-      return send(res, 200, { ok: true });
-    }
-
-    if (p === '/api/recite' && method === 'POST') {
-      const b = await readBody(req);
-      const subject = subjectOf(b.subjectId);
-      const docs = docsOf(b.docIds);
-      if (!b.text || b.text.trim().length < 10) return send(res, 400, { message: 'Récite un peu plus !' });
-      const r = await ai.reciteCheck({ subject: subject.name, docs, recitation: b.text });
-      db.results.push({ id: id(), type: 'recitation', subjectId: subject.id, docIds: b.docIds, score: r.score, max: 20, at: Date.now() });
-      save();
-      return send(res, 200, r);
-    }
-
-    if (p === '/api/check-answer' && method === 'POST') {
-      const b = await readBody(req);
-      const subject = subjectOf(b.subjectId);
-      return send(res, 200, await ai.checkAnswer({ subject: subject.name, question: b.question, expected: b.expected, answer: b.answer }));
-    }
-
-    if (p === '/api/result' && method === 'POST') {
-      const b = await readBody(req);
-      db.results.push({ id: id(), type: b.type, subjectId: b.subjectId, refId: b.refId, score: +b.score, max: +b.max, at: Date.now() });
-      save();
-      return send(res, 200, { ok: true });
-    }
-
-    if (p === '/api/ask' && method === 'POST') {
-      const b = await readBody(req);
-      const subject = subjectOf(b.subjectId);
-      return send(res, 200, { answer: await ai.question({ subject: subject.name, docs: docsOf(b.docIds), question: b.question }) });
-    }
-
-    send(res, 404, { message: 'Route inconnue' });
+    const body = ['POST', 'PUT'].includes(req.method) ? await readBody(req) : {};
+    return send(res, 200, await core.handle(req.method, p, body, { local }));
   }
 
   const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://x');
+    // L'appli Android parle au PC depuis une autre origine
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'content-type, x-pin');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Private-Network', 'true');
+    if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
     try {
       if (url.pathname.startsWith('/api/')) return await api(req, res, url);
 
       if (url.pathname.startsWith('/images/')) {
-        if (db.settings.pin && !isLocal(req) && url.searchParams.get('pin') !== db.settings.pin) { res.writeHead(401); return res.end(); }
-        const f = path.join(dataDir, 'images', path.basename(url.pathname));
-        if (!fs.existsSync(f)) { res.writeHead(404); return res.end(); }
+        if (!isLocal(req) && url.searchParams.get('pin') !== db.settings.pin) { res.writeHead(401); return res.end(); }
+        const name = path.basename(url.pathname);
+        const f = path.join(imgDir, name);
+        if (!IMG_NAME.test(name) || !fs.existsSync(f)) { res.writeHead(404); return res.end(); }
         res.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream', 'Cache-Control': 'max-age=31536000' });
         return fs.createReadStream(f).pipe(res);
       }
@@ -283,9 +142,9 @@ function startServer({ dataDir, port = 4777, publicDir = path.join(__dirname, 'p
       if (!fs.existsSync(f) || fs.statSync(f).isDirectory()) f = path.join(publicDir, 'index.html');
       res.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
       fs.createReadStream(f).pipe(res);
-    } catch (err) {
-      console.error(err);
-      if (!res.headersSent) send(res, err.status || 500, { message: err.message || 'Erreur' });
+    } catch (e) {
+      if (!e.status || e.status >= 500) console.error(e);
+      if (!res.headersSent) send(res, e.status || 500, { message: e.message || 'Erreur' });
     }
   });
   server.requestTimeout = 0;
@@ -293,7 +152,7 @@ function startServer({ dataDir, port = 4777, publicDir = path.join(__dirname, 'p
 
   return new Promise((resolve, reject) => {
     server.once('error', reject);
-    server.listen(port, '0.0.0.0', () => resolve({ server, port, lanUrls }));
+    server.listen(port, '0.0.0.0', () => resolve({ server, port, lanUrls, db }));
   });
 }
 

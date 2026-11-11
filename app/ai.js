@@ -40,7 +40,8 @@ class AI {
       e.status = 400;
       throw e;
     }
-    return new Anthropic({ apiKey: s.apiKey });
+    // dangerouslyAllowBrowser : l'appli Android appelle l'IA directement (la clé reste sur le téléphone de l'élève)
+    return new Anthropic({ apiKey: s.apiKey, dangerouslyAllowBrowser: true });
   }
 
   model() {
