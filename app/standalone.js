@@ -92,6 +92,8 @@ async function doSync() {
   applyData(db, res.data);
   if (res.settings) {
     if (!db.settings.apiKey && res.settings.apiKey) db.settings.apiKey = res.settings.apiKey;
+    if (!db.settings.geminiKey && res.settings.geminiKey) db.settings.geminiKey = res.settings.geminiKey;
+    if (!db.settings.providerSet && res.settings.provider) db.settings.provider = res.settings.provider;
     if (!db.settings.modelSet && res.settings.model) db.settings.model = res.settings.model;
   }
   const changedLocal = before !== JSON.stringify(exportData(db));

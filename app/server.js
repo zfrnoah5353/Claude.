@@ -23,6 +23,7 @@ function startServer({ dataDir, port = 4777, publicDir = path.join(__dirname, 'p
   try { db = JSON.parse(fs.readFileSync(dbFile, 'utf8')); } catch {}
   db = normalizeDb(db || emptyDb());
   if (!db.settings.apiKey && process.env.ANTHROPIC_API_KEY) db.settings.apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!db.settings.geminiKey && process.env.GEMINI_API_KEY) db.settings.geminiKey = process.env.GEMINI_API_KEY;
   // Code de liaison du téléphone (créé automatiquement, modifiable dans les réglages)
   if (!db.settings.pin) db.settings.pin = String(crypto.randomInt(1000, 10000));
 
@@ -110,7 +111,8 @@ function startServer({ dataDir, port = 4777, publicDir = path.join(__dirname, 'p
       }
       if (b.data) applyData(db, b.data);
       core.changed();
-      return send(res, 200, { data: exportData(db), settings: { apiKey: db.settings.apiKey, model: db.settings.model }, version: db.version });
+      const st = db.settings;
+      return send(res, 200, { data: exportData(db), settings: { provider: st.provider, geminiKey: st.geminiKey, apiKey: st.apiKey, model: st.model }, version: db.version });
     }
 
     const body = ['POST', 'PUT'].includes(req.method) ? await readBody(req) : {};

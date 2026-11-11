@@ -223,12 +223,12 @@ function viewWelcome() {
     <h1>Bienvenue sur ReviseIA 👋</h1>
     <p>Scanne tes cours, synthèses et interros, et l'IA te prépare des <b>synthèses</b>, des <b>exercices</b>, des <b>flashcards</b>, et corrige quand tu <b>récites</b> ton cours.</p>
     ${STANDALONE
-      ? `<p>Pour que l'IA marche sur ton tel (même en 4G, sans le PC), il faut ta <b>clé API Claude</b>.</p>
+      ? `<p>Pour que l'IA marche sur ton tel (même en 4G, sans le PC), il faut une <b>clé IA gratuite</b> (Google Gemini, 2 minutes à créer).</p>
          <a class="btn big" href="#/connect">🔗 La récupérer depuis mon PC (même Wi-Fi)</a>
          <p class="muted small" style="text-align:center">ou</p>
          <a class="btn big alt" href="#/settings">🔑 La coller moi-même</a>`
       : IS_PC_APP
-      ? `<p>Pour commencer, colle ta <b>clé API Claude</b> dans les réglages (une seule fois).</p><a class="btn big" href="#/settings">⚙️ Ouvrir les réglages</a>`
+      ? `<p>Pour commencer, crée ta <b>clé IA gratuite</b> (Google Gemini) et colle-la dans les réglages (une seule fois, 2 minutes).</p><a class="btn big" href="#/settings">⚙️ Ouvrir les réglages</a>`
       : `<p>La clé API n'est pas encore réglée. Fais-le sur le <b>PC</b> dans ⚙️ Réglages, puis reviens ici.</p><button class="btn big" onclick="refresh(true)">🔄 C'est fait</button>`}
   </div>`;
 }
@@ -665,28 +665,62 @@ function viewSettings() {
   view.innerHTML = `
   <h1>⚙️ Réglages</h1>
   <div class="card">
-    <h3>🔑 Clé API Claude ${S.settings.hasKey ? '<span class="badge" style="color:var(--ok)">✔ enregistrée</span>' : ''}</h3>
-    <p class="small muted">C'est ce qui fait marcher l'IA. Crée-la sur <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> → « Create Key », ajoute un peu de crédit, puis colle-la ici. Elle reste uniquement sur ton PC.</p>
-    <input type="password" id="key" placeholder="${S.settings.hasKey ? '•••••••• (laisser vide pour garder)' : 'sk-ant-...'}">
-    <h3 style="margin-top:20px">🧠 Qualité de l'IA</h3>
-    <p class="small muted">Économique suffit pour réviser. Passe en Qualité max si l'IA lit mal une écriture à la main.</p>
-    <select id="model">
-      <option value="haiku" ${S.settings.model !== 'opus' ? 'selected' : ''}>Économique (Claude Haiku 5.5) — recommandé, ~0,3 centime par action</option>
-      <option value="opus" ${S.settings.model === 'opus' ? 'selected' : ''}>Qualité max (Claude Opus 5.5) — ~10 centimes par action</option>
-    </select>
-    <h3 style="margin-top:20px">🔒 Code PIN pour le téléphone</h3>
-    <p class="small muted">Empêche les autres personnes du Wi-Fi de voir tes cours. Laisse vide pour ne pas en mettre.</p>
+    ${aiBlock()}
+    <h3 style="margin-top:20px">🔒 Code du téléphone</h3>
+    <p class="small muted">Le code que le téléphone tape pour se relier au PC (empêche les autres personnes du Wi-Fi de voir tes cours).</p>
     <input type="text" id="pinset" inputmode="numeric" placeholder="ex : 1234">
     <button class="btn big" id="save" style="margin-top:16px">💾 Enregistrer</button>
   </div>`;
   api('/api/connect').then((c) => { if (c.pin) $('#pinset').value = c.pin; }).catch(() => {});
+  bindAiBlock();
   $('#save').onclick = async () => {
     try {
-      await api('/api/settings', { body: { apiKey: $('#key').value, pin: $('#pinset').value, model: $('#model').value } });
+      await api('/api/settings', { body: { ...aiValues(), pin: $('#pinset').value } });
       await refresh(); toast('Réglages enregistrés ✅'); location.hash = '#/';
     } catch (e) { toast(e.message, true); }
   };
 }
+
+// --- Choix de l'IA (partagé PC / téléphone) ---
+function aiBlock() {
+  const st = S.settings;
+  const prov = st.provider || 'gemini';
+  const ok = '<span class="badge" style="color:var(--ok)">✔ enregistrée</span>';
+  return `
+    <h3>🤖 Quelle IA ?</h3>
+    <select id="provider">
+      <option value="gemini" ${prov === 'gemini' ? 'selected' : ''}>Gratuite — Google Gemini (recommandé)</option>
+      <option value="claude" ${prov === 'claude' ? 'selected' : ''}>Claude — payante (crédit à acheter)</option>
+    </select>
+    <div id="aiGemini" ${prov === 'gemini' ? '' : 'hidden'}>
+      <h3 style="margin-top:18px">🔑 Clé Gemini gratuite ${st.hasGeminiKey ? ok : ''}</h3>
+      ${STANDALONE && !st.hasGeminiKey ? '<p class="small">Le plus simple : <a href="#/connect">la récupérer depuis le PC</a> si tu l\'y as déjà mise.</p>' : ''}
+      <ol class="small">
+        <li>Ouvre <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a> et connecte-toi avec ton compte Google.</li>
+        <li>Clique sur <b>« Create API key »</b> (« Créer une clé API »).</li>
+        <li>Copie la clé (elle commence par <code>AIza</code>) et colle-la ici.</li>
+      </ol>
+      <input type="password" id="gkey" placeholder="${st.hasGeminiKey ? '•••••••• (laisser vide pour garder)' : 'AIza...'}">
+      <p class="small muted">0 €, sans carte bancaire. Il y a une limite de demandes par minute et par jour (largement assez pour réviser). En version gratuite, Google peut utiliser tes cours pour améliorer ses IA : n'y mets rien de privé.</p>
+    </div>
+    <div id="aiClaude" ${prov === 'claude' ? '' : 'hidden'}>
+      <h3 style="margin-top:18px">🔑 Clé API Claude ${st.hasClaudeKey ? ok : ''}</h3>
+      <p class="small muted">À créer sur <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a>, avec du crédit acheté.</p>
+      <input type="password" id="key" placeholder="${st.hasClaudeKey ? '•••••••• (laisser vide pour garder)' : 'sk-ant-...'}">
+      <label>Qualité</label>
+      <select id="model">
+        <option value="haiku" ${st.model !== 'opus' ? 'selected' : ''}>Économique (Claude Haiku 5.5) — ~0,3 centime par action</option>
+        <option value="opus" ${st.model === 'opus' ? 'selected' : ''}>Qualité max (Claude Opus 5.5) — ~10 centimes par action</option>
+      </select>
+    </div>`;
+}
+function bindAiBlock() {
+  $('#provider').onchange = () => {
+    $('#aiGemini').hidden = $('#provider').value !== 'gemini';
+    $('#aiClaude').hidden = $('#provider').value !== 'claude';
+  };
+}
+const aiValues = () => ({ provider: $('#provider').value, geminiKey: $('#gkey').value, apiKey: $('#key').value, model: $('#model').value });
 
 // --- Relier le téléphone ---
 async function viewConnect() {
@@ -723,15 +757,7 @@ function viewSettingsPhone() {
   view.innerHTML = `
   <h1>⚙️ Réglages</h1>
   <div class="card">
-    <h3>🔑 Clé API Claude ${S.settings.hasKey ? '<span class="badge" style="color:var(--ok)">✔ enregistrée</span>' : ''}</h3>
-    <p class="small muted">${S.settings.hasKey ? "C'est bon, l'IA marche sur ton tel (4G ou Wi-Fi)." : 'Le plus simple : <a href="#/connect">la récupérer depuis le PC</a>. Sinon crée-la sur <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> et colle-la ici.'}</p>
-    <input type="password" id="key" placeholder="${S.settings.hasKey ? '•••••••• (laisser vide pour garder)' : 'sk-ant-...'}">
-    <h3 style="margin-top:20px">🧠 Qualité de l'IA</h3>
-    <p class="small muted">Économique suffit pour réviser. Passe en Qualité max si l'IA lit mal une écriture à la main.</p>
-    <select id="model">
-      <option value="haiku" ${S.settings.model !== 'opus' ? 'selected' : ''}>Économique (Claude Haiku 5.5) — recommandé, ~0,3 centime par action</option>
-      <option value="opus" ${S.settings.model === 'opus' ? 'selected' : ''}>Qualité max (Claude Opus 5.5) — ~10 centimes par action</option>
-    </select>
+    ${aiBlock()}
     <button class="btn big" id="save" style="margin-top:16px">💾 Enregistrer</button>
   </div>
   <div class="card">
@@ -739,8 +765,9 @@ function viewSettingsPhone() {
     <p>${pi ? `Relié au PC <b>${esc(pi.host)}</b>.` : 'Pas encore relié au PC.'}</p>
     <div class="row"><a class="btn alt" href="#/connect">🔗 ${pi ? 'Changer' : 'Relier au PC'}</a>${pi ? '<button class="btn alt" id="syncnow">🔄 Synchroniser</button>' : ''}</div>
   </div>`;
+  bindAiBlock();
   $('#save').onclick = async () => {
-    await api('/api/settings', { body: { apiKey: $('#key').value, model: $('#model').value } });
+    await api('/api/settings', { body: aiValues() });
     await refresh(); toast('Enregistré ✅'); location.hash = '#/';
   };
   if ($('#syncnow')) $('#syncnow').onclick = () => syncPC(true);
@@ -752,6 +779,7 @@ function viewPair() {
   <h1>🔗 Relier au PC</h1>
   <div class="card">
     <p>Sur le PC, ouvre ReviseIA et clique sur 📱 : l'adresse et le code sont écrits en bas.</p>
+    <p class="small">Ta clé IA est copiée toute seule sur le tel.</p>
     <p class="small muted">Le téléphone et le PC doivent être sur le <b>même Wi-Fi</b> juste pour cette étape. Après, l'appli marche partout (4G, bus…) et se resynchronise toute seule quand tu rentres.</p>
     <label>Adresse du PC</label>
     <input type="text" id="host" inputmode="decimal" placeholder="ex : 192.168.1.23" value="${esc(pi?.host || '')}">

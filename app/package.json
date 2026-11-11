@@ -1,7 +1,7 @@
 {
   "name": "revise-ia",
   "productName": "ReviseIA",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Scanne tes cours, genere synthèses et exercices avec l'IA, recite tes cours - PC + telephone",
   "main": "main.js",
   "author": "ReviseIA",
@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.8.0",
+    "@google/genai": "^3.2.0",
     "qrcode": "^1.5.4"
   },
   "devDependencies": {

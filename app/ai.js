@@ -1,5 +1,9 @@
-// Toutes les fonctions IA (Claude) de ReviseIA
+// Toutes les fonctions IA de ReviseIA : Gemini (gratuit, par défaut) ou Claude (payant)
 const Anthropic = require('@anthropic-ai/sdk');
+const { GoogleGenAI, ApiError: GeminiApiError } = require('@google/genai');
+
+// Modèles Gemini gratuits : si le 1er atteint sa limite gratuite, on passe au suivant
+const GEMINI_MODELS = ['gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite'];
 
 const MODELS = {
   opus: 'claude-opus-5-5',   // meilleure qualité (~30x plus cher)
@@ -33,10 +37,14 @@ class AI {
     this.getSettings = getSettings;
   }
 
+  provider() {
+    return this.getSettings().provider === 'claude' ? 'claude' : 'gemini';
+  }
+
   client() {
     const s = this.getSettings();
     if (!s.apiKey) {
-      const e = new Error("Clé API Claude manquante. Va dans ⚙️ Réglages sur le PC pour la coller.");
+      const e = new Error("Clé API Claude manquante. Va dans ⚙️ Réglages pour la coller.");
       e.status = 400;
       throw e;
     }
@@ -48,15 +56,57 @@ class AI {
     return MODELS[this.getSettings().model] || MODELS.haiku;
   }
 
-  async ask({ system, content, effort = 'medium', maxTokens = 32000 }) {
+  // content : texte, ou liste de blocs {type:'text', text} / {type:'image', mediaType, data}
+  async ask(opts) {
+    return this.provider() === 'claude' ? this.askClaude(opts) : this.askGemini(opts);
+  }
+
+  async askGemini({ system, content, maxTokens = 32000, json = false }) {
+    const key = this.getSettings().geminiKey;
+    if (!key) throw Object.assign(new Error('Clé Gemini manquante. Va dans ⚙️ Réglages pour la coller (elle est gratuite).'), { status: 400 });
+    const ai = new GoogleGenAI({ apiKey: key });
+    const blocks = typeof content === 'string' ? [{ type: 'text', text: content }] : content;
+    const parts = blocks.map((b) => (b.type === 'image' ? { inlineData: { mimeType: b.mediaType, data: b.data } } : { text: b.text }));
+    let lastErr;
+    for (const model of GEMINI_MODELS) {
+      try {
+        const res = await ai.models.generateContent({
+          model,
+          contents: [{ role: 'user', parts }],
+          config: {
+            systemInstruction: BASE_SYSTEM + '\n\n' + (system || ''),
+            maxOutputTokens: Math.min(maxTokens, 65536),
+            ...(json ? { responseMimeType: 'application/json' } : {}),
+          },
+        });
+        if (res.promptFeedback && res.promptFeedback.blockReason) {
+          throw Object.assign(new Error("L'IA a refusé cette demande. Essaie de reformuler."), { status: 422 });
+        }
+        const text = (res.text || '').trim();
+        if (!text) throw Object.assign(new Error("L'IA n'a rien répondu, réessaie."), { status: 502 });
+        return text;
+      } catch (err) {
+        lastErr = err;
+        // Limite gratuite atteinte / modèle surchargé / modèle indisponible -> modèle suivant
+        if (err instanceof GeminiApiError && [404, 429, 500, 503].includes(err.status)) continue;
+        throw friendlyGeminiError(err);
+      }
+    }
+    throw friendlyGeminiError(lastErr);
+  }
+
+  async askClaude({ system, content, effort = 'medium', maxTokens = 32000 }) {
     const client = this.client();
     const model = this.model();
+    const blocks = typeof content === 'string' ? content : content.map((b) => (b.type === 'image'
+      ? { type: 'image', source: { type: 'base64', media_type: b.mediaType, data: b.data } }
+      : { type: 'text', text: b.text }));
     const params = {
       model,
       max_tokens: maxTokens,
       system: BASE_SYSTEM + '\n\n' + (system || ''),
       output_config: { effort },
-      messages: [{ role: 'user', content }],
+      messages: [{ role: 'user', content: blocks }],
     };
     let msg;
     try {
@@ -80,13 +130,13 @@ class AI {
       e.status = 422;
       throw e;
     }
-    const text = msg.content.filter((b) => b.type === 'text').map((b) => b.text).join('\n').trim();
-    return text;
+    return msg.content.filter((b) => b.type === 'text').map((b) => b.text).join('\n').trim();
   }
 
   async askJSON(opts) {
     const text = await this.ask({
       ...opts,
+      json: true,
       system: (opts.system || '') + '\n\nRéponds UNIQUEMENT avec du JSON valide, sans texte avant ou après, sans bloc ```.',
     });
     return parseJSON(text);
@@ -97,7 +147,7 @@ class AI {
     const content = images.map((dataUrl) => {
       const m = /^data:(image\/[a-z+]+);base64,(.*)$/s.exec(dataUrl);
       if (!m) throw Object.assign(new Error('Image invalide'), { status: 400 });
-      return { type: 'image', source: { type: 'base64', media_type: m[1], data: m[2] } };
+      return { type: 'image', mediaType: m[1], data: m[2] };
     });
     content.push({
       type: 'text',
@@ -257,4 +307,23 @@ function friendlyError(err) {
   return e;
 }
 
-module.exports = { AI, MODELS };
+function friendlyGeminiError(err) {
+  if (!(err instanceof GeminiApiError)) {
+    if (err && err.status) return err;
+    const e = new Error("Pas de connexion à Internet ou à l'IA Gemini.");
+    e.status = 503;
+    return e;
+  }
+  const raw = String(err.message || '');
+  let msg;
+  if (err.status === 400 && /api key|API_KEY/i.test(raw)) msg = 'Clé Gemini invalide. Vérifie-la dans ⚙️ Réglages.';
+  else if (err.status === 401 || err.status === 403) msg = "Clé Gemini refusée. Vérifie-la dans ⚙️ Réglages (ou crée-en une nouvelle sur aistudio.google.com).";
+  else if (err.status === 429) msg = 'Limite gratuite de Gemini atteinte. Attends une minute (ou demain si la limite du jour est atteinte) et réessaie.';
+  else if (err.status >= 500) msg = 'Gemini est surchargé, réessaie dans un instant.';
+  else msg = `Erreur de Gemini (${err.status}) : ${raw.slice(0, 200)}`;
+  const e = new Error(msg);
+  e.status = err.status === 429 ? 429 : 502;
+  return e;
+}
+
+module.exports = { AI, MODELS, GEMINI_MODELS };

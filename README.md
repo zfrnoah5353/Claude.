@@ -1,6 +1,6 @@
 # 📚 ReviseIA — tes cours + l'IA, sur PC et téléphone
 
-Scanne tes **cours, synthèses et interros** (Français, Math, Latin, Anglais, NDLS, Sciences, Géo, Histoire… + tes propres matières), et l'IA (Claude) te prépare :
+Scanne tes **cours, synthèses et interros** (Français, Math, Latin, Anglais, NDLS, Sciences, Géo, Histoire… + tes propres matières), et l'IA te prépare (**gratuit** avec Google Gemini, ou Claude si tu préfères) :
 
 - ✨ **Synthèses** (complète, fiche express, ou plan + par cœur) — avec 🔊 lecture à voix haute
 - 🏋️ **Exercices interactifs** (QCM, vrai/faux, textes à trous, questions ouvertes corrigées par l'IA) — dans le style des interros de ton prof
@@ -17,8 +17,8 @@ PC et téléphone sont **reliés** : ce que tu scannes sur le tel apparaît sur 
 1. **Télécharge le .exe** dans l'onglet [Releases](../../releases) : `ReviseIA-Installation.exe` (ou `ReviseIA-Portable.exe`, sans installation).
 2. Lance-le. Si Windows affiche « Windows a protégé votre ordinateur » → **Informations complémentaires → Exécuter quand même** (l'appli n'est pas signée, c'est normal).
 3. Si le pare-feu demande → **Autoriser** (réseaux privés), pour que le téléphone puisse se connecter.
-4. ⚙️ **Réglages** → colle ta **clé API Claude** (à créer sur [console.anthropic.com](https://console.anthropic.com/settings/keys), avec un peu de crédit).
-5. **Téléphone Android** : télécharge `ReviseIA.apk` sur le tel et ouvre-le (autorise « installer des applis inconnues » si Android le demande). Dans l'appli → **🔗 Relier au PC** → tape l'adresse et le code affichés sur le PC dans 📱 (une seule fois, à la maison sur le Wi-Fi). La clé API est copiée toute seule sur le tel.
+4. ⚙️ **Réglages** → colle ta **clé Gemini gratuite** : va sur [aistudio.google.com/apikey](https://aistudio.google.com/apikey), connecte-toi avec ton compte Google, « Create API key », copie la clé (`AIza…`). 0 €, sans carte bancaire. *(Il faut avoir 18 ans pour l'API Gemini.)*
+5. **Téléphone Android** : télécharge `ReviseIA.apk` sur le tel et ouvre-le (autorise « installer des applis inconnues » si Android le demande). Dans l'appli → **🔗 Relier au PC** → tape l'adresse et le code affichés sur le PC dans 📱 (une seule fois, à la maison sur le Wi-Fi). La clé IA est copiée toute seule sur le tel.
    *(Pas d'Android ? 📱 → scanne le QR code : ça ouvre ReviseIA dans le navigateur, mais seulement sur le Wi-Fi de la maison.)*
 
 ## Bon à savoir
@@ -27,7 +27,9 @@ PC et téléphone sont **reliés** : ce que tu scannes sur le tel apparaît sur 
 - Appli Android : marche partout. L'IA (scanner, créer, corriger) a besoin d'Internet (4G ou Wi-Fi) ; réviser ce qui est déjà créé marche même hors réseau.
 - La synchro tel ↔ PC se fait quand les deux sont sur le même Wi-Fi avec ReviseIA ouvert sur le PC (point vert ● en haut ; touche-le pour synchroniser).
 - Tes cours restent **sur ton PC** (dossier `%APPDATA%\ReviseIA\donnees`).
-- 💰 Par défaut l'IA est en mode **Économique** (~0,3 centime par action : 5 $ de crédit = ~1 500 actions). Réglages → « Qualité max » si l'IA lit mal une écriture (~10 centimes par action).
+- 💰 Gemini gratuit : nombre de demandes limité par minute et par jour. Si la limite est atteinte, ReviseIA essaie tout seul un autre modèle Gemini gratuit ; sinon attends un peu.
+- 🔒 En version gratuite, Google peut utiliser ce que tu envoies pour améliorer ses IA : n'y mets rien de privé.
+- Option payante : Réglages → « Claude » (mode Économique ~0,3 centime par action).
 
 ## Pour les développeurs
 

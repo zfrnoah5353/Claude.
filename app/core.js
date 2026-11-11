@@ -27,7 +27,7 @@ const stamp = (o) => o.updatedAt || o.createdAt || 0;
 function emptyDb() {
   const now = Date.now();
   return {
-    settings: { apiKey: '', pin: '', model: 'haiku', defaultsV: 2 },
+    settings: { provider: 'gemini', geminiKey: '', apiKey: '', pin: '', model: 'haiku', defaultsV: 3 },
     subjects: DEFAULT_SUBJECTS.map(([id, name, emoji, color]) => ({ id, name, emoji, color, createdAt: 0, updatedAt: 0 })),
     docs: [], generated: [], results: [], deleted: {}, version: 1, createdAt: now,
   };
@@ -35,9 +35,11 @@ function emptyDb() {
 
 function normalizeDb(db) {
   if (!db) db = emptyDb();
-  db.settings = Object.assign({ apiKey: '', pin: '', model: 'haiku' }, db.settings);
+  db.settings = Object.assign({ provider: 'gemini', geminiKey: '', apiKey: '', pin: '', model: 'haiku' }, db.settings);
   // v2 : le mode Économique (Haiku) devient le mode par défaut, même pour une appli déjà installée
   if (!(db.settings.defaultsV >= 2)) { db.settings.model = 'haiku'; db.settings.modelSet = false; db.settings.defaultsV = 2; }
+  // v3 : Gemini (gratuit) devient l'IA par défaut
+  if (!(db.settings.defaultsV >= 3)) { db.settings.provider = 'gemini'; db.settings.providerSet = false; db.settings.defaultsV = 3; }
   for (const k of COLLECTIONS) db[k] = Array.isArray(db[k]) ? db[k] : [];
   db.deleted = db.deleted || {};
   return db;
@@ -105,7 +107,14 @@ function createCore({ db, persist, saveImage, deleteImage }) {
     docs: db.docs,
     generated: db.generated,
     results: db.results.slice(-300),
-    settings: { hasKey: !!db.settings.apiKey, hasPin: !!db.settings.pin, model: db.settings.model },
+    settings: {
+      provider: db.settings.provider === 'claude' ? 'claude' : 'gemini',
+      hasKey: db.settings.provider === 'claude' ? !!db.settings.apiKey : !!db.settings.geminiKey,
+      hasGeminiKey: !!db.settings.geminiKey,
+      hasClaudeKey: !!db.settings.apiKey,
+      hasPin: !!db.settings.pin,
+      model: db.settings.model,
+    },
   });
 
   async function handle(method, p, b = {}, ctx = { local: true }) {
@@ -116,6 +125,8 @@ function createCore({ db, persist, saveImage, deleteImage }) {
     if (p === '/api/settings' && method === 'POST') {
       if (!ctx.local) throw err('Les réglages se changent sur le PC.', 403);
       if (typeof b.apiKey === 'string' && b.apiKey.trim()) db.settings.apiKey = b.apiKey.trim();
+      if (typeof b.geminiKey === 'string' && b.geminiKey.trim()) db.settings.geminiKey = b.geminiKey.trim();
+      if (b.provider === 'gemini' || b.provider === 'claude') { db.settings.provider = b.provider; db.settings.providerSet = true; }
       if (typeof b.pin === 'string' && b.pin.trim()) db.settings.pin = b.pin.trim();
       if (b.model === 'opus' || b.model === 'haiku') { db.settings.model = b.model; db.settings.modelSet = true; }
       changed();
