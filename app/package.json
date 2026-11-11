@@ -1,0 +1,53 @@
+{
+  "name": "revise-ia",
+  "productName": "ReviseIA",
+  "version": "1.0.0",
+  "description": "Scanne tes cours, genere synthèses et exercices avec l'IA, recite tes cours - PC + telephone",
+  "main": "main.js",
+  "author": "ReviseIA",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "server": "node server.js",
+    "dist": "electron-builder --win portable --x64",
+    "dist:all": "electron-builder --win portable nsis --x64"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.reviseia.app",
+    "productName": "ReviseIA",
+    "files": [
+      "main.js",
+      "server.js",
+      "ai.js",
+      "public/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "portable",
+        "nsis"
+      ],
+      "signAndEditExecutable": false
+    },
+    "portable": {
+      "artifactName": "ReviseIA-Portable.exe"
+    },
+    "nsis": {
+      "artifactName": "ReviseIA-Installation.exe",
+      "oneClick": true,
+      "createDesktopShortcut": true
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zfrnoah5353/Claude..git"
+  }
+}

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5b5bf0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ReviseIA">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="stylesheet" href="/style.css">
+<title>ReviseIA</title>
+</head>
+<body>
+<header class="top">
+  <button class="icon-btn" id="backBtn" aria-label="Retour" hidden>←</button>
+  <a href="#/" class="brand"><img src="/icon.svg" alt="" width="28" height="28"> <span>ReviseIA</span></a>
+  <span class="sync" id="sync" title="Synchronisation">●</span>
+  <a href="#/connect" class="icon-btn" id="connectBtn" title="Relier mon téléphone">📱</a>
+  <a href="#/settings" class="icon-btn" title="Réglages">⚙️</a>
+</header>
+<main id="view"></main>
+<div id="loading" hidden><div class="spinner"></div><p id="loadingText">L'IA travaille…</p><small>Ça peut prendre de 20 secondes à 2 minutes.</small></div>
+<div id="toast" hidden></div>
+<script src="/app.js"></script>
+</body>
+</html>
