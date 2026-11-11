@@ -27,7 +27,7 @@ PC et téléphone sont **reliés** : ce que tu scannes sur le tel apparaît sur 
 - Appli Android : marche partout. L'IA (scanner, créer, corriger) a besoin d'Internet (4G ou Wi-Fi) ; réviser ce qui est déjà créé marche même hors réseau.
 - La synchro tel ↔ PC se fait quand les deux sont sur le même Wi-Fi avec ReviseIA ouvert sur le PC (point vert ● en haut ; touche-le pour synchroniser).
 - Tes cours restent **sur ton PC** (dossier `%APPDATA%\ReviseIA\donnees`).
-- Réglages → choisis « Économique » pour dépenser beaucoup moins de crédit API.
+- 💰 Par défaut l'IA est en mode **Économique** (~0,3 centime par action : 5 $ de crédit = ~1 500 actions). Réglages → « Qualité max » si l'IA lit mal une écriture (~10 centimes par action).
 
 ## Pour les développeurs
 

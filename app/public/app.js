@@ -669,9 +669,10 @@ function viewSettings() {
     <p class="small muted">C'est ce qui fait marcher l'IA. Crée-la sur <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> → « Create Key », ajoute un peu de crédit, puis colle-la ici. Elle reste uniquement sur ton PC.</p>
     <input type="password" id="key" placeholder="${S.settings.hasKey ? '•••••••• (laisser vide pour garder)' : 'sk-ant-...'}">
     <h3 style="margin-top:20px">🧠 Qualité de l'IA</h3>
+    <p class="small muted">Économique suffit pour réviser. Passe en Qualité max si l'IA lit mal une écriture à la main.</p>
     <select id="model">
-      <option value="opus" ${S.settings.model !== 'haiku' ? 'selected' : ''}>Meilleure qualité (Claude Opus 5.5) — recommandé</option>
-      <option value="haiku" ${S.settings.model === 'haiku' ? 'selected' : ''}>Économique (Claude Haiku 5.5) — beaucoup moins cher</option>
+      <option value="haiku" ${S.settings.model !== 'opus' ? 'selected' : ''}>Économique (Claude Haiku 5.5) — recommandé, ~0,3 centime par action</option>
+      <option value="opus" ${S.settings.model === 'opus' ? 'selected' : ''}>Qualité max (Claude Opus 5.5) — ~10 centimes par action</option>
     </select>
     <h3 style="margin-top:20px">🔒 Code PIN pour le téléphone</h3>
     <p class="small muted">Empêche les autres personnes du Wi-Fi de voir tes cours. Laisse vide pour ne pas en mettre.</p>
@@ -726,9 +727,10 @@ function viewSettingsPhone() {
     <p class="small muted">${S.settings.hasKey ? "C'est bon, l'IA marche sur ton tel (4G ou Wi-Fi)." : 'Le plus simple : <a href="#/connect">la récupérer depuis le PC</a>. Sinon crée-la sur <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a> et colle-la ici.'}</p>
     <input type="password" id="key" placeholder="${S.settings.hasKey ? '•••••••• (laisser vide pour garder)' : 'sk-ant-...'}">
     <h3 style="margin-top:20px">🧠 Qualité de l'IA</h3>
+    <p class="small muted">Économique suffit pour réviser. Passe en Qualité max si l'IA lit mal une écriture à la main.</p>
     <select id="model">
-      <option value="opus" ${S.settings.model !== 'haiku' ? 'selected' : ''}>Meilleure qualité (Claude Opus 5.5)</option>
-      <option value="haiku" ${S.settings.model === 'haiku' ? 'selected' : ''}>Économique (Claude Haiku 5.5) — moins de crédit et de 4G</option>
+      <option value="haiku" ${S.settings.model !== 'opus' ? 'selected' : ''}>Économique (Claude Haiku 5.5) — recommandé, ~0,3 centime par action</option>
+      <option value="opus" ${S.settings.model === 'opus' ? 'selected' : ''}>Qualité max (Claude Opus 5.5) — ~10 centimes par action</option>
     </select>
     <button class="btn big" id="save" style="margin-top:16px">💾 Enregistrer</button>
   </div>

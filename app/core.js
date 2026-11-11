@@ -27,7 +27,7 @@ const stamp = (o) => o.updatedAt || o.createdAt || 0;
 function emptyDb() {
   const now = Date.now();
   return {
-    settings: { apiKey: '', pin: '', model: 'opus' },
+    settings: { apiKey: '', pin: '', model: 'haiku', defaultsV: 2 },
     subjects: DEFAULT_SUBJECTS.map(([id, name, emoji, color]) => ({ id, name, emoji, color, createdAt: 0, updatedAt: 0 })),
     docs: [], generated: [], results: [], deleted: {}, version: 1, createdAt: now,
   };
@@ -35,7 +35,9 @@ function emptyDb() {
 
 function normalizeDb(db) {
   if (!db) db = emptyDb();
-  db.settings = Object.assign({ apiKey: '', pin: '', model: 'opus' }, db.settings);
+  db.settings = Object.assign({ apiKey: '', pin: '', model: 'haiku' }, db.settings);
+  // v2 : le mode Économique (Haiku) devient le mode par défaut, même pour une appli déjà installée
+  if (!(db.settings.defaultsV >= 2)) { db.settings.model = 'haiku'; db.settings.modelSet = false; db.settings.defaultsV = 2; }
   for (const k of COLLECTIONS) db[k] = Array.isArray(db[k]) ? db[k] : [];
   db.deleted = db.deleted || {};
   return db;

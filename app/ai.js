@@ -2,8 +2,8 @@
 const Anthropic = require('@anthropic-ai/sdk');
 
 const MODELS = {
-  opus: 'claude-opus-5-5',   // meilleure qualité (par défaut)
-  haiku: 'claude-haiku-5-5', // très économique
+  opus: 'claude-opus-5-5',   // meilleure qualité (~30x plus cher)
+  haiku: 'claude-haiku-5-5', // économique (par défaut)
 };
 
 const SUBJECT_HINTS = {
@@ -45,7 +45,7 @@ class AI {
   }
 
   model() {
-    return MODELS[this.getSettings().model] || MODELS.opus;
+    return MODELS[this.getSettings().model] || MODELS.haiku;
   }
 
   async ask({ system, content, effort = 'medium', maxTokens = 32000 }) {
