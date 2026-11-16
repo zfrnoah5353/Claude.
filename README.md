@@ -15,6 +15,10 @@ Un seul fichier : `dist/SetupForge.exe` (double-clic, rien à installer, fonctio
 - **Export** texte ou tableau Markdown, sauvegarde et import en fichier `.json`.
 - 45 000 pièces environ, dans 14 catégories.
 
+## Sur téléphone
+
+La même app existe en version web tactile (un `.exe` ne tourne pas sur Android ni iPhone). `python3 tools/buildmobile.py` fabrique le dossier `mobile/`, à publier sur n'importe quel hébergement de pages statiques. Dans cette version, les setups sont enregistrés dans le navigateur du téléphone.
+
 ## Limites à connaître
 
 - **Les prix sont des estimations.** La base de données ne contient aucun prix : les montants précédés de « ≈ » sont calculés à partir des caractéristiques et peuvent s'écarter des prix réels. Chaque pièce a des liens marchands pour vérifier, et le prix réel se saisit dans la case.

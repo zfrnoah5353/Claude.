@@ -1,4 +1,4 @@
-import { CATS, CAT, db, store, loadAll, save, uid, getPart, partsOf, newBuild, currentBuild, context, check, fits, power, totals, linePrice, eur, spec, links, exportText } from './core.js';
+import { CATS, CAT, db, store, isServer, loadAll, save, uid, getPart, partsOf, newBuild, currentBuild, context, check, fits, power, totals, linePrice, eur, spec, links, exportText } from './core.js';
 import { generate } from './generator.js';
 import { View3D } from './view3d.js';
 
@@ -8,6 +8,17 @@ let view3d, build, ctx, issues;
 let picker = null;                       // { cat, replace, q, compat, brand, sort, limit }
 const gen = { budget: 1200, usage: 'gaming', os: false, monitor: false, periph: false, cpuBrand: '', gpuBrand: '', color: '', seed: 1, result: null };
 
+// Confirmation en deux temps (les boîtes de dialogue du navigateur ne sont pas toujours disponibles).
+function sure(el) {
+  if (el.dataset.armed) return true;
+  const old = el.textContent; el.dataset.armed = '1'; el.textContent = 'Sûr ?'; el.style.color = 'var(--err)'; el.style.opacity = 1;
+  setTimeout(() => { if (el.isConnected) { delete el.dataset.armed; el.textContent = old; el.style.color = ''; el.style.opacity = ''; } }, 3000);
+  return false;
+}
+function copyText(text, field) {
+  const fallback = () => { if (field) { field.select(); document.execCommand('copy'); } toast('Copié'); };
+  try { navigator.clipboard.writeText(text).then(() => toast('Copié'), fallback); } catch { fallback(); }
+}
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 2200); }
 
 // ------------------------------------------------------------------ rendu principal
@@ -248,7 +259,7 @@ function openExport() {
   $('#modal').innerHTML = `<div class="dlg small"><div class="dlg-h"><h2>Exporter « ${esc(build.name)} »</h2><button class="ghost" data-act="close">✕</button></div>
     <div class="dlg-b"><div class="seg" style="margin-bottom:10px"><button data-exp="txt" class="on">Texte</button><button data-exp="md">Tableau Markdown (Reddit, Discord)</button></div>
     <textarea id="exptxt" readonly>${esc(exportText(build, false))}</textarea>
-    <div class="actions"><button class="primary" data-act="copy">Copier</button><button data-act="dl-json">Enregistrer en fichier (.json)</button><button data-act="import">Importer un fichier…</button></div></div></div>`;
+    <div class="actions"><button class="primary" data-act="copy">Copier</button><button data-act="dl-json">${isServer ? 'Enregistrer en fichier (.json)' : 'Copier la sauvegarde (.json)'}</button><button data-act="import">Importer un fichier…</button></div></div></div>`;
 }
 function download(name, text) {
   const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: 'application/json' })); a.download = name; a.click(); URL.revokeObjectURL(a.href);
@@ -306,16 +317,16 @@ document.addEventListener('click', e => {
     case 'more': picker.limit += 120; return renderPicker();
     case 'close': return closeModal();
     case 'new-build': newBuild(); showView('build'); return refresh();
-    case 'open-build': if (e.target.closest('.x')) return; store.current = id; save(); showView('build'); view3d.ctx = null; return refresh();
+    case 'open-build': store.current = id; save(); showView('build'); view3d.ctx = null; return refresh();
     case 'dup-build': { const s = store.builds.find(b => b.id === id); const b = newBuild(s.name + ' (copie)'); b.lines = JSON.parse(JSON.stringify(s.lines)); save(); return refresh(); }
-    case 'del-build': { const s = store.builds.find(b => b.id === id); if (!confirm(`Supprimer « ${s.name} » ?`)) return; store.builds = store.builds.filter(b => b.id !== id); if (store.current === id) store.current = store.builds[0]?.id || null; save(); return refresh(); }
+    case 'del-build': { if (!sure(el)) return; store.builds = store.builds.filter(b => b.id !== id); if (store.current === id) store.current = store.builds[0]?.id || null; save(); return refresh(); }
     case 'export': return openExport();
-    case 'copy': navigator.clipboard.writeText($('#exptxt').value).then(() => toast('Copié'), () => { $('#exptxt').select(); document.execCommand('copy'); toast('Copié'); }); return;
-    case 'dl-json': return download(build.name.replace(/[^\w\- ]+/g, '').trim() + '.json', JSON.stringify({ app: 'SetupForge', name: build.name, lines: build.lines, custom: store.custom.filter(c => build.lines.some(l => l.pid === c.id)) }, null, 1));
+    case 'copy': return copyText($('#exptxt').value, $('#exptxt'));
+    case 'dl-json': return (isServer ? t => download(build.name.replace(/[^\w\- ]+/g, '').trim() + '.json', t) : t => copyText(t))(JSON.stringify({ app: 'SetupForge', name: build.name, lines: build.lines, custom: store.custom.filter(c => build.lines.some(l => l.pid === c.id)) }, null, 1));
     case 'import': return importFile();
     case 'new-custom': return openCustom(el.dataset.cat);
     case 'edit-custom': return openCustom(null, id);
-    case 'del-custom': if (!confirm('Supprimer cette pièce perso ?')) return; store.custom = store.custom.filter(p => p.id !== id); for (const b of store.builds) b.lines = b.lines.filter(l => l.pid !== id); save(); renderCustom(); return refresh();
+    case 'del-custom': if (!sure(el)) return; store.custom = store.custom.filter(p => p.id !== id); for (const b of store.builds) b.lines = b.lines.filter(l => l.pid !== id); save(); renderCustom(); return refresh();
     case 'gen-run': return runGen();
     case 'gen-again': gen.seed++; return runGen();
     case 'gen-use': { const b = newBuild(`Setup ${gen.budget} € — ${{ gaming: 'jeu', mixed: 'polyvalent', work: 'création' }[gen.usage]}`); b.lines = JSON.parse(JSON.stringify(gen.result.lines)); save(); showView('build'); view3d.ctx = null; return refresh(); }
@@ -329,12 +340,12 @@ document.addEventListener('change', e => {
 $('#bname').addEventListener('input', e => { build.name = e.target.value || 'Sans nom'; save(); renderBuilds(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#modal').hidden) closeModal(); });
 
-setInterval(() => fetch('/api/ping').catch(() => {}), 5000);
-addEventListener('pagehide', () => navigator.sendBeacon('/api/bye'));
+
 
 (async function start() {
   await loadAll(f => { $('#loadbar').style.width = (f * 100) + '%'; });
-  fetch('/api/ping').catch(() => {});
+  if (isServer) { fetch('api/ping').catch(() => {}); setInterval(() => fetch('api/ping').catch(() => {}), 5000); addEventListener('pagehide', () => navigator.sendBeacon('api/bye')); }
+  if (matchMedia('(pointer: coarse)').matches) $('#hint3d').textContent = 'Touchez un emplacement pour choisir une pièce · glissez pour tourner · pincez pour zoomer';
   $('#loading').remove(); $('#app').hidden = false;
   try { view3d = new View3D($('#stage'), cat => openPicker(cat, CAT[cat].multi ? null : (i => i >= 0 ? i : null)(currentBuild().lines.findIndex(l => l.cat === cat)))); }
   catch (err) { $('#hint3d').textContent = 'La 3D n\'est pas disponible sur cet appareil (WebGL désactivé).'; console.error(err); }

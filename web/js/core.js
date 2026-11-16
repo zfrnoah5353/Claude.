@@ -21,19 +21,25 @@ export const CAT = Object.fromEntries(CATS.map(c => [c.k, c]));
 export const db = {};      // cat -> [pièces]
 const index = {};          // cat -> Map(id -> pièce)
 export let store = { builds: [], custom: [], current: null };
+export let isServer = false;
+const LS_KEY = 'setupforge-store';
 
 export async function loadAll(onProgress) {
   let done = 0;
   await Promise.all(CATS.map(async c => {
-    const r = await fetch(`/data/${c.k}.json`);
+    const r = await fetch(`data/${c.k}.json`);
     db[c.k] = await r.json();
     index[c.k] = new Map(db[c.k].map(p => [p.id, p]));
     onProgress && onProgress(++done / CATS.length);
   }));
+  // Version .exe : sauvegarde dans un fichier via le serveur local. Version web / téléphone : dans le navigateur.
   try {
-    const s = await (await fetch('/api/store')).json();
-    store = Object.assign(store, s);
-  } catch { /* première utilisation */ }
+    const r = await fetch('api/store');
+    if (!r.ok || !(r.headers.get('content-type') || '').includes('json')) throw 0;
+    store = Object.assign(store, await r.json()); isServer = true;
+  } catch {
+    try { store = Object.assign(store, JSON.parse(localStorage.getItem(LS_KEY) || '{}')); } catch { /* stockage indisponible */ }
+  }
   store.builds ||= []; store.custom ||= [];
 }
 
@@ -41,7 +47,8 @@ let saveTimer = null;
 export function save() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
-    fetch('/api/store', { method: 'PUT', body: JSON.stringify(store) }).catch(() => {});
+    if (isServer) fetch('api/store', { method: 'PUT', body: JSON.stringify(store) }).catch(() => {});
+    else try { localStorage.setItem(LS_KEY, JSON.stringify(store)); } catch { /* stockage indisponible */ }
   }, 250);
 }
 
