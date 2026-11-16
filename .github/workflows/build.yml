@@ -1,0 +1,20 @@
+name: build
+on:
+  push:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  exe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+      - run: go vet ./...
+      - run: GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "-s -w -H windowsgui" -o dist/SetupForge.exe .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SetupForge-windows
+          path: dist/SetupForge.exe

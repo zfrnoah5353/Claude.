@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SetupForge</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23ff8a3d'/%3E%3Cpath d='M9 8h14v16H9z' fill='none' stroke='%23141619' stroke-width='3'/%3E%3Ccircle cx='16' cy='14' r='3' fill='%23141619'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="app.css">
+<script type="importmap">{"imports":{"three":"./vendor/three.module.min.js","three/addons/":"./vendor/"}}</script>
+</head>
+<body>
+<div id="loading"><div class="logo">Setup<b>Forge</b></div><div class="bar"><i id="loadbar"></i></div><p>Chargement de 45 000 pièces…</p></div>
+<div id="app" hidden>
+  <aside id="side">
+    <div class="logo">Setup<b>Forge</b></div>
+    <nav>
+      <button data-view="build" class="on">🛠 Configurateur 3D</button>
+      <button data-view="gen">✨ Setup par budget</button>
+      <button data-view="custom">🧩 Mes pièces perso</button>
+    </nav>
+    <div class="side-h">Mes setups <button data-act="new-build" title="Nouveau setup">＋</button></div>
+    <div id="builds"></div>
+    <div class="side-foot">100 % gratuit · sans compte · sans pub<br><a href="#" data-act="about">À propos &amp; licences</a></div>
+  </aside>
+  <main>
+    <section id="v-build" class="view">
+      <div id="parts-col">
+        <header class="bhead">
+          <input id="bname" aria-label="Nom du setup">
+          <button data-act="export" title="Exporter / partager">⇪ Exporter</button>
+        </header>
+        <div id="parts"></div>
+      </div>
+      <div id="right-col">
+        <div id="stage">
+          <div id="tools3d">
+            <button data-opt="desk">🖥 Bureau</button>
+            <button data-opt="airflow">💨 Flux d'air</button>
+            <button data-opt="rgb" class="on">🌈 RGB</button>
+            <button data-opt="panel" class="on">▣ Panneau</button>
+          </div>
+          <div id="flowchip" hidden></div>
+          <div id="hint3d">Cliquez sur un emplacement pour choisir une pièce · glissez pour tourner · molette pour zoomer</div>
+        </div>
+        <div id="summary"></div>
+      </div>
+    </section>
+    <section id="v-gen" class="view" hidden></section>
+    <section id="v-custom" class="view" hidden></section>
+  </main>
+</div>
+<div id="modal" hidden></div>
+<div id="toast" hidden></div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
