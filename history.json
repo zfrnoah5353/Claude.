@@ -157,6 +157,36 @@
    "status": "programme",
    "published_at": "2026-11-20T18:20:00+01:00",
    "deleted_at": null
+  },
+  {
+   "id": "20261120-153440-jeux",
+   "format": "jeux",
+   "signature": "jeux|h0|Néon|{\"broll_hook\": true, \"carousel\": [\"Néon\", \"Naturel\", \"FPS\"]}|c3|tilt",
+   "look": "Néon",
+   "hook": "Un look pour chaque jeu",
+   "musique": {
+    "tempo": 99,
+    "tonalite": "La mineur",
+    "accords": "i-vi-iv-v",
+    "batterie": "four",
+    "charleston": "8",
+    "arpege": "up",
+    "basse": "pulse",
+    "septiemes": true
+   },
+   "file": "posts/20261120-153440-jeux.mp4",
+   "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-153440-jeux.mp4",
+   "caption": "Un look prêt pour VALORANT, CS2, Fortnite, Apex, Overwatch 2 et Warzone 🎮\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #warzone #apexlegends #fps #valoranttips #pcgamer #gaming #setupgaming",
+   "created": "2026-11-20T15:37:48+01:00",
+   "metricool": {
+    "post_id": "435657257",
+    "uuid": "-5419789123815586573",
+    "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=-5419789123815586573",
+    "date": "2026-11-20T19:20:00+01:00"
+   },
+   "status": "programme",
+   "published_at": "2026-11-20T19:20:00+01:00",
+   "deleted_at": null
   }
  ]
 }
