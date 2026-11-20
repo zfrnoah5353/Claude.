@@ -213,7 +213,7 @@
         if (c.scrollWidth > c.clientWidth + 2 && getComputedStyle(c).overflow !== 'visible')
           bad.push(`texte coupe: "${(c.textContent || '').trim().slice(0, 40)}"`);
       });
-      if ((n.classList.contains('app') || n.classList.contains('card')) && [n, ...n.children].some(c => c.scrollHeight > c.clientHeight + 2))
+      if (n.classList.contains('app') && [...n.querySelectorAll('*')].some(c => c.getBoundingClientRect().bottom > r.bottom + 1 || c.getBoundingClientRect().right > r.right + 1))
         bad.push(`contenu coupe dans un bloc: "${(n.textContent || '').trim().slice(0, 40)}"`);
       if (n.classList.contains('txt') && n.scrollWidth > n.clientWidth + 2)
         bad.push(`texte deborde: "${(n.textContent || '').trim().slice(0, 40)}"`);
