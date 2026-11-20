@@ -59,6 +59,36 @@
    "status": "programme",
    "published_at": "2026-11-20T15:48:00+01:00",
    "deleted_at": null
+  },
+  {
+   "id": "20261120-151706-auto",
+   "format": "auto",
+   "signature": "auto|h0|Cinématique|{}|c1|tilt",
+   "look": "Cinématique",
+   "hook": "Ton look s’active tout seul",
+   "musique": {
+    "tempo": 125,
+    "tonalite": "Mi mineur",
+    "accords": "i-vi-iii-vii",
+    "batterie": "broken",
+    "charleston": "8",
+    "arpege": "up",
+    "basse": "pulse",
+    "septiemes": false
+   },
+   "file": "posts/20261120-151706-auto.mp4",
+   "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-151706-auto.mp4",
+   "caption": "Lance ton jeu, ton look s’applique tout seul 🎮\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #apexlegends #warzone #valorantclips #jeuxvideo #gaming #pcgaming",
+   "created": "2026-11-20T15:19:25+01:00",
+   "metricool": {
+    "post_id": "435636942",
+    "uuid": "6445838160763438900",
+    "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=6445838160763438900",
+    "date": "2026-11-20T16:18:00+01:00"
+   },
+   "status": "programme",
+   "published_at": "2026-11-20T16:18:00+01:00",
+   "deleted_at": null
   }
  ]
 }
