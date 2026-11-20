@@ -353,6 +353,36 @@
    "status": "echec",
    "erreur": "verification : meme accroche et description que celui de 22 h 20 ; tampon FAUX peu lisible sur le plan video",
    "created": "2026-11-20T15:46:48+01:00"
+  },
+  {
+   "id": "20261120-154747-pov",
+   "format": "pov",
+   "signature": "pov|h2|FPS|{\"broll_line\": \"Un raccourci,\", \"carousel\": [\"FPS\", \"Vibrant\", \"Naturel\"]}|c3|left",
+   "look": "FPS",
+   "hook": "POV : ton pote te demande ton réglage",
+   "musique": {
+    "tempo": 110,
+    "tonalite": "Sol mineur",
+    "accords": "i-vii-vi-vii",
+    "batterie": "halftime",
+    "charleston": "8",
+    "arpege": "random",
+    "basse": "pulse",
+    "septiemes": true
+   },
+   "file": "posts/20261120-154747-pov.mp4",
+   "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-154747-pov.mp4",
+   "caption": "POV : tu découvres Ctrl+Alt+C en pleine partie ⌨️\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #fps #astucepc #setupgaming #valorantfr #windows11 #jeuxvideo",
+   "created": "2026-11-20T15:51:03+01:00",
+   "metricool": {
+    "post_id": "435672901",
+    "uuid": "-5215260014448589337",
+    "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=-5215260014448589337",
+    "date": "2026-11-21T00:20:00+01:00"
+   },
+   "status": "programme",
+   "published_at": "2026-11-21T00:20:00+01:00",
+   "deleted_at": null
   }
  ]
 }
