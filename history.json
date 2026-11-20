@@ -337,6 +337,14 @@
    "status": "programme",
    "published_at": "2026-11-20T22:20:00+01:00",
    "deleted_at": null
+  },
+  {
+   "id": "20261120-154056-pov",
+   "format": "pov",
+   "signature": null,
+   "status": "echec",
+   "erreur": "verification : trop proche du POV de 17 h 20 (meme accroche, meme look)",
+   "created": "2026-11-20T15:44:24+01:00"
   }
  ]
 }
