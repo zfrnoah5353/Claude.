@@ -119,6 +119,14 @@
    "status": "programme",
    "published_at": "2026-11-20T17:20:00+01:00",
    "deleted_at": null
+  },
+  {
+   "id": "20261120-152909-vraifaux",
+   "format": "vraifaux",
+   "signature": null,
+   "status": "echec",
+   "erreur": "verification : guillemet fermant seul sur une ligne (corrige : espaces insecables)",
+   "created": "2026-11-20T15:33:23+01:00"
   }
  ]
 }
