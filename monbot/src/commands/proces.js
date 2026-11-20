@@ -6,6 +6,7 @@ import {
   PermissionFlagsBits as P, OverwriteType, GuildScheduledEventPrivacyLevel, GuildScheduledEventEntityType, GuildScheduledEventStatus,
 } from 'discord.js';
 import Anthropic from '@anthropic-ai/sdk';
+import { gemini, geminiActif } from '../gemini.js';
 import { getConfig, kvGet, kvSet, kvList, addTimer } from '../db.js';
 import { err, ok, ts, COLORS } from '../util.js';
 import { sanction as modSanction } from '../modules/moderation.js';
@@ -34,6 +35,9 @@ function parisTime(dateStr, timeStr) {
 // Sans clé : IA gratuite de Pollinations (sans compte). Avec ANTHROPIC_API_KEY dans .env : Claude.
 let ai = null;
 export async function askAI(system, content) {
+  if (!process.env.ANTHROPIC_API_KEY && geminiActif()) {
+    try { return await gemini(system, content); } catch (e) { console.error('Procès IA :', e.message, '→ secours Pollinations'); }
+  }
   if (!process.env.ANTHROPIC_API_KEY) {
     const r = await fetch('https://text.pollinations.ai/openai', {
       method: 'POST', headers: { 'content-type': 'application/json' }, signal: AbortSignal.timeout(120e3),

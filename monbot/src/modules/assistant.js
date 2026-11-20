@@ -3,11 +3,13 @@
 //  - dans le salon #🤖・parler-à-monbot (créé tout seul s'il n'existe pas),
 //  - quand on mentionne @MonBot,
 //  - dans les tickets, au membre qui l'a ouvert, jusqu'à ce que le staff prenne le relais.
-// Sans clé : IA gratuite de Pollinations (sans compte). Avec ANTHROPIC_API_KEY : Claude Haiku.
+// IA utilisée : Claude Haiku si ANTHROPIC_API_KEY, sinon Google Gemini si GEMINI_API_KEY (gratuit),
+// sinon l'IA gratuite de Pollinations (sans compte), et Pollinations en secours si Gemini échoue.
 import { Events, ChannelType } from 'discord.js';
 import Anthropic from '@anthropic-ai/sdk';
 import { getTicket, saveTicket, isTicketStaff } from './tickets.js';
 import { kvGet, kvSet } from '../db.js';
+import { gemini, geminiActif } from '../gemini.js';
 
 export const SALON_IA = '🤖・parler-à-monbot';
 const ANCIEN_SALON = '🤖・parler-à-claude';
@@ -105,7 +107,9 @@ async function repondre(m, contexte) {
       if (r.stop_reason === 'refusal') return m.reply('🤖 Je ne peux pas répondre à ça, désolé.').catch(() => {});
       rep = r.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
     } else {
-      rep = await iaGratuite(texte);
+      rep = geminiActif()
+        ? await gemini(SYSTEM, texte).catch(e => { console.error('Assistant IA :', e.message, '→ secours Pollinations'); return iaGratuite(texte); })
+        : await iaGratuite(texte);
     }
     rep ||= '🤖 …';
     // Discord : 2000 caractères max par message
@@ -142,7 +146,7 @@ async function salonIA(guild) {
 export function setup(client) {
   client.once(Events.ClientReady, async (c) => {
     for (const g of c.guilds.cache.values()) await salonIA(g);
-    if (!process.env.ANTHROPIC_API_KEY) iaGratuite('Réponds juste : OK').then(r => console.log('✅ IA gratuite joignable :', (r || '').slice(0, 40))).catch(e => console.error('❌ IA gratuite injoignable :', e.message));
+    if (!process.env.ANTHROPIC_API_KEY) (geminiActif() ? gemini('Réponds en un mot.', 'Réponds juste : OK') : iaGratuite('Réponds juste : OK')).then(r => console.log(`✅ IA ${geminiActif() ? 'Gemini' : 'gratuite'} joignable :`, (r || '').slice(0, 40))).catch(e => console.error('❌ IA gratuite injoignable :', e.message));
   });
 
   client.on(Events.MessageCreate, async (m) => {
