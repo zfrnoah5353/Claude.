@@ -29,6 +29,36 @@
    "status": "programme",
    "published_at": "2026-11-20T15:18:00+01:00",
    "deleted_at": null
+  },
+  {
+   "id": "20261120-151440-quiz",
+   "format": "quiz",
+   "signature": "quiz|h0|Cinématique/Néon/FPS/Vibrant|{}|c1|tilt",
+   "look": "Cinématique/Néon/FPS/Vibrant",
+   "hook": "Quel look est fait pour toi ?",
+   "musique": {
+    "tempo": 120,
+    "tonalite": "Si majeur",
+    "accords": "I-IV-V-IV",
+    "batterie": "four",
+    "charleston": "off",
+    "arpege": "up",
+    "basse": "off",
+    "septiemes": true
+   },
+   "file": "posts/20261120-151440-quiz.mp4",
+   "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-151440-quiz.mp4",
+   "caption": "A, B, C ou D ? Ton style de jeu choisit ton look 🎨\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #tiktokgaming #jeuxvideo #gamingfr #pcgamer #astucepc #valoranttips #valorantfr #pcgaming",
+   "created": "2026-11-20T15:17:05+01:00",
+   "metricool": {
+    "post_id": "435634283",
+    "uuid": "5519903693450135936",
+    "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=5519903693450135936",
+    "date": "2026-11-20T15:48:00+01:00"
+   },
+   "status": "programme",
+   "published_at": "2026-11-20T15:48:00+01:00",
+   "deleted_at": null
   }
  ]
 }
