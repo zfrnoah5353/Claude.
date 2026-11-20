@@ -345,6 +345,14 @@
    "status": "echec",
    "erreur": "verification : trop proche du POV de 17 h 20 (meme accroche, meme look)",
    "created": "2026-11-20T15:44:24+01:00"
+  },
+  {
+   "id": "20261120-154237-vraifaux",
+   "format": "vraifaux",
+   "signature": null,
+   "status": "echec",
+   "erreur": "verification : meme accroche et description que celui de 22 h 20 ; tampon FAUX peu lisible sur le plan video",
+   "created": "2026-11-20T15:46:48+01:00"
   }
  ]
 }
