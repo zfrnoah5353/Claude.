@@ -383,6 +383,36 @@
    "status": "programme",
    "published_at": "2026-11-21T00:20:00+01:00",
    "deleted_at": null
+  },
+  {
+   "id": "20261120-155019-auto",
+   "format": "auto",
+   "signature": "auto|h2|Vibrant|{\"broll_hook\": true, \"broll_outro\": true}|c4|left",
+   "look": "Vibrant",
+   "hook": "Mode auto en jeu",
+   "musique": {
+    "tempo": 119,
+    "tonalite": "Fa# mineur",
+    "accords": "vi-vii-i-i",
+    "batterie": "halftime",
+    "charleston": "16",
+    "arpege": "updown",
+    "basse": "off",
+    "septiemes": false
+   },
+   "file": "posts/20261120-155019-auto.mp4",
+   "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-155019-auto.mp4",
+   "caption": "Le mode auto en jeu détecte ton jeu au premier plan ⚡\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #cs2 #fortnite #windows11 #pcgamer #gaming #valorantclips #pcgaming #valorantfr",
+   "created": "2026-11-20T15:53:06+01:00",
+   "metricool": {
+    "post_id": "435675079",
+    "uuid": "-567918778367521209",
+    "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=-567918778367521209",
+    "date": "2026-11-21T06:20:00+01:00"
+   },
+   "status": "programme",
+   "published_at": "2026-11-21T06:20:00+01:00",
+   "deleted_at": null
   }
  ]
 }
