@@ -26,6 +26,12 @@ Le bot a des commandes slash : /help liste tout. Tickets pour le support, /flamm
 Dans un ticket, tu fais le premier niveau de support : tu aides à décrire le problème et tu donnes les premières réponses ; pour une sanction, un remboursement, une arnaque ou une décision, tu dis qu'un membre du staff va prendre le relais.
 Tu ne prétends jamais être un humain ni faire des actions que tu ne peux pas faire (bannir, donner des objets, modifier des rôles…).`;
 
+// En message privé : assistant généraliste, comme une conversation normale avec une IA (pas centré sur le serveur).
+const SYSTEM_MP = `Tu es un assistant IA généraliste, dans une conversation privée sur Discord.
+Tu réponds à n'importe quelle question, sur n'importe quel sujet (devoirs, code, jeux, conseils, culture, idées, écriture, traductions…), comme le ferait un grand assistant IA : précis, utile, honnête, et tu dis quand tu n'es pas sûr.
+Réponds dans la langue de la personne (en français par défaut), avec un ton naturel et sympa. Adapte la longueur à la question : court pour une question simple, détaillé si on te demande une explication ou du code. Utilise le Markdown de Discord (gras, listes, blocs de code). Pas de tableau.
+Tu suis la conversation grâce aux messages précédents. Tu ne parles du serveur Discord ou des commandes du bot que si on te le demande.`;
+
 function quota(userId, ownerId) {
   if (userId === ownerId) return true;
   const jour = new Date().toISOString().slice(0, 10);
@@ -38,11 +44,11 @@ function quota(userId, ownerId) {
 
 // Les derniers messages du salon, pour que l'IA suive la conversation.
 async function historique(m) {
-  const msgs = [...(await m.channel.messages.fetch({ limit: 16, before: m.id }).catch(() => new Map())).values()].reverse();
+  const msgs = [...(await m.channel.messages.fetch({ limit: m.guild ? 16 : 30, before: m.id }).catch(() => new Map())).values()].reverse();
   return msgs.filter(x => x.content || x.attachments.size).map(x => {
     const qui = x.author.id === m.client.user.id ? 'MonBot (toi)' : (x.member?.displayName || x.author.username);
     const pj = [...x.attachments.values()].map(a => ` [pièce jointe : ${a.name}]`).join('');
-    return `${qui} : ${(x.content || '').slice(0, 800)}${pj}`;
+    return `${qui} : ${(x.content || '').slice(0, m.guild ? 800 : 3000)}${pj}`;
   }).join('\n');
 }
 
@@ -51,11 +57,11 @@ async function historique(m) {
 // les questions passent une par une, et on attend puis on réessaie quand elle demande de patienter.
 let file = Promise.resolve();
 const attendre = (ms) => new Promise(r => setTimeout(r, ms));
-async function appelGratuit(texte) {
+async function appelGratuit(system, texte) {
   for (let essai = 0; essai < 4; essai++) {
     const r = await fetch('https://text.pollinations.ai/openai', {
       method: 'POST', headers: { 'content-type': 'application/json' }, signal: AbortSignal.timeout(90e3),
-      body: JSON.stringify({ model: 'openai', referrer: 'monbot', messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content: texte }] }),
+      body: JSON.stringify({ model: 'openai', referrer: 'monbot', messages: [{ role: 'system', content: system }, { role: 'user', content: texte }] }),
     });
     if (r.ok) return (await r.json())?.choices?.[0]?.message?.content?.trim();
     const corps = await r.text().catch(() => '');
@@ -68,8 +74,8 @@ async function appelGratuit(texte) {
   }
   throw new Error('IA gratuite : trop de demandes, réessaie plus tard');
 }
-function iaGratuite(texte) {
-  const p = file.then(() => appelGratuit(texte));
+function iaGratuite(texte, system = SYSTEM) {
+  const p = file.then(() => appelGratuit(system, texte));
   file = p.catch(() => {});
   return p;
 }
@@ -86,6 +92,7 @@ async function repondre(m, contexte) {
   await m.channel.sendTyping().catch(() => {});
   const typing = setInterval(() => m.channel.sendTyping().catch(() => {}), 8000);
   try {
+    const sys = m.guild ? SYSTEM : SYSTEM_MP;
     const hist = await historique(m);
     const nom = m.member?.displayName || m.author.username;
     const texte = [
@@ -99,17 +106,17 @@ async function repondre(m, contexte) {
     if (process.env.ANTHROPIC_API_KEY) {
       ai ??= new Anthropic();
       const r = await ai.messages.create({
-        model: MODEL, max_tokens: 2000,
+        model: MODEL, max_tokens: 4000,
         output_config: { effort: 'low' },
-        system: SYSTEM,
+        system: sys,
         messages: [{ role: 'user', content: texte }],
       });
       if (r.stop_reason === 'refusal') return m.reply('🤖 Je ne peux pas répondre à ça, désolé.').catch(() => {});
       rep = r.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
     } else {
       rep = geminiActif()
-        ? await gemini(SYSTEM, texte).catch(e => { console.error('Assistant IA :', e.message, '→ secours Pollinations'); return iaGratuite(texte); })
-        : await iaGratuite(texte);
+        ? await gemini(sys, texte).catch(e => { console.error('Assistant IA :', e.message, '→ secours Pollinations'); return iaGratuite(texte, sys); })
+        : await iaGratuite(texte, sys);
     }
     rep ||= '🤖 …';
     // Discord : 2000 caractères max par message
