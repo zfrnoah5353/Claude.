@@ -1,0 +1,63 @@
+{
+ "id": "20261120-234151-v2pov",
+ "created": "2026-11-20T23:44:05+01:00",
+ "format": "v2pov",
+ "signature": "v2pov|h3|Néon|{\"looks\": [\"Néon\", \"FPS\", \"Cinématique\", \"Vibrant\"]}|c1|left",
+ "seed": 2065665859,
+ "hook": "POV : ton pote voit ton écran",
+ "look": "Néon",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_a.jpg",
+  "scene_b.jpg"
+ ],
+ "plans": [
+  "mk51609_1.mp4"
+ ],
+ "musique": {
+  "tempo": 125,
+  "tonalite": "Sol mineur",
+  "accords": "i-vi-iii-vii",
+  "batterie": "halftime",
+  "charleston": "8",
+  "arpege": "random",
+  "basse": "off",
+  "septiemes": false
+ },
+ "caption": "POV : tu découvres ColorTweaks 😳\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #astucepc #gaming #fps #valoranttips #gamer #pcgamer #pcgaming #windows11",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#astucepc",
+  "#gaming",
+  "#fps",
+  "#valoranttips",
+  "#gamer",
+  "#pcgamer",
+  "#pcgaming",
+  "#windows11"
+ ],
+ "file": "posts/20261120-234151-v2pov.mp4",
+ "controles": {
+  "duree": 12.2,
+  "son_moyen_db": -14.5,
+  "son_crete_db": -0.5,
+  "bandes": [
+   [
+    133.43944444444443,
+    63.53945767195767
+   ],
+   [
+    57.122638888888886,
+    35.77916005291005
+   ],
+   [
+    70.3695171957672,
+    43.08472883597884
+   ]
+  ],
+  "taille_mo": 5.36,
+  "planche": "/home/user/Claude./work/20261120-234151-v2pov/planche.jpg"
+ },
+ "problemes": []
+}
