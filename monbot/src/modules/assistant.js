@@ -57,7 +57,7 @@ async function appelGratuit(texte) {
     });
     if (r.ok) return (await r.json())?.choices?.[0]?.message?.content?.trim();
     const corps = await r.text().catch(() => '');
-    if (r.status === 402 || r.status === 429) {
+    if ([402, 429, 502, 503, 504].includes(r.status)) {
       const s = Number(corps.match(/after (\d+)\s*s/i)?.[1] || r.headers.get('retry-after') || 45);
       await attendre((Math.min(s, 60) + 1) * 1000);
       continue;

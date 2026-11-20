@@ -20,7 +20,7 @@ const { default: db } = await import('./db.js');
 let enCours = false;
 async function tick(raison) {
   if (enCours) return; enCours = true;
-  try { await sauvegarder(db); console.log(`💾 Sauvegarde (${raison}) envoyée.`); }
+  try { if (await sauvegarder(db)) console.log(`💾 Sauvegarde (${raison}) envoyée.`); }
   catch (e) { console.error('Sauvegarde ratée :', e.message); }
   finally { enCours = false; }
 }

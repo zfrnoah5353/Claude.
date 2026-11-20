@@ -3,6 +3,7 @@
 //   dans le salon caché #monbot-sauvegarde du serveur, et récupérée au démarrage.
 // - L'offre gratuite endort le service après 15 min sans visite : le bot visite sa propre adresse.
 import { readFile, writeFile, rm } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
 
 const API = 'https://discord.com/api/v10';
@@ -59,20 +60,28 @@ export async function restaurer() {
   const buf = Buffer.from(await (await fetch(a.url)).arrayBuffer());
   for (const ext of ['', '-wal', '-shm']) await rm(DB_PATH + ext, { force: true });
   await writeFile(DB_PATH, buf);
-  console.log(`✅ Base restaurée depuis la sauvegarde du ${new Date(m.timestamp).toLocaleString('fr-FR')} (${Math.round(buf.length / 1024)} Ko).`);
+  dernierHash = empreinte(buf);
+  console.log(`✅ Base restaurée depuis la sauvegarde du ${new Date(m.edited_timestamp || m.timestamp).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })} (${Math.round(buf.length / 1024)} Ko).`);
 }
 
+// Un seul message de sauvegarde, modifié à chaque fois (pas de nouveau message = pas de notification),
+// et seulement si la base a changé depuis la dernière sauvegarde.
+let dernierHash = null;
+const empreinte = (buf) => createHash('sha256').update(buf).digest('hex');
 export async function sauvegarder(db) {
   const snap = '/tmp/monbot-snap.db';
   await rm(snap, { force: true });
   db.exec(`VACUUM INTO '${snap}'`); // copie cohérente même pendant que le bot écrit
   const data = await readFile(snap);
+  const h = empreinte(data);
+  if (h === dernierHash) return false;
   const s = await getSalon(true);
   const avant = await derniereSauvegarde(s);
   const form = new FormData();
-  form.append('payload_json', JSON.stringify({ content: `💾 Sauvegarde automatique · <t:${Math.floor(Date.now() / 1000)}:f>` }));
+  form.append('payload_json', JSON.stringify({ content: `💾 Sauvegarde automatique · <t:${Math.floor(Date.now() / 1000)}:f>`, attachments: [{ id: 0, filename: FILE }] }));
   form.append('files[0]', new Blob([data]), FILE);
-  await discord(`/channels/${s.id}/messages`, { method: 'POST', body: form });
-  if (avant) await discord(`/channels/${s.id}/messages/${avant.id}`, { method: 'DELETE' }).catch(() => {});
+  if (avant) await discord(`/channels/${s.id}/messages/${avant.id}`, { method: 'PATCH', body: form });
+  else await discord(`/channels/${s.id}/messages`, { method: 'POST', body: form });
+  dernierHash = h;
+  return true;
 }
-
