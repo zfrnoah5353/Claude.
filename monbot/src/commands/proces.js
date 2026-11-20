@@ -121,7 +121,7 @@ async function startHearing(guild, p, k) {
   await ch?.send({ content: `🔔 ${people(p).map(id => `<@${id}>`).join(' ')}\n# ⚖️ L'audience est ouverte !\nRejoignez <#${p.voice}>. Le juge <@${p.juge}> mène les débats. Déposez vos preuves avec \`/proces preuve\`.`, allowedMentions: { users: people(p) } }).catch(() => {});
 }
 
-async function endVote(client, k) {
+async function endVote(client, k, { sansIA = false } = {}) {
   const p = getP(k); if (!p?.vote || p.vote.ended) return;
   const guild = client.guilds.cache.get(p.guild); const ch = guild?.channels.cache.get(p.text);
   const vals = Object.values(p.vote.votes); const g = vals.filter(v => v === 'g').length; const n = vals.length - g;
@@ -130,7 +130,8 @@ async function endVote(client, k) {
   const msg = ch && await ch.messages.fetch(p.vote.msg).catch(() => null);
   await msg?.edit({ components: [voteRow(k, true)] }).catch(() => {});
   await ch?.send({ embeds: [new EmbedBuilder().setColor(GOLD).setTitle('🗳️ Résultat du vote du public')
-    .setDescription(`🔴 **Coupable :** ${g} (${pct(g)} %)\n🟢 **Non coupable :** ${n} (${pct(n)} %)\n\nLe juge <@${p.juge}> va maintenant rendre son verdict avec \`/proces verdict\`.`)] }).catch(() => {});
+    .setDescription(`🔴 **Coupable :** ${g} (${pct(g)} %)\n🟢 **Non coupable :** ${n} (${pct(n)} %)\n\n${p.jugeIA ? '🤖 **Claude, le juge, se retire pour délibérer…**' : `Le juge <@${p.juge}> va maintenant rendre son verdict avec \`/proces verdict\`.`}`)] }).catch(() => {});
+  if (p.jugeIA && !sansIA && guild && ch) await verdictIA(guild, k, ch).catch(e => ch.send(`❌ Claude n'a pas pu rendre son verdict : ${e.message}. Le juge ou l'owner peut le faire avec \`/proces verdict\`.`).catch(() => {}));
 }
 const voteRow = (k, done) => new ActionRowBuilder().addComponents(
   new ButtonBuilder().setCustomId(`proces:vote:${k}:g`).setLabel('Coupable').setEmoji('🔴').setStyle(ButtonStyle.Danger).setDisabled(!!done),
@@ -157,9 +158,57 @@ sub(data, 'vote', 'Lancer le vote du public (juge)', s => s.addIntegerOption(o =
 sub(data, 'verdict', 'Rendre le verdict et clore le procès (juge)', s => s
   .addStringOption(o => o.setName('decision').setDescription('Décision').setRequired(true).addChoices({ name: 'Coupable', value: 'Coupable' }, { name: 'Non coupable', value: 'Non coupable' }))
   .addStringOption(o => o.setName('sanction').setDescription('Appliquée auto si coupable (ex : mute 30 minutes, honte 2 jours, ban 1 jour, kick, warn)').setMaxLength(300)));
+sub(data, 'juge-ia', 'Faire de Claude (l\'IA) le juge de ce procès (owner)', s => s.addBooleanOption(o => o.setName('actif').setDescription('Oui : Claude juge · Non : le juge humain reprend la main')));
 sub(data, 'infos', 'Voir la fiche du procès de ce salon');
 sub(data, 'annuler', 'Annuler ce procès (owner)');
 sub(data, 'installer', 'Créer / réparer la catégorie Tribunal et le bouton de demande (owner)');
+
+// --- Verdict (commun au juge humain et à Claude) : sanction appliquée, motivation, annonce, salons verrouillés
+async function rendreVerdict(guild, k, decision, sanction, { motivation = '', par, salon }) {
+  const cfg = getConfig(guild.id).proces;
+  const q = getP(k);
+  if (decision === 'Coupable' && sanction) {
+    const res = await applySanction(guild, q, sanction, cfg.aiEnabled);
+    sanction = `${sanction}\n${res}`;
+  }
+  if (!motivation && cfg.aiEnabled) {
+    motivation = await askAI(AI_SYSTEM, `Voici le dossier.\n\n${await dossier(guild, q)}\n\nLe juge a décidé : ${decision}${sanction ? `, sanction : ${sanction}` : ''}. Rédige la motivation officielle du jugement, solennelle et un peu drôle, en 8 lignes maximum, qui s'appuie sur les preuves et le vote du public. N'invente aucun fait.`).catch(() => '');
+  }
+  q.closed = true; q.verdict = decision + (sanction ? ` — ${sanction}` : ''); saveP(k, q);
+  const e = new EmbedBuilder().setColor(decision === 'Coupable' ? COLORS.err : COLORS.ok).setTitle(`🔨 VERDICT — procès n°${q.n}`)
+    .setDescription([`L'accusé <@${q.accuse}> est déclaré **${decision.toUpperCase()}**.`, sanction ? `**Sanction :** ${sanction}` : '', q.vote?.result ? `🗳️ Vote du public : ${q.vote.result}` : '', motivation ? `\n**Motivation :**\n${motivation}` : ''].filter(Boolean).join('\n').slice(0, 4000))
+    .setFooter({ text: `Rendu par ${par}` }).setTimestamp();
+  const content = `${[q.accuse, q.accusateur].map(id => `<@${id}>`).join(' ')}`;
+  const ann = cfg.announceChannel && guild.channels.cache.get(cfg.announceChannel);
+  if (ann && ann.id !== salon) await ann.send({ embeds: [e] }).catch(() => {});
+  await applyPerms(guild, q, true);
+  const ev = q.event && await guild.scheduledEvents.fetch(q.event).catch(() => null);
+  if (ev?.status === GuildScheduledEventStatus.Active) await ev.setStatus(GuildScheduledEventStatus.Completed).catch(() => {});
+  else if (ev) await ev.delete().catch(() => {});
+  return { content, embeds: [e] };
+}
+
+// --- Claude juge : il lit tout le dossier et le vote, puis décide. Sanctions légères seulement (pas de ban ni de kick).
+const JUGE_SYSTEM = `Tu es le JUGE d'un procès pour rire organisé sur un serveur Discord francophone (jeu de rôle entre amis).
+Tu décides seul, de façon juste : tu t'appuies sur les preuves, les débats et le vote du public (que tu peux contredire si les preuves vont dans l'autre sens).
+Sanctions autorisées UNIQUEMENT si coupable : "warn", "mute X minutes" (60 minutes maximum) ou "honte X heures" (24 heures maximum). Jamais de ban ni de kick. Tu peux aussi ne donner aucune sanction.
+Réponds UNIQUEMENT avec ce JSON, sans rien autour : {"decision":"Coupable" ou "Non coupable","sanction":"texte de la sanction ou chaîne vide","motivation":"la motivation du jugement, solennelle et un peu drôle, 8 lignes maximum, en français, sans inventer de fait"}`;
+async function verdictIA(guild, k, ch) {
+  const cfg = getConfig(guild.id).proces;
+  if (!cfg.aiEnabled) throw new Error('l\'IA est désactivée dans le panel (module Procès)');
+  const q = getP(k); if (!q || q.closed) return;
+  await ch.sendTyping().catch(() => {});
+  const out = await askAI(JUGE_SYSTEM, `Voici le dossier complet.\n\n${await dossier(guild, q)}`);
+  const j = JSON.parse(out.match(/\{[\s\S]*\}/)?.[0] || 'null');
+  if (!j || !['Coupable', 'Non coupable'].includes(j.decision)) throw new Error('réponse de l\'IA illisible');
+  let sanction = j.decision === 'Coupable' ? String(j.sanction || '').slice(0, 200) : '';
+  // Garde-fou : on ne laisse passer que des sanctions légères
+  const s = sanction && readSanction(sanction);
+  if (s && (['ban', 'kick'].includes(s.type) || (s.type === 'mute' && s.ms > 3600e3) || (s.type === 'honte' && s.ms > 86400e3))) sanction = 'warn';
+  if (sanction && !s) sanction = '';
+  const msg = await rendreVerdict(guild, k, j.decision, sanction, { motivation: String(j.motivation || '').slice(0, 1800), par: '🤖 Claude, juge IA', salon: ch.id });
+  await ch.send(msg);
+}
 
 // --- Sanction du verdict : « mute 30 minutes », « ban 2 jours », « kick », « warn »… appliquée automatiquement
 const UNITS = [[/^(s|sec|secondes?)$/, 1e3], [/^(m|mn|mins?|minutes?)$/, 60e3], [/^(h|hr|heures?)$/, 3600e3], [/^(j|d|jours?|days?)$/, 86400e3], [/^(sem|semaines?|w|weeks?)$/, 604800e3], [/^mois$/, 2592000e3]];
@@ -433,6 +482,14 @@ export const commands = [{
         return i.editReply({ embeds: [new EmbedBuilder().setColor(GOLD).setTitle(`🤖 Analyse du greffier IA — procès n°${p.n}`).setDescription(txt.slice(0, 4000)).setFooter({ text: 'L\'IA aide le juge mais ne décide pas.' })] });
       } catch (e) { return i.editReply(err(e.message)); }
     }
+    if (s === 'juge-ia') {
+      if (!isOwner(i)) return i.reply(err('Seul l\'owner peut faire de Claude le juge.'));
+      if (!cfg.aiEnabled) return i.reply(err('L\'IA est désactivée dans le panel (module Procès).'));
+      p.jugeIA = i.options.getBoolean('actif') ?? true; saveP(k, p);
+      return i.reply(p.jugeIA
+        ? { embeds: [new EmbedBuilder().setColor(GOLD).setTitle('🤖⚖️ Claude est le juge de ce procès').setDescription(`À la fin du **vote du public** (\`/proces vote\`), Claude lira tout le dossier (preuves, débats, vote) et rendra le verdict **tout seul**.\nSanctions possibles : avertissement, mute (1 h max) ou honte (24 h max). Jamais de ban ni de kick.\nL'owner peut toujours rendre le verdict lui-même avec \`/proces verdict\`.`)] }
+        : ok(`Claude n'est plus juge : <@${p.juge}> reprend la main.`));
+    }
     if (s === 'vote') {
       if (!isJudge) return i.reply(err('Seul le juge peut lancer le vote.'));
       if (p.vote && !p.vote.ended) return i.reply(err('Un vote est déjà en cours.'));
@@ -446,31 +503,10 @@ export const commands = [{
     }
     if (s === 'verdict') {
       if (!isJudge) return i.reply(err('Seul le juge rend le verdict.'));
-      if (p.vote && !p.vote.ended) await endVote(i.client, k);
+      if (p.vote && !p.vote.ended) await endVote(i.client, k, { sansIA: true });
       await i.deferReply();
-      const q = getP(k); const decision = i.options.getString('decision');
-      let sanction = i.options.getString('sanction');
-      // Coupable + sanction citée -> le bot l'applique tout seul (l'IA aide à la comprendre si besoin)
-      if (decision === 'Coupable' && sanction) {
-        const res = await applySanction(i.guild, q, sanction, cfg.aiEnabled);
-        sanction = `${sanction}\n${res}`;
-      }
-      let motivation = '';
-      if (cfg.aiEnabled) {
-        motivation = await askAI(AI_SYSTEM, `Voici le dossier.\n\n${await dossier(i.guild, q)}\n\nLe juge a décidé : ${decision}${sanction ? `, sanction : ${sanction}` : ''}. Rédige la motivation officielle du jugement, solennelle et un peu drôle, en 8 lignes maximum, qui s'appuie sur les preuves et le vote du public. N'invente aucun fait.`).catch(() => '');
-      }
-      q.closed = true; q.verdict = decision + (sanction ? ` — ${sanction}` : ''); saveP(k, q);
-      const e = new EmbedBuilder().setColor(decision === 'Coupable' ? COLORS.err : COLORS.ok).setTitle(`🔨 VERDICT — procès n°${q.n}`)
-        .setDescription([`L'accusé <@${q.accuse}> est déclaré **${decision.toUpperCase()}**.`, sanction ? `**Sanction :** ${sanction}` : '', q.vote?.result ? `🗳️ Vote du public : ${q.vote.result}` : '', motivation ? `\n**Motivation :**\n${motivation}` : ''].filter(Boolean).join('\n').slice(0, 4000))
-        .setFooter({ text: `Rendu par le juge ${i.member.displayName}` }).setTimestamp();
-      await i.editReply({ content: `${[q.accuse, q.accusateur].map(id => `<@${id}>`).join(' ')}`, embeds: [e] });
-      const ann = cfg.announceChannel && i.guild.channels.cache.get(cfg.announceChannel);
-      if (ann && ann.id !== i.channelId) await ann.send({ embeds: [e] }).catch(() => {});
-      await applyPerms(i.guild, q, true);
-      const ev = q.event && await i.guild.scheduledEvents.fetch(q.event).catch(() => null);
-      if (ev?.status === GuildScheduledEventStatus.Active) await ev.setStatus(GuildScheduledEventStatus.Completed).catch(() => {});
-      else if (ev) await ev.delete().catch(() => {});
-      return;
+      const msg = await rendreVerdict(i.guild, k, i.options.getString('decision'), i.options.getString('sanction'), { par: `le juge ${i.member.displayName}`, salon: i.channelId });
+      return i.editReply(msg);
     }
     if (s === 'annuler') {
       if (!isOwner(i)) return i.reply(err('Seul l\'owner peut annuler un procès.'));
