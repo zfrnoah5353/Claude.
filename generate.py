@@ -30,7 +30,9 @@ WORK = os.path.join(ROOT, "work")
 HISTORY = os.path.join(ROOT, "history.json")
 ERRORS = os.path.join(ROOT, "errors.log")
 TZ = ZoneInfo("Europe/Paris")
-FORMATS = ["quiz", "tuto", "avantapres", "raccourcis", "auto", "fonctions", "jeux", "pov", "vraifaux"]
+FORMATS_V1 = ["quiz", "tuto", "avantapres", "raccourcis", "auto", "fonctions", "jeux", "pov", "vraifaux"]
+FORMATS_V2 = ["v2choc", "v2pov", "v2question", "v2astuce"]
+FORMATS = FORMATS_V2 + FORMATS_V1
 PRESETS = ["Naturel", "Vibrant", "Néon", "Cinématique", "FPS"]
 HL = lambda s: f'<span class="hl">{s}</span>'
 
@@ -232,6 +234,58 @@ def broll_sources(rng, workdir, n=4):
     return out
 
 
+
+# ---------------------------------------------------------------- style v2 (natif TikTok)
+V2_HOOKS = {
+    "v2choc": ["Tes couleurs sont [fades] ?", "Ton VALORANT est trop [terne]", "Arrête de jouer en [gris]", "Ton écran mérite [mieux]"],
+    "v2pov": ["POV : t’actives le mode [Néon]", "POV : t’as trouvé le [réglage]", "POV : ton écran [se réveille]", "POV : ton pote voit ton [écran]"],
+    "v2question": ["Lequel tu prends ? [1, 2 ou 3]", "Tu choisis [lequel] ?", "Ton look [préféré] ?", "[1, 2 ou 3] ? Dis-le en com"],
+    "v2astuce": ["Astuce [Windows 11] pour tes jeux", "Le filtre [gratuit] que t’as pas", "Ça s’active en [2 touches]", "Même jeu, [autres couleurs]"],
+}
+V2_SUBS = ["regarde bien", "attends 2 sec", "attends la fin", None]
+V2_REVEAL = ["[Même partie.] Juste un filtre", "Un raccourci : [Ctrl+Alt+C]", "Look [{p}]", "Et là, [{p}]", "[Avant] / [après]"]
+V2_LINES = ["[Gratuit.] Sans compte.", "Marche sur [6 jeux]", "Ça touche [pas] au jeu", "[2 touches] et c’est réglé", "Tout est [réversible]",
+            "Fait pour [Windows 11]"]
+V2_HL = ["#ffe14d", "#3be38f", "#5ef0ff", "#ff7ad9"]
+V2_CAPTIONS = {
+    "v2choc": ["Tes couleurs sont fades ? Regarde jusqu’au bout 👀", "Ton jeu peut être bien plus vivant 🎨", "Avant ou après ? 👇"],
+    "v2pov": ["POV : tu découvres ColorTweaks 😳", "POV : ton écran passe en mode {p} ⚡", "Ton pote va te demander ton réglage 👀"],
+    "v2question": ["1, 2 ou 3 ? Réponds en commentaire 👇", "Lequel tu gardes ? 👇", "Ton look préféré en com 👇"],
+    "v2astuce": ["L’astuce Windows 11 pour des couleurs plus vives 🎮", "Un filtre gratuit pour tes jeux 🎨", "2 touches, et ton jeu change de couleurs ⌨️"],
+}
+
+
+CURRENT_LOOK = {}
+
+
+def build_v2(fmt, rng, hook_i):
+    strong = ["Néon", "Vibrant", "FPS"]
+    rng.shuffle(strong)
+    rest = ["Cinématique", "Naturel"]
+    rng.shuffle(rest)
+    looks = strong[:1] + rng.sample(strong[1:] + rest, 4)
+    main = looks[0]
+    gp = rng.randrange(2)
+    hook = {"type": "v2hook", "dur": 1.8, "text": V2_HOOKS[fmt][hook_i], "sub": rng.choice(V2_SUBS), "gp": gp,
+            "top": rng.choice([300, 330, 360])}
+    reveal = {"type": "v2reveal", "dur": 3.2, "preset": main, "gp": gp,
+              "text": rng.choice(V2_REVEAL).replace("{p}", main)}
+    cuts = {"type": "v2cuts", "dur": 3.0, "presets": looks[1:4], "gp": gp + 1}
+    line = {"type": "v2line", "dur": 1.8, "text": rng.choice(V2_LINES), "br": rng.randrange(20)}
+    cta = {"type": "v2cta", "dur": 2.4, "preset": main, "gp": gp}
+    if fmt == "v2choc":
+        scenes = [hook, reveal, cuts, line, cta]
+    elif fmt == "v2pov":
+        scenes = [hook, reveal, line, cuts, cta]
+    elif fmt == "v2question":
+        cuts = {**cuts, "presets": looks[:3], "dur": 3.6}
+        scenes = [hook, cuts, {**reveal, "preset": looks[0], "text": "Moi je prends [" + looks[0] + "]"}, cta]
+        main = "/".join(looks[:3])
+    else:
+        scenes = [hook, reveal, line, cuts, cta]
+    CURRENT_LOOK["main"] = looks[0]
+    return scenes, main, True, {"looks": looks[:4]}
+
 # ---------------------------------------------------------------- scripts (formats)
 def build_script(fmt, rng, hook_i):
     lines, kicker, sub = HOOKS[fmt][hook_i]
@@ -389,8 +443,9 @@ def recent_captions(n=10):
 
 def caption_for(fmt, rng, filt, gp_kind, games_tags):
     used = recent_captions()
-    options = [c for c in CAPTIONS[fmt] if c not in used] or CAPTIONS[fmt]
-    hook = rng.choice(options)
+    pool = V2_CAPTIONS[fmt] if fmt.startswith("v2") else CAPTIONS[fmt]
+    options = [c for c in pool if c not in used] or pool
+    hook = rng.choice(options).replace("{p}", CURRENT_LOOK.get("main", "Néon"))
     lines = [hook, "", "⬇️ Lien en bio pour le télécharger : gratuit, Windows 11."]
     if filt:
         lines.append("*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.")
@@ -420,8 +475,8 @@ def verify(path, report, workdir):
     for k, val in exp.items():
         if v.get(k) != val:
             problems.append(f"video {k}={v.get(k)} (attendu {val})")
-    if not (18.0 <= dur <= 25.0):
-        problems.append(f"duree {dur:.2f}s hors 18-25 s")
+    if not (10.0 <= dur <= 25.0):
+        problems.append(f"duree {dur:.2f}s hors 10-25 s")
     if not a:
         problems.append("pas de piste audio")
     else:
@@ -492,11 +547,12 @@ def generate_once(fmt_req=None, seed=None):
     used = {p.get("signature") for p in known}
     # choix d'une combinaison jamais utilisee, format different du precedent
     for _ in range(200):
-        fmt = fmt_req or rng.choice([f for f in FORMATS if f != last_fmt])
-        hook_i = rng.randrange(len(HOOKS[fmt]))
+        fmt = fmt_req or rng.choice([f for f in FORMATS_V2 if f != last_fmt])
+        is_v2 = fmt.startswith("v2")
+        hook_i = rng.randrange(len(V2_HOOKS[fmt] if is_v2 else HOOKS[fmt]))
         sub_seed = rng.randrange(2**31)
         srng = random.Random(sub_seed)
-        scenes, preset, filt, variant = build_script(fmt, srng, hook_i)
+        scenes, preset, filt, variant = (build_v2 if is_v2 else build_script)(fmt, srng, hook_i)
         halos_i = rng.randrange(len(HALOS))
         text_in = rng.choice(["up", "tilt", "left"])
         sig = f"{fmt}|h{hook_i}|{preset}|{json.dumps(variant, ensure_ascii=False, sort_keys=True)}|c{halos_i}|{text_in}"
@@ -515,9 +571,12 @@ def generate_once(fmt_req=None, seed=None):
     os.makedirs(POSTS, exist_ok=True)
     gp = gameplay_sources(srng, workdir)
     gp_kind = gp[0]["kind"] if gp else None
-    n_br = sum(1 for sc in scenes if sc.get("broll") or sc["type"] == "brollText")
+    n_br = sum(1 for sc in scenes if sc.get("broll") or sc["type"] in ("brollText", "v2line"))
     br = broll_sources(srng, workdir, n_br) if n_br else []
-    cfg = {"seed": seed, "halos": HALOS[halos_i], "style": {"textIn": text_in}, "scenes": scenes,
+    style = {"textIn": text_in}
+    if fmt.startswith("v2"):
+        style.update({"v2": True, "hl": srng.choice(V2_HL)})
+    cfg = {"seed": seed, "halos": HALOS[halos_i], "style": style, "scenes": scenes,
            "gameplay": {"sources": gp}, "broll": br}
     total = sum(s["dur"] for s in scenes)
     log(f"Format : {fmt} | accroche {hook_i} | look {preset} | {total:.1f} s | gameplay : {gp_kind} ({len(gp)} source(s))")
@@ -554,8 +613,8 @@ def generate_once(fmt_req=None, seed=None):
     caption, cap_hook, tags = caption_for(fmt, srng, filt, gp_kind, fmt in ("auto", "jeux", "vraifaux"))
     meta = {
         "id": vid, "created": datetime.now(TZ).isoformat(timespec="seconds"), "format": fmt, "signature": sig,
-        "seed": seed, "hook": " ".join(html.unescape(l).replace('<span class="hl">', "").replace("</span>", "")
-                                       for l in HOOKS[fmt][hook_i][0]),
+        "seed": seed, "hook": (V2_HOOKS[fmt][hook_i].replace("[", "").replace("]", "") if fmt.startswith("v2") else
+                 " ".join(html.unescape(l).replace('<span class="hl">', "").replace("</span>", "") for l in HOOKS[fmt][hook_i][0])),
         "look": preset, "filtre_reproduit": filt, "gameplay": [g["name"] for g in gp], "plans": [b["name"] for b in br], "musique": minfo,
         "caption": caption, "hashtags": tags, "file": f"posts/{vid}.mp4", "controles": checks, "problemes": problems,
     }

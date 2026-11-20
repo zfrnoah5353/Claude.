@@ -176,6 +176,7 @@
   }
 
   function drawChrome(t, dur) {
+    if (window.CONFIG.style && window.CONFIG.style.v2) { document.getElementById('header').style.display = 'none'; document.getElementById('footer').style.display = 'none'; }
     for (const o of window.__halos || []) {
       const dx = Math.sin(t * o.sp + o.ph) * o.amp, dy = Math.cos(t * o.sp * 0.8 + o.ph) * o.amp;
       o.h.style.transform = `translate(${dx.toFixed(1)}px,${dy.toFixed(1)}px)`;
@@ -201,7 +202,7 @@
   // verifie qu'aucun texte ne deborde (appele aux images cles)
   function checkLayout() {
     const bad = [];
-    document.querySelectorAll('.scene .txt, .scene .card, .scene .app').forEach(n => {
+    document.querySelectorAll('.scene .txt, .scene .card, .scene .app, .scene .v2cap').forEach(n => {
       if (n.closest('.scene').style.display === 'none') return;
       const cs = getComputedStyle(n);
       if (+cs.opacity < 0.95 || cs.visibility === 'hidden') return;

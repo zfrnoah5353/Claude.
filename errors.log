@@ -2,3 +2,4 @@
 [2026-11-20T15:34:39+01:00] generation : controle echoue : t=11.60s contenu coupe dans un bloc: "AccueilPanneau couleursJeuxProfilsPerfor" ; t=11.60s hors cadre: "Maquette de l’interface" [0,1528,1080,1561] ; t=11.60s hors cadre: "*rendu du filtre reproduit au montage" [90,1566,990,1604] ; t=12.93s contenu coupe dans un bloc: "AccueilPanneau couleursJeuxProfilsPerfor" ; t=12.93s hors cadre: "Maquette de l’interface" [0,1528,1080,1561] ; t=12.93s hors cadre: "*rendu du filtre reproduit au montage" [90,1566,990,1604]
 [2026-11-20T15:44:24+01:00] verification 20261120-154056-pov : trop proche du POV de 17 h 20 (meme accroche, meme look)
 [2026-11-20T15:46:48+01:00] verification 20261120-154237-vraifaux : meme accroche et description que celui de 22 h 20 ; tampon FAUX peu lisible sur le plan video
+[2026-11-20T23:39:16+01:00] generation : controle echoue : bande sombre unie a t=6.1s (haut 41, bas 20)

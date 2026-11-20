@@ -429,6 +429,8 @@
     },
   };
 
+  Object.assign(BUILD, window.V2_BUILD || {});
+  if (CFG.style && CFG.style.hl) document.documentElement.style.setProperty('--hl', CFG.style.hl);
   // ---------- construction ----------
   window.__stageLayout(CFG);
   let t = 0;
