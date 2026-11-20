@@ -244,9 +244,10 @@
     "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=-1225554402048192834",
     "date": "2026-11-21T04:20:00+01:00"
    },
-   "status": "programme",
+   "status": "remplace",
    "published_at": "2026-11-21T04:20:00+01:00",
-   "deleted_at": null
+   "deleted_at": null,
+   "remplace_par": "20261120-234702-v2question"
   },
   {
    "id": "20261120-153749-raccourcis",
@@ -443,6 +444,36 @@
    },
    "status": "programme",
    "published_at": "2026-11-21T00:20:00+01:00",
+   "deleted_at": null
+  },
+  {
+   "id": "20261120-234702-v2question",
+   "format": "v2question",
+   "signature": "v2question|h2|Néon/FPS/Naturel|{\"looks\": [\"Néon\", \"FPS\", \"Naturel\", \"Cinématique\"]}|c1|tilt",
+   "look": "Néon/FPS/Naturel",
+   "hook": "Ton look préféré ?",
+   "musique": {
+    "tempo": 117,
+    "tonalite": "Ré majeur",
+    "accords": "I-III-IV-V",
+    "batterie": "four",
+    "charleston": "16",
+    "arpege": "updown",
+    "basse": "8",
+    "septiemes": true
+   },
+   "file": "posts/20261120-234702-v2question.mp4",
+   "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-234702-v2question.mp4",
+   "caption": "Lequel tu gardes ? 👇\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #pcgaming #astucepc #gamer #windows11 #pcgamer #valoranttips",
+   "created": "2026-11-20T23:49:02+01:00",
+   "metricool": {
+    "post_id": "436177446",
+    "uuid": "-1225554402048192834",
+    "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=-1225554402048192834",
+    "date": "2026-11-21T04:20:00+01:00"
+   },
+   "status": "programme",
+   "published_at": "2026-11-21T04:20:00+01:00",
    "deleted_at": null
   }
  ]
