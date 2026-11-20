@@ -507,6 +507,36 @@
    "status": "programme",
    "published_at": "2026-11-21T02:20:00+01:00",
    "deleted_at": null
+  },
+  {
+   "id": "20261120-235401-v2astuce",
+   "format": "v2astuce",
+   "signature": "v2astuce|h0|Vibrant|{\"looks\": [\"Vibrant\", \"FPS\", \"Naturel\", \"Cinématique\"]}|c3|up",
+   "look": "Vibrant",
+   "hook": "Astuce Windows 11 pour tes jeux",
+   "musique": {
+    "tempo": 99,
+    "tonalite": "Mi majeur",
+    "accords": "VI-IV-I-V",
+    "batterie": "halftime",
+    "charleston": "off",
+    "arpege": "down",
+    "basse": "8",
+    "septiemes": true
+   },
+   "file": "posts/20261120-235401-v2astuce.mp4",
+   "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-235401-v2astuce.mp4",
+   "caption": "L’astuce Windows 11 pour des couleurs plus vives 🎮\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #pcgaming #valorantclips #fps #astucepc #pcgamer #gamingfr #gaming #setupgaming",
+   "created": "2026-11-20T23:56:09+01:00",
+   "metricool": {
+    "post_id": "436180828",
+    "uuid": "-567918778367521209",
+    "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=-567918778367521209",
+    "date": "2026-11-21T06:20:00+01:00"
+   },
+   "status": "programme",
+   "published_at": "2026-11-21T06:20:00+01:00",
+   "deleted_at": null
   }
  ]
 }
