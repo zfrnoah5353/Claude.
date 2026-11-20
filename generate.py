@@ -370,8 +370,27 @@ def build_script(fmt, rng, hook_i):
     return scenes, preset, filt, variant
 
 
+def recent_captions(n=10):
+    caps = []
+    try:
+        with open(HISTORY, encoding="utf-8") as f:
+            caps += [p.get("caption", "") for p in json.load(f).get("posts", [])[-n:]]
+    except Exception:  # noqa
+        pass
+    for mp in glob.glob(os.path.join(POSTS, "*.json")):
+        if not mp.endswith(".metricool.json"):
+            try:
+                with open(mp, encoding="utf-8") as f:
+                    caps.append(json.load(f).get("caption", ""))
+            except Exception:  # noqa
+                pass
+    return {c.split("\n")[0] for c in caps if c}
+
+
 def caption_for(fmt, rng, filt, gp_kind, games_tags):
-    hook = rng.choice(CAPTIONS[fmt])
+    used = recent_captions()
+    options = [c for c in CAPTIONS[fmt] if c not in used] or CAPTIONS[fmt]
+    hook = rng.choice(options)
     lines = [hook, "", "⬇️ Lien en bio pour le télécharger : gratuit, Windows 11."]
     if filt:
         lines.append("*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.")
