@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>ColorTweaks video</title>
+<style>
+@font-face{font-family:Poppins;font-weight:400;src:url(../assets/fonts/Poppins-Regular.ttf)}
+@font-face{font-family:Poppins;font-weight:500;src:url(../assets/fonts/Poppins-Medium.ttf)}
+@font-face{font-family:Poppins;font-weight:600;src:url(../assets/fonts/Poppins-SemiBold.ttf)}
+@font-face{font-family:Poppins;font-weight:700;src:url(../assets/fonts/Poppins-Bold.ttf)}
+@font-face{font-family:Poppins;font-weight:800;src:url(../assets/fonts/Poppins-ExtraBold.ttf)}
+@font-face{font-family:Poppins;font-weight:900;src:url(../assets/fonts/Poppins-Black.ttf)}
+:root{--ac:#3be38f;--ac2:#22d3ee;--tx:#f2fbf7;--mu:#a9c4c0;--card:rgba(16,44,52,.78);--bd:rgba(150,230,210,.16)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1920px;overflow:hidden;background:#0a2026}
+body{font-family:Poppins,sans-serif;color:var(--tx);-webkit-font-smoothing:antialiased}
+#stage{position:absolute;inset:0;overflow:hidden}
+#bg{position:absolute;inset:0;background:linear-gradient(170deg,#0b2a30 0%,#0a1f2a 45%,#0d2233 100%)}
+.halo{position:absolute;width:1100px;height:1100px;border-radius:50%;filter:blur(40px);opacity:.55;will-change:transform}
+#dots{position:absolute;inset:0;background-image:radial-gradient(rgba(180,255,230,.07) 2px,transparent 2.5px);background-size:46px 46px;opacity:.8}
+#header{position:absolute;left:0;right:0;top:150px;display:flex;justify-content:center;align-items:center;gap:18px}
+#header .name{font-weight:800;font-size:38px;letter-spacing:.32em;padding-left:.32em}
+#footer{position:absolute;left:0;right:0;top:1610px;display:flex;justify-content:center}
+#footer span{font-weight:600;font-size:34px;color:var(--tx);background:rgba(8,30,36,.72);border:2px solid var(--bd);padding:14px 34px;border-radius:999px}
+#footer b{color:var(--ac);font-weight:700}
+.scene{position:absolute;left:0;top:0;width:1080px;height:1920px;display:none}
+.a{position:absolute;opacity:0;will-change:transform,opacity}
+.col{position:absolute;left:80px;right:80px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.col>*{position:relative;opacity:0;max-width:920px}
+.txt{white-space:normal}
+.center{left:90px;right:90px;text-align:center}
+.h1{font-weight:800;font-size:96px;line-height:1.06;letter-spacing:-.02em}
+.h2{font-weight:800;font-size:72px;line-height:1.1;letter-spacing:-.015em}
+.h3{font-weight:700;font-size:52px;line-height:1.15}
+.sub{font-weight:500;font-size:40px;line-height:1.35;color:var(--mu)}
+.hl{color:var(--ac)}
+.pill{display:inline-block;font-weight:700;font-size:34px;padding:12px 30px;border-radius:999px;background:rgba(59,227,143,.14);border:2px solid rgba(59,227,143,.55);color:var(--ac)}
+.card{background:var(--card);border:2px solid var(--bd);border-radius:36px;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.num{width:92px;height:92px;flex:none;border-radius:50%;background:var(--ac);color:#06281a;font-weight:800;font-size:48px;display:grid;place-items:center;box-shadow:0 0 0 10px rgba(59,227,143,.16)}
+.row{display:flex;align-items:center;gap:34px}
+.key{display:inline-grid;place-items:center;min-width:170px;height:150px;padding:0 34px;border-radius:30px;background:linear-gradient(#1d4650,#12313a);border:3px solid rgba(160,240,215,.35);box-shadow:0 12px 0 #08191e,0 26px 50px rgba(0,0,0,.45);font-weight:800;font-size:60px;color:#fff}
+.plus{font-weight:700;font-size:60px;color:var(--mu)}
+.foot{position:absolute;left:90px;right:90px;top:1545px;text-align:center;font-weight:500;font-size:25px;color:rgba(220,240,235,.78)}
+.shot{position:absolute;overflow:hidden;border-radius:34px;border:3px solid rgba(160,240,215,.25);box-shadow:0 30px 90px rgba(0,0,0,.5);background:#000}
+.shot img,.shot canvas{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:cover}
+.tag{position:absolute;top:22px;font-weight:700;font-size:30px;padding:8px 22px;border-radius:14px;background:rgba(6,16,20,.75);color:#fff}
+.tag.r{background:rgba(59,227,143,.92);color:#06281a}
+.wipe{position:absolute;top:0;bottom:0;width:6px;background:#fff;box-shadow:0 0 30px rgba(255,255,255,.7)}
+/* app replica */
+.app{position:absolute;display:flex;background:#0B0B0D;border:2px solid #26262D;border-radius:30px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.55)}
+.app .side{width:270px;background:#060607;border-right:2px solid #17171B;padding:26px 16px;display:flex;flex-direction:column;gap:6px}
+.app .it{padding:13px 16px;border-radius:14px;color:#9A9AA6;font-weight:600;font-size:22px;white-space:nowrap}
+.app .it.on{background:#1C1C21;color:#fff}
+.app .main{flex:1;padding:30px 34px}
+.app .mh{display:flex;justify-content:space-between;align-items:center;font-size:32px;font-weight:700}
+.app .tg{width:74px;height:42px;border-radius:21px;background:#2a2a31;border:2px solid #3a3a44;position:relative}
+.app .tg i{position:absolute;left:5px;top:5px;width:28px;height:28px;border-radius:50%;background:#fff}
+.app .sl{margin-top:30px}
+.app .sl>div{display:flex;justify-content:space-between;font-weight:600;font-size:25px}
+.app .sl>div span:last-child{color:#9A9AA6;font-variant-numeric:tabular-nums}
+.app .sl>i{display:block;position:relative;height:8px;border-radius:4px;background:#2f3440;margin-top:18px}
+.app .sl>i u{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:#5E8FCB}
+.app .sl>i b{position:absolute;top:-11px;width:30px;height:30px;border-radius:50%;background:#7FAEE6;border:3px solid #F2F6FB;transform:translateX(-50%)}
+.app .pr{display:flex;gap:12px;flex-wrap:wrap;margin-top:34px}
+.app .pr span{padding:12px 20px;border-radius:16px;border:2px solid #222228;background:#141417;font-weight:600;font-size:23px}
+.app .pr span.on{border-color:#6FA3E0;background:#151F2C}
+.mock{position:absolute;left:0;right:0;text-align:center;font-size:22px;font-weight:500;color:rgba(220,240,235,.6)}
+.game{display:flex;align-items:center;gap:26px;padding:26px 34px}
+.game .gi{width:20px;align-self:stretch;border-radius:10px}
+.game .gn{font-weight:800;font-size:44px;line-height:1.1}
+.game .gl{font-weight:500;font-size:28px;color:var(--mu);margin-top:4px}
+.feat{display:flex;align-items:center;gap:28px;padding:26px 34px}
+.feat .ic{width:76px;height:76px;flex:none;border-radius:22px;background:rgba(59,227,143,.15);border:2px solid rgba(59,227,143,.5);display:grid;place-items:center}
+.feat .t{font-weight:700;font-size:40px;line-height:1.15}
+.feat .d{font-weight:500;font-size:28px;color:var(--mu);margin-top:4px;line-height:1.3}
+.ans{display:flex;align-items:center;gap:26px;padding:24px 30px}
+.ans .l{width:74px;height:74px;flex:none;border-radius:20px;background:#173b44;border:2px solid var(--bd);display:grid;place-items:center;font-weight:800;font-size:38px}
+.ans .t{font-weight:600;font-size:38px;line-height:1.2}
+.btn{display:inline-block;font-weight:800;font-size:52px;padding:30px 70px;border-radius:999px;background:var(--ac);color:#06281a;box-shadow:0 0 0 14px rgba(59,227,143,.18),0 30px 70px rgba(59,227,143,.35)}
+.taskbar{position:absolute;left:0;right:0;bottom:0;height:96px;background:rgba(20,26,34,.92);border-top:2px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:flex-end;padding:0 26px;gap:22px}
+.clock{font-weight:600;font-size:24px;color:#e8eef5;text-align:right;line-height:1.2}
+.tray{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;background:rgba(59,227,143,.12);border:2px solid rgba(59,227,143,.5)}
+.toast{position:absolute;right:26px;bottom:120px;width:640px;padding:24px 28px;border-radius:24px;background:#16232c;border:2px solid rgba(59,227,143,.45);box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.toast .t1{font-weight:700;font-size:30px}
+.toast .t2{font-weight:500;font-size:25px;color:var(--mu);margin-top:4px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs id="filters"></defs>
+</svg>
+<div id="stage">
+  <div id="bg"><div id="halos"></div><div id="dots"></div></div>
+  <div id="scenes"></div>
+  <div id="header" class="a"></div>
+  <div id="footer" class="a"><span>Lien en bio · <b>@colortweaks</b></span></div>
+</div>
+<script src="engine.js"></script>
+<script src="scenes.js"></script>
+</body>
+</html>
