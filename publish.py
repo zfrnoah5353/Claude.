@@ -139,6 +139,11 @@ def cmd_prepare(a):
     url = raw_url(vid)
     check_url(url, size)
     when = (now() + timedelta(minutes=max(DELAY_MIN, a.delay))).replace(second=0, microsecond=0)
+    if a.at:
+        at = datetime.fromisoformat(a.at)
+        at = at.replace(tzinfo=TZ) if at.tzinfo is None else at.astimezone(TZ)
+        if at > now() + timedelta(minutes=DELAY_MIN - 1):
+            when = at.replace(second=0, microsecond=0)
     info = {
         "autoPublish": True,
         "draft": False,
@@ -238,6 +243,23 @@ def cmd_cleanup(a):
     print(f"Nettoyage : {len(removed)} fichier(s) supprime(s)")
 
 
+def cmd_plan(a):
+    """Nombre de videos a produire maintenant : objectif 2 par tranche de 2 h entre 17 h et 23 h, 1 sinon,
+    moins celles deja programmees dans les 2 prochaines heures (lots prepares a l'avance)."""
+    h = load_history()
+    t = now()
+    soon = 0
+    for p in h["posts"]:
+        if p.get("status") != "programme":
+            continue
+        d = datetime.fromisoformat(p["published_at"])
+        if t - timedelta(minutes=10) <= d < t + timedelta(hours=2):
+            soon += 1
+    target = 2 if 17 <= t.hour <= 22 else 1
+    need = max(0, target - soon)
+    print(json.dumps({"heure": t.strftime("%H:%M"), "objectif": target, "deja_programmees": soon, "a_faire": need}))
+
+
 def cmd_status(a):
     h = load_history()
     for p in h["posts"][-10:]:
@@ -248,14 +270,16 @@ def main():
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
     p = sp.add_parser("prepare"); p.add_argument("id"); p.add_argument("--delay", type=int, default=DELAY_MIN, help="minutes avant publication")
+    p.add_argument("--at", help="heure de publication precise, ISO (heure de Paris)")
     p = sp.add_parser("record"); p.add_argument("id"); p.add_argument("--post-id", required=True)
     p.add_argument("--uuid", default=""); p.add_argument("--planner-url", default=""); p.add_argument("--date", required=True)
     p = sp.add_parser("fail"); p.add_argument("id"); p.add_argument("stage"); p.add_argument("message")
     sp.add_parser("cleanup")
+    sp.add_parser("plan")
     sp.add_parser("status")
     a = ap.parse_args()
     try:
-        {"prepare": cmd_prepare, "record": cmd_record, "fail": cmd_fail, "cleanup": cmd_cleanup, "status": cmd_status}[a.cmd](a)
+        {"prepare": cmd_prepare, "record": cmd_record, "fail": cmd_fail, "cleanup": cmd_cleanup, "plan": cmd_plan, "status": cmd_status}[a.cmd](a)
     except SystemExit:
         raise
     except Exception as e:  # noqa

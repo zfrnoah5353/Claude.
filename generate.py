@@ -376,8 +376,22 @@ def generate_once(fmt_req=None, seed=None):
     posts = hist.get("posts", [])
     seed = seed if seed is not None else int(time.time() * 1000) % 2**31
     rng = random.Random(seed)
-    last_fmt = posts[-1]["format"] if posts else None
-    used = {p.get("signature") for p in posts}
+    pending = []
+    for mp in glob.glob(os.path.join(POSTS, "*.json")):
+        if mp.endswith(".metricool.json"):
+            continue
+        try:
+            with open(mp, encoding="utf-8") as f:
+                m = json.load(f)
+            if not m.get("problemes"):
+                pending.append(m)
+        except Exception:  # noqa
+            pass
+    known = sorted([{"format": p.get("format"), "signature": p.get("signature"), "created": p.get("created", "")} for p in posts]
+                   + [{"format": m["format"], "signature": m["signature"], "created": m["created"]} for m in pending],
+                   key=lambda x: x["created"] or "")
+    last_fmt = known[-1]["format"] if known else None
+    used = {p.get("signature") for p in known}
     # choix d'une combinaison jamais utilisee, format different du precedent
     for _ in range(200):
         fmt = fmt_req or rng.choice([f for f in FORMATS if f != last_fmt])

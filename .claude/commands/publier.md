@@ -13,6 +13,11 @@ Toute erreur définitive va dans `errors.log` (via `publish.py fail`) et rien n'
 - Si `scipy` manque : `pip install -q scipy numpy`.
 - `git pull --ff-only origin $(git rev-parse --abbrev-ref HEAD)` pour avoir le dernier `history.json` (ignore une erreur réseau).
 
+## 0 bis. Combien de vidéos
+`python3 publish.py plan` → `a_faire`. Si `a_faire` vaut 0 (des vidéos sont déjà programmées pour les 2 prochaines
+heures), fais seulement le nettoyage (étape 1) et termine en le disant en une ligne. Sinon produis `a_faire` vidéo(s)
+(cela remplace la règle 2 vidéos / 1 vidéo ci-dessus).
+
 ## 1. Nettoyage
 `python3 publish.py cleanup` (supprime du dépôt les vidéos publiées il y a plus de 48 h).
 

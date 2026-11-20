@@ -1,30 +1,31 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python3 generate.py:*)",
-      "Bash(python3 publish.py:*)",
-      "Bash(python3 -m pip install:*)",
+      "Bash(python3:*)",
+      "Bash(pip:*)",
       "Bash(pip install:*)",
-      "Bash(node render.js:*)",
+      "Bash(node:*)",
       "Bash(ffmpeg:*)",
       "Bash(ffprobe:*)",
-      "Bash(git status:*)",
-      "Bash(git log:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git push:*)",
-      "Bash(git pull:*)",
-      "Bash(git fetch:*)",
-      "Bash(git merge:*)",
-      "Bash(git rm:*)",
+      "Bash(git:*)",
       "Bash(ls:*)",
       "Bash(cat:*)",
       "Bash(tail:*)",
+      "Bash(head:*)",
+      "Bash(date:*)",
+      "Bash(TZ=Europe/Paris date:*)",
+      "Bash(mkdir:*)",
+      "Bash(rm -f errors.log:*)",
       "Read",
-      "Edit(errors.log)",
-      "mcp__Metricool_Social_Media_Management__getBrandSettings",
-      "mcp__Metricool_Social_Media_Management__createScheduledPost",
-      "mcp__Metricool_Social_Media_Management__getScheduledPosts"
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "Skill(publier)",
+      "mcp__Metricool_Social_Media_Management",
+      "mcp__Metricool_Social_Media_Management__*",
+      "mcp__claude-code-remote__list_triggers",
+      "mcp__claude-code-remote__update_trigger"
     ]
   }
 }
