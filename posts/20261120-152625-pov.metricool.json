@@ -1,0 +1,41 @@
+{
+ "blogId": "7583648",
+ "date": "2026-11-20T17:20:00+01:00",
+ "info": {
+  "autoPublish": true,
+  "draft": false,
+  "descendants": [],
+  "firstCommentText": "",
+  "hasNotReadNotes": false,
+  "media": [
+   "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-152625-pov.mp4"
+  ],
+  "mediaAltText": [],
+  "providers": [
+   {
+    "network": "tiktok"
+   }
+  ],
+  "publicationDate": {
+   "dateTime": "2026-11-20T17:20:00",
+   "timezone": "Europe/Paris"
+  },
+  "shortener": false,
+  "smartLinkData": {
+   "ids": []
+  },
+  "text": "POV : tes couleurs passent de fades à vivantes en un raccourci 🎮\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #setupgaming #windows11 #gamingfr #astucepc #fps #pcgaming #valorantclips",
+  "tiktokData": {
+   "disableComment": false,
+   "disableDuet": false,
+   "disableStitch": false,
+   "privacyOption": "PUBLIC_TO_EVERYONE",
+   "commercialContentThirdParty": false,
+   "commercialContentOwnBrand": true,
+   "title": "POV : tes couleurs passent de fades à vivantes en un raccourci",
+   "autoAddMusic": false,
+   "isAigc": true
+  }
+ },
+ "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-152625-pov.mp4"
+}

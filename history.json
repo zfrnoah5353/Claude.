@@ -89,6 +89,36 @@
    "status": "programme",
    "published_at": "2026-11-20T16:18:00+01:00",
    "deleted_at": null
+  },
+  {
+   "id": "20261120-152625-pov",
+   "format": "pov",
+   "signature": "pov|h1|Néon|{\"broll_line\": \"Ton setup\", \"carousel\": [\"Néon\", \"Vibrant\", \"Cinématique\"]}|c1|tilt",
+   "look": "Néon",
+   "hook": "POV : tu découvres Ctrl+Alt+C",
+   "musique": {
+    "tempo": 100,
+    "tonalite": "Mi mineur",
+    "accords": "i-vii-vi-vii",
+    "batterie": "halftime",
+    "charleston": "8",
+    "arpege": "updown",
+    "basse": "8",
+    "septiemes": true
+   },
+   "file": "posts/20261120-152625-pov.mp4",
+   "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-152625-pov.mp4",
+   "caption": "POV : tes couleurs passent de fades à vivantes en un raccourci 🎮\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #setupgaming #windows11 #gamingfr #astucepc #fps #pcgaming #valorantclips",
+   "created": "2026-11-20T15:29:08+01:00",
+   "metricool": {
+    "post_id": "435649728",
+    "uuid": "5202059188576993795",
+    "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=5202059188576993795",
+    "date": "2026-11-20T17:20:00+01:00"
+   },
+   "status": "programme",
+   "published_at": "2026-11-20T17:20:00+01:00",
+   "deleted_at": null
   }
  ]
 }
