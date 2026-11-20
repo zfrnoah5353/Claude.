@@ -287,12 +287,12 @@ def build_script(fmt, rng, hook_i):
         seq = PRESETS[:]
         rng.shuffle(seq)
         scenes = [{**hook, "dur": 2.3},
-                  {"type": "keys", "dur": 4.8, "title": "Activer / couper", "combo": ["Ctrl", "Alt", "C"],
+                  {"type": "keys", "dur": 4.8, "title": rng.choice(["Activer / couper", "Un raccourci pour tout", "Allumé, éteint"]), "combo": ["Ctrl", "Alt", "C"],
                    "mode": "toggle", "preset": preset, "presses": [1.2, 2.6, 3.7],
-                   "caption": "Raccourci global, même en jeu"},
-                  {"type": "keys", "dur": 5.0, "title": "Look suivant", "combo": ["Ctrl", "Alt", "N"], "mode": "next",
-                   "cycle": seq, "presses": [1.0, 1.9, 2.8, 3.7], "caption": "Passe au préréglage suivant"},
-                  {"type": "tray", "dur": 3.0, "title": "Toujours prêt", "sub": "Une icône près de l’horloge garde l’appli active",
+                   "caption": rng.choice(["Raccourci global, même en jeu", "Marche en pleine partie", "Sans quitter ton jeu"])},
+                  {"type": "keys", "dur": 5.0, "title": rng.choice(["Look suivant", "Change de style", "Fais défiler tes looks"]), "combo": ["Ctrl", "Alt", "N"], "mode": "next",
+                   "cycle": seq, "presses": [1.0, 1.9, 2.8, 3.7], "caption": rng.choice(["Passe au préréglage suivant", "Les 5 looks, un par un", "Trouve ton look en jouant"])},
+                  {"type": "tray", "dur": 3.0, "title": rng.choice(["Toujours prêt", "Discret", "Près de l’horloge"]), "sub": "Une icône près de l’horloge garde l’appli active",
                    "tip": "Clic droit, Quitter : tes couleurs d’origine reviennent"},
                   outro]
         filt = True
@@ -302,8 +302,8 @@ def build_script(fmt, rng, hook_i):
         scenes = [hook,
                   {"type": "auto", "dur": 6.0, "title": rng.choice(["Mode auto en jeu", "Zéro réglage en partie"]),
                    "game": "VALORANT", "preset": preset, "date": datetime.now(TZ).strftime("%d/%m/%Y"),
-                   "caption": "Détection du jeu au premier plan"},
-                  {"type": "games", "dur": 4.4, "title": "6 jeux reconnus", "games": [{"n": a, "l": b} for a, b in g]},
+                   "caption": rng.choice(["Détection du jeu au premier plan", "Le jeu passe devant, le look suit", "Rien à faire en partie"])},
+                  {"type": "games", "dur": 4.4, "title": rng.choice(["6 jeux reconnus", "Ton jeu est dedans ?", "Compatible avec"]), "games": [{"n": a, "l": b} for a, b in g]},
                   {"type": "safety", "dur": 3.0, "title": "Sans risque", "items": rng.sample(SAFETY, 3)},
                   outro]
         filt = True
