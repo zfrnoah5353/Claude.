@@ -1,0 +1,64 @@
+{
+ "id": "20261120-155019-auto",
+ "created": "2026-11-20T15:53:06+01:00",
+ "format": "auto",
+ "signature": "auto|h2|Vibrant|{\"broll_hook\": true, \"broll_outro\": true}|c4|left",
+ "seed": 2037373122,
+ "hook": "Mode auto en jeu",
+ "look": "Vibrant",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_b.jpg",
+  "scene_a.jpg"
+ ],
+ "plans": [
+  "mk43526_0.mp4",
+  "mk51603_0.mp4"
+ ],
+ "musique": {
+  "tempo": 119,
+  "tonalite": "Fa# mineur",
+  "accords": "vi-vii-i-i",
+  "batterie": "halftime",
+  "charleston": "16",
+  "arpege": "updown",
+  "basse": "off",
+  "septiemes": false
+ },
+ "caption": "Le mode auto en jeu détecte ton jeu au premier plan ⚡\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #cs2 #fortnite #windows11 #pcgamer #gaming #valorantclips #pcgaming #valorantfr",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#cs2",
+  "#fortnite",
+  "#windows11",
+  "#pcgamer",
+  "#gaming",
+  "#valorantclips",
+  "#pcgaming",
+  "#valorantfr"
+ ],
+ "file": "posts/20261120-155019-auto.mp4",
+ "controles": {
+  "duree": 19.4,
+  "son_moyen_db": -14.6,
+  "son_crete_db": -0.6,
+  "bandes": [
+   [
+    50.461170634920634,
+    30.07385582010582
+   ],
+   [
+    92.55486111111111,
+    63.65071428571429
+   ],
+   [
+    55.14123677248677,
+    38.38162698412698
+   ]
+  ],
+  "taille_mo": 8.72,
+  "planche": "/home/user/Claude./work/20261120-155019-auto/planche.jpg"
+ },
+ "problemes": []
+}
