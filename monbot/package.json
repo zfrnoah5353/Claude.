@@ -1,0 +1,28 @@
+{
+  "name": "monbot",
+  "version": "1.0.0",
+  "description": "Bot Discord tout-en-un avec panel",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env --no-warnings=ExperimentalWarning src/index.js",
+    "check": "node --check src/index.js",
+    "cloud": "node --no-warnings=ExperimentalWarning src/cloud.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.6.0",
+    "@discord-player/extractor": "^7.1.0",
+    "@napi-rs/canvas": "^0.1.65",
+    "discord-player": "^7.1.0",
+    "discord.js": "^14.18.0",
+    "mathjs": "^14.0.0",
+    "opusscript": "^0.1.1",
+    "qrcode": "^1.5.4"
+  },
+  "optionalDependencies": {
+    "ffmpeg-static": "^5.2.0"
+  }
+}

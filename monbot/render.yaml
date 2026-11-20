@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: monbot
+    runtime: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm run cloud
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "22.23.0"
+      - key: DISCORD_TOKEN
+        sync: false
+      - key: PANEL_KEY
+        sync: false
+      - key: BOT_NAME
+        value: MonBot

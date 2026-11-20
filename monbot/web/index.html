@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src * data:; connect-src *; style-src 'self' 'unsafe-inline'; script-src 'self'">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e1f22">
+  <title>Panel</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Connexion -->
+  <div id="login" class="login hidden">
+    <div class="login-card">
+      <div class="logo">⚡</div>
+      <h1>Panel du bot</h1>
+      <p class="muted">Connecte-toi au bot pour tout gérer.</p>
+      <label>Adresse du bot</label>
+      <input id="l-url" placeholder="http://localhost:3000" value="http://localhost:3000">
+      <label>Clé du panel</label>
+      <input id="l-key" type="password" placeholder="La PANEL_KEY du fichier .env">
+      <label class="check"><input type="checkbox" id="l-remember" checked> Se souvenir de moi</label>
+      <button id="l-go" class="btn primary big">Se connecter</button>
+      <div id="l-err" class="error"></div>
+      <p class="hint">Sur l'appareil où tourne le bot : <code>http://localhost:3000</code>. Depuis un autre appareil du même Wi-Fi : <code>http://ADRESSE-IP:3000</code>.</p>
+    </div>
+  </div>
+
+  <!-- Application -->
+  <div id="app" class="app hidden">
+    <button id="menu-btn" class="menu-btn" title="Menu">☰</button>
+    <nav id="guilds" class="guilds"></nav>
+    <aside class="side">
+      <div class="side-head" id="guild-head">Choisis un serveur</div>
+      <div class="side-scroll" id="side-menu"></div>
+      <div class="side-foot">
+        <img id="bot-avatar" alt="">
+        <div class="bot-meta"><b id="bot-name">Bot</b><span id="bot-status" class="muted">…</span></div>
+        <button id="logout" class="icon-btn" title="Se déconnecter">⏻</button>
+      </div>
+    </aside>
+    <main id="main" class="main"></main>
+  </div>
+
+  <div id="savebar" class="savebar hidden">
+    <span>Attention, tu as des modifications non enregistrées !</span>
+    <div><button id="sb-reset" class="btn link">Annuler</button><button id="sb-save" class="btn success">Enregistrer</button></div>
+  </div>
+  <div id="toasts" class="toasts"></div>
+  <script src="app.js"></script>
+</body>
+</html>
