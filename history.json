@@ -247,6 +247,36 @@
    "status": "programme",
    "published_at": "2026-11-21T04:20:00+01:00",
    "deleted_at": null
+  },
+  {
+   "id": "20261120-153749-raccourcis",
+   "format": "raccourcis",
+   "signature": "raccourcis|h0|Néon|{\"broll_hook\": true, \"cycle\": [\"Cinématique\", \"FPS\", \"Néon\", \"Naturel\", \"Vibrant\"]}|c3|tilt",
+   "look": "Néon",
+   "hook": "Un raccourci et tout change",
+   "musique": {
+    "tempo": 113,
+    "tonalite": "Sol mineur",
+    "accords": "vi-vii-i-i",
+    "batterie": "four",
+    "charleston": "16",
+    "arpege": "updown",
+    "basse": "pulse",
+    "septiemes": true
+   },
+   "file": "posts/20261120-153749-raccourcis.mp4",
+   "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-153749-raccourcis.mp4",
+   "caption": "Ctrl+Alt+C pour activer, Ctrl+Alt+N pour changer de look ⌨️\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #gamingfr #valorantfr #setupgaming #valoranttips #windows11 #fps #gaming",
+   "created": "2026-11-20T15:40:55+01:00",
+   "metricool": {
+    "post_id": "435660637",
+    "uuid": "-579408402848397554",
+    "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=-579408402848397554",
+    "date": "2026-11-20T21:20:00+01:00"
+   },
+   "status": "programme",
+   "published_at": "2026-11-20T21:20:00+01:00",
+   "deleted_at": null
   }
  ]
 }
