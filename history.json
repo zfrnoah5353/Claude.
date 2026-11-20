@@ -127,6 +127,36 @@
    "status": "echec",
    "erreur": "verification : guillemet fermant seul sur une ligne (corrige : espaces insecables)",
    "created": "2026-11-20T15:33:23+01:00"
+  },
+  {
+   "id": "20261120-153245-fonctions",
+   "format": "fonctions",
+   "signature": "fonctions|h0|FPS|{\"broll_outro\": true, \"order\": [\"Un look par jeu\", \"Raccourcis globaux\", \"Auto en jeu\", \"5 curseurs\", \"5 préréglages\", \"4 optimisations Windows\", \"Icône près de l’horloge\"]}|c0|up",
+   "look": "FPS",
+   "hook": "Tout ce que fait ColorTweaks",
+   "musique": {
+    "tempo": 118,
+    "tonalite": "Mib mineur",
+    "accords": "vi-vii-i-i",
+    "batterie": "halftime",
+    "charleston": "off",
+    "arpege": "random",
+    "basse": "8",
+    "septiemes": true
+   },
+   "file": "posts/20261120-153245-fonctions.mp4",
+   "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-153245-fonctions.mp4",
+   "caption": "Une appli gratuite pour booster les couleurs de tes jeux 🎮\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #valorantfr #jeuxvideo #gamer #pcgamer #gamingfr #gaming #valorantclips #windows11",
+   "created": "2026-11-20T15:35:49+01:00",
+   "metricool": {
+    "post_id": "435655368",
+    "uuid": "8961209103443247993",
+    "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=8961209103443247993",
+    "date": "2026-11-20T18:20:00+01:00"
+   },
+   "status": "programme",
+   "published_at": "2026-11-20T18:20:00+01:00",
+   "deleted_at": null
   }
  ]
 }
