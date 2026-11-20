@@ -48,9 +48,9 @@ async function historique(m) {
 async function iaGratuite(texte) {
   const r = await fetch('https://text.pollinations.ai/openai', {
     method: 'POST', headers: { 'content-type': 'application/json' }, signal: AbortSignal.timeout(90e3),
-    body: JSON.stringify({ model: 'openai', messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content: texte }] }),
+    body: JSON.stringify({ model: 'openai', referrer: 'monbot', messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content: texte }] }),
   });
-  if (!r.ok) throw new Error(`IA gratuite : ${r.status}`);
+  if (!r.ok) throw new Error(`IA gratuite : ${r.status} ${(await r.text().catch(() => '')).slice(0, 300)}`);
   return (await r.json())?.choices?.[0]?.message?.content?.trim();
 }
 
