@@ -187,6 +187,36 @@
    "status": "programme",
    "published_at": "2026-11-20T19:20:00+01:00",
    "deleted_at": null
+  },
+  {
+   "id": "20261120-153453-tuto",
+   "format": "tuto",
+   "signature": "tuto|h2|Naturel|{\"broll_hook\": true, \"broll_outro\": true}|c1|left",
+   "look": "Naturel",
+   "hook": "Comment installer ColorTweaks ?",
+   "musique": {
+    "tempo": 103,
+    "tonalite": "Sib majeur",
+    "accords": "VI-IV-I-V",
+    "batterie": "broken",
+    "charleston": "8",
+    "arpege": "up",
+    "basse": "8",
+    "septiemes": false
+   },
+   "file": "posts/20261120-153453-tuto.mp4",
+   "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-153453-tuto.mp4",
+   "caption": "Installer ColorTweaks prend une minute, voilà comment 👇\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #gamer #jeuxvideo #valorantclips #valoranttips #gamingfr #pcgaming",
+   "created": "2026-11-20T15:38:33+01:00",
+   "metricool": {
+    "post_id": "435658248",
+    "uuid": "3268064264465106509",
+    "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=3268064264465106509",
+    "date": "2026-11-20T20:20:00+01:00"
+   },
+   "status": "programme",
+   "published_at": "2026-11-20T20:20:00+01:00",
+   "deleted_at": null
   }
  ]
 }
