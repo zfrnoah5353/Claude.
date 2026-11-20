@@ -307,6 +307,36 @@
    "status": "programme",
    "published_at": "2026-11-21T02:20:00+01:00",
    "deleted_at": null
+  },
+  {
+   "id": "20261120-153834-vraifaux",
+   "format": "vraifaux",
+   "signature": "vraifaux|h1|-|{\"broll_outro\": true, \"truths\": [\"ColorTweaks modifie les fichiers du jeu\", \"On peut changer de look en jeu\", \"Tout est réversible\", \"C’est payant\"]}|c1|up",
+   "look": "-",
+   "hook": "Ce qu’on me demande tout le temps",
+   "musique": {
+    "tempo": 120,
+    "tonalite": "Si mineur",
+    "accords": "i-iv-vi-v",
+    "batterie": "broken",
+    "charleston": "16",
+    "arpege": "down",
+    "basse": "off",
+    "septiemes": true
+   },
+   "file": "posts/20261120-153834-vraifaux.mp4",
+   "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-153834-vraifaux.mp4",
+   "caption": "On répond aux questions qu’on nous pose le plus 👇\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n\n#colortweaks #valorant #fortnite #warzone #setupgaming #valoranttips #windows11 #pcgaming",
+   "created": "2026-11-20T15:43:10+01:00",
+   "metricool": {
+    "post_id": "435663357",
+    "uuid": "-3271336742889435328",
+    "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=-3271336742889435328",
+    "date": "2026-11-20T22:20:00+01:00"
+   },
+   "status": "programme",
+   "published_at": "2026-11-20T22:20:00+01:00",
+   "deleted_at": null
   }
  ]
 }
