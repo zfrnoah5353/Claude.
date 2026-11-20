@@ -2,7 +2,10 @@
 description: Génère, vérifie et publie une vidéo promo ColorTweaks sur TikTok via Metricool, puis nettoie
 ---
 
-Tu publies UNE vidéo promo TikTok ColorTweaks. Travaille dans la racine du dépôt, sans poser de question
+Tu publies des vidéos promo TikTok ColorTweaks : **2 vidéos** si l'heure de Paris est entre 17 h et 22 h 59
+(la 2e programmée 60 min après la 1re : `publish.py prepare <id> --delay 60`), sinon **1 vidéo**.
+Pour chaque vidéo, enchaîne les étapes 2 à 7 (la 2e vidéo est générée après l'enregistrement de la 1re
+dans history.json, pour qu'elle soit différente). Travaille dans la racine du dépôt, sans poser de question
 (mode non interactif). Ne publie jamais une vidéo qui n'a pas passé tous les contrôles.
 Toute erreur définitive va dans `errors.log` (via `publish.py fail`) et rien n'est publié.
 
@@ -47,4 +50,4 @@ est normale : garde l'id renvoyé par createScheduledPost.
 `python3 publish.py record <id> --post-id <id Metricool> --uuid <uuid> --planner-url <plannerUrl> --date <date>`
 
 ## 8. Compte rendu
-Termine par 3 lignes : format et accroche, heure de publication prévue, lien `plannerUrl`.
+Termine par 3 lignes par vidéo : format et accroche, heure de publication prévue, lien `plannerUrl`.

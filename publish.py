@@ -131,7 +131,7 @@ def cmd_prepare(a):
         commit([f"posts/{vid}.mp4", f"posts/{vid}.json"], f"Video {vid} ({meta['format']})")
     url = raw_url(vid)
     check_url(url, size)
-    when = (now() + timedelta(minutes=DELAY_MIN)).replace(second=0, microsecond=0)
+    when = (now() + timedelta(minutes=max(DELAY_MIN, a.delay))).replace(second=0, microsecond=0)
     info = {
         "autoPublish": True,
         "draft": False,
@@ -240,7 +240,7 @@ def cmd_status(a):
 def main():
     ap = argparse.ArgumentParser()
     sp = ap.add_subparsers(dest="cmd", required=True)
-    p = sp.add_parser("prepare"); p.add_argument("id")
+    p = sp.add_parser("prepare"); p.add_argument("id"); p.add_argument("--delay", type=int, default=DELAY_MIN, help="minutes avant publication")
     p = sp.add_parser("record"); p.add_argument("id"); p.add_argument("--post-id", required=True)
     p.add_argument("--uuid", default=""); p.add_argument("--planner-url", default=""); p.add_argument("--date", required=True)
     p = sp.add_parser("fail"); p.add_argument("id"); p.add_argument("stage"); p.add_argument("message")
