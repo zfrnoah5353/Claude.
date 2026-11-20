@@ -122,7 +122,10 @@ async function salonIA(guild) {
 }
 
 export function setup(client) {
-  client.once(Events.ClientReady, async (c) => { for (const g of c.guilds.cache.values()) await salonIA(g); });
+  client.once(Events.ClientReady, async (c) => {
+    for (const g of c.guilds.cache.values()) await salonIA(g);
+    if (!process.env.ANTHROPIC_API_KEY) iaGratuite('Réponds juste : OK').then(r => console.log('✅ IA gratuite joignable :', (r || '').slice(0, 40))).catch(e => console.error('❌ IA gratuite injoignable :', e.message));
+  });
 
   client.on(Events.MessageCreate, async (m) => {
     if (m.author.bot || m.system) return;
