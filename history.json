@@ -1,3 +1,34 @@
 {
- "posts": []
+ "posts": [
+  {
+   "id": "20261120-151217-avantapres",
+   "format": "avantapres",
+   "signature": "avantapres|h1|Cinématique|{\"carousel\": [\"Cinématique\", \"Vibrant\", \"Néon\", \"FPS\"]}|c2|tilt",
+   "look": "Cinématique",
+   "hook": "Avant / après sur VALORANT",
+   "musique": {
+    "tempo": 128,
+    "tonalite": "Lab majeur",
+    "accords": "I-III-IV-V",
+    "batterie": "four",
+    "charleston": "16",
+    "arpege": "updown",
+    "basse": "pulse",
+    "septiemes": false
+   },
+   "file": "posts/20261120-151217-avantapres.mp4",
+   "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-151217-avantapres.mp4",
+   "caption": "Même partie, autres couleurs : avant / après avec ColorTweaks 🎨\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #gamer #astucepc #pcgamer #valoranttips #gaming #pcgaming",
+   "created": "2026-11-20T15:14:39+01:00",
+   "metricool": {
+    "post_id": "435631754",
+    "uuid": "-5753263573969320226",
+    "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=-5753263573969320226",
+    "date": "2026-11-20T15:18:00+01:00"
+   },
+   "status": "programme",
+   "published_at": "2026-11-20T15:18:00+01:00",
+   "deleted_at": null
+  }
+ ]
 }
