@@ -30,7 +30,7 @@ WORK = os.path.join(ROOT, "work")
 HISTORY = os.path.join(ROOT, "history.json")
 ERRORS = os.path.join(ROOT, "errors.log")
 TZ = ZoneInfo("Europe/Paris")
-FORMATS = ["quiz", "tuto", "avantapres", "raccourcis", "auto", "fonctions", "jeux"]
+FORMATS = ["quiz", "tuto", "avantapres", "raccourcis", "auto", "fonctions", "jeux", "pov", "vraifaux"]
 PRESETS = ["Naturel", "Vibrant", "Néon", "Cinématique", "FPS"]
 HL = lambda s: f'<span class="hl">{s}</span>'
 
@@ -115,6 +115,33 @@ HOOKS = {
         (["Ton jeu a", HL("son look")], "6 JEUX", None),
     ],
 }
+HOOKS["pov"] = [
+    (["POV :", f"ta ranked commence et {HL('tout est fade')}"], None, None),
+    (["POV :", f"tu découvres {HL('Ctrl+Alt+C')}"], None, None),
+    (["POV :", f"ton pote te demande {HL('ton réglage')}"], None, None),
+]
+HOOKS["vraifaux"] = [
+    (["Vrai ou faux ?", HL("ColorTweaks")], "VRAI OU FAUX", "Réponds avant la fin"),
+    (["Ce qu’on me demande", f"{HL('tout le temps')}"], "FAQ", None),
+    (["On démêle", f"le {HL('vrai du faux')}"], "VRAI OU FAUX", None),
+]
+TRUTHS = [
+    ("ColorTweaks modifie les fichiers du jeu", "FAUX", "Il ajuste les couleurs de l’écran, pas le jeu"),
+    ("C’est payant", "FAUX", "Gratuit, sans abonnement ni compte"),
+    ("Tout est réversible", "VRAI", "Quitte l’appli : tes couleurs d’origine reviennent"),
+    ("Il faut créer un compte", "FAUX", "Aucun compte, aucune donnée collectée"),
+    ("Il y a des looks prêts pour 6 jeux", "VRAI", "VALORANT, CS2, Fortnite, Apex, Overwatch 2, Warzone"),
+    ("Il interagit avec Vanguard", "FAUX", "Rien n’est injecté dans le jeu"),
+    ("On peut changer de look en jeu", "VRAI", "Ctrl+Alt+N passe au préréglage suivant"),
+]
+BROLL_LINES = [
+    (["Tes couleurs", HL("sont ternes ?")], None),
+    (["Même jeu,", HL("autre ambiance")], None),
+    (["Un raccourci,", HL("et c’est réglé")], "Ctrl+Alt+C"),
+    (["Ton setup", f"mérite {HL('mieux')}"], None),
+    (["Gratuit,", HL("pour Windows 11")], None),
+]
+
 CAPTIONS = {
     "quiz": ["Quel look ColorTweaks est fait pour toi ? Dis ta lettre en commentaire 👇",
              "A, B, C ou D ? Ton style de jeu choisit ton look 🎨",
@@ -134,6 +161,12 @@ CAPTIONS = {
     "fonctions": ["Tout ce que fait ColorTweaks, gratuitement 🎨",
                   "Préréglages, curseurs, raccourcis, mode auto : tout est dans l’appli ✅",
                   "Une appli gratuite pour booster les couleurs de tes jeux 🎮"],
+    "pov": ["POV : tes couleurs passent de fades à vivantes en un raccourci 🎮",
+            "POV : tu découvres Ctrl+Alt+C en pleine partie ⌨️",
+            "POV : ton pote veut savoir comment t’as ces couleurs 👀"],
+    "vraifaux": ["Vrai ou faux ? Tout ce qu’il faut savoir sur ColorTweaks ✅",
+                 "On répond aux questions qu’on nous pose le plus 👇",
+                 "Gratuit ? Sûr ? Réversible ? Vrai ou faux 🎯"],
     "jeux": ["Un look prêt pour VALORANT, CS2, Fortnite, Apex, Overwatch 2 et Warzone 🎮",
              "Ton jeu a son look ColorTweaks 🎨",
              "6 jeux, des looks prêts à l’emploi 🔥"],
@@ -182,6 +215,21 @@ def gameplay_sources(rng, workdir, need_seconds=12):
         rng.shuffle(stills)
         srcs = [{"kind": "still", "src": "file://" + s, "name": os.path.basename(s)} for s in stills]
     return srcs
+
+
+def broll_sources(rng, workdir, n=4):
+    """Plans libres de droits (assets/broll, licence Mixkit Free) decoupes en images 720x1280."""
+    clips = sorted(glob.glob(os.path.join(ROOT, "assets", "broll", "*.mp4")))
+    out = []
+    for k, c in enumerate(rng.sample(clips, min(n, len(clips)))):
+        d = os.path.join(workdir, f"broll{k}")
+        os.makedirs(d, exist_ok=True)
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", c, "-vf", "fps=30,scale=720:1280", "-q:v", "4",
+                        os.path.join(d, "f_%05d.jpg")], check=True)
+        cnt = len(glob.glob(os.path.join(d, "f_*.jpg")))
+        if cnt:
+            out.append({"kind": "clip", "dir": "file://" + d, "fps": 30, "count": cnt, "name": os.path.basename(c)})
+    return out
 
 
 # ---------------------------------------------------------------- scripts (formats)
@@ -286,8 +334,39 @@ def build_script(fmt, rng, hook_i):
                   outro]
         filt = True
         variant["carousel"] = car
+    elif fmt == "pov":
+        bl = rng.choice(BROLL_LINES)
+        others = [p for p in PRESETS if p != preset]
+        rng.shuffle(others)
+        car = [preset] + others[:2]
+        scenes = [{**hook, "dur": 2.6, "broll": True},
+                  {"type": "beforeafter", "dur": 5.4, "preset": preset, "title": f"Look {HL(preset)}",
+                   "caption": rng.choice(["Un clic, et c’est appliqué", "Le filtre s’applique à tout l’écran"])},
+                  {"type": "brollText", "dur": 2.6, "lines": bl[0], "kicker": bl[1], "pos": rng.choice(["center", "low"])},
+                  {"type": "carousel", "dur": 4.6, "title": rng.choice(["Choisis ton look", "Lequel tu prends ?"]), "presets": car},
+                  {**outro, "broll": rng.random() < 0.5}]
+        filt = True
+        variant["broll_line"] = bl[0][0]
+        variant["carousel"] = car
+    elif fmt == "vraifaux":
+        picks = rng.sample(TRUTHS, 4)
+        scenes = [{**hook, "dur": 2.3, "broll": rng.random() < 0.6}]
+        for i, (st, v, d) in enumerate(picks):
+            scenes.append({"type": "truth", "dur": 3.6, "statement": st, "verdict": v, "detail": d,
+                           "kicker": f"Vrai ou faux ? {i + 1}/4", "broll": rng.random() < 0.5})
+        scenes.append(outro)
+        filt = False
+        preset = "-"
+        variant["truths"] = [p[0] for p in picks]
     else:
         raise ValueError(fmt)
+    # habillage varie : accroche et fin sur plans d'illustration libres de droits
+    if fmt not in ("pov", "vraifaux") and rng.random() < 0.5:
+        scenes[0]["broll"] = True
+        variant["broll_hook"] = True
+    if scenes[-1]["type"] == "outro" and "broll" not in scenes[-1] and rng.random() < 0.35:
+        scenes[-1]["broll"] = True
+        variant["broll_outro"] = True
     return scenes, preset, filt, variant
 
 
@@ -413,8 +492,10 @@ def generate_once(fmt_req=None, seed=None):
     os.makedirs(POSTS, exist_ok=True)
     gp = gameplay_sources(srng, workdir)
     gp_kind = gp[0]["kind"] if gp else None
+    n_br = sum(1 for sc in scenes if sc.get("broll") or sc["type"] == "brollText")
+    br = broll_sources(srng, workdir, n_br) if n_br else []
     cfg = {"seed": seed, "halos": HALOS[halos_i], "style": {"textIn": text_in}, "scenes": scenes,
-           "gameplay": {"sources": gp}}
+           "gameplay": {"sources": gp}, "broll": br}
     total = sum(s["dur"] for s in scenes)
     log(f"Format : {fmt} | accroche {hook_i} | look {preset} | {total:.1f} s | gameplay : {gp_kind} ({len(gp)} source(s))")
     cfg_path = os.path.join(workdir, "config.json")
@@ -447,12 +528,12 @@ def generate_once(fmt_req=None, seed=None):
 
     # 4) controles
     problems, checks = verify(out, report, workdir)
-    caption, cap_hook, tags = caption_for(fmt, srng, filt, gp_kind, fmt in ("auto", "jeux"))
+    caption, cap_hook, tags = caption_for(fmt, srng, filt, gp_kind, fmt in ("auto", "jeux", "vraifaux"))
     meta = {
         "id": vid, "created": datetime.now(TZ).isoformat(timespec="seconds"), "format": fmt, "signature": sig,
         "seed": seed, "hook": " ".join(html.unescape(l).replace('<span class="hl">', "").replace("</span>", "")
                                        for l in HOOKS[fmt][hook_i][0]),
-        "look": preset, "filtre_reproduit": filt, "gameplay": [g["name"] for g in gp], "musique": minfo,
+        "look": preset, "filtre_reproduit": filt, "gameplay": [g["name"] for g in gp], "plans": [b["name"] for b in br], "musique": minfo,
         "caption": caption, "hashtags": tags, "file": f"posts/{vid}.mp4", "controles": checks, "problemes": problems,
     }
     with open(os.path.join(POSTS, vid + ".json"), "w", encoding="utf-8") as f:
@@ -460,9 +541,8 @@ def generate_once(fmt_req=None, seed=None):
     if problems:
         os.remove(out)
         raise RuntimeError("controle echoue : " + " ; ".join(problems))
-    shutil.rmtree(os.path.join(workdir, "clip0"), ignore_errors=True)
-    for k in (1, 2):
-        shutil.rmtree(os.path.join(workdir, f"clip{k}"), ignore_errors=True)
+    for d in glob.glob(os.path.join(workdir, "clip*")) + glob.glob(os.path.join(workdir, "broll*")):
+        shutil.rmtree(d, ignore_errors=True)
     return meta
 
 

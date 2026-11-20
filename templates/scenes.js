@@ -53,6 +53,27 @@
     return { box, img, top, filter: f, update, src };
   }
 
+  // ---------- plans d'illustration libres de droits (jamais filtres : ce ne sont pas des captures de jeu) ----------
+  const BR = (CFG.broll || []);
+  let brCursor = 0;
+  function broll(ctx, strong) {
+    const box = el('div', 'bgv', null, ctx.root);
+    const img = el('img', null, null, box);
+    const tint = el('div', 'tint', null, box);
+    if (strong) tint.style.opacity = 1.0; else tint.style.opacity = 0.85;
+    const src = BR.length ? BR[(brCursor++) % BR.length] : null;
+    ctx.add(box, { at: 0, kind: 'fade', din: 0.3, silent: true, dout: 0.3, exitScale: 1 });
+    ctx.root.classList.add('onv');
+    let last = '';
+    return (lt, dur) => {
+      if (!src) return;
+      const i = Math.min(src.count - 1, Math.floor(lt * src.fps));
+      const url = `${src.dir}/f_${String(i + 1).padStart(5, '0')}.jpg`;
+      if (url !== last) { last = url; img.src = url; IMG_WAITS.add(img.decode().catch(() => {})); }
+      img.style.transform = `scale(${lerp(1.0, 1.08, ease.inOutCubic(clamp(lt / Math.max(dur, 0.1)))).toFixed(4)})`;
+    };
+  }
+
   function foot(root) { return el('div', 'foot txt', FOOT, root); }
   function col(root, top = 330, height = 1200, gap = 40) {
     const c = el('div', 'col', null, root);
@@ -64,12 +85,39 @@
   // =====================================================================
   const BUILD = {
     hook(s, ctx) {
+      const bu = s.broll ? broll(ctx) : null;
       const c = col(ctx.root, 330, 1150, 34);
       let at = 0.05;
       if (s.kicker) { ctx.add(el('div', 'pill txt', s.kicker, c), { at, kind: 'pop' }); at += 0.18; }
       s.lines.forEach(l => { ctx.add(el('div', 'h1 txt', l, c), { at, kind: kindIn(), sfx: 'tick' }); at += 0.16; });
       if (s.sub) ctx.add(el('div', 'sub txt', s.sub, c), { at: at + 0.15, kind: 'up', dist: 60 });
       ev(ctx.t0 + 0.05, 'impact', 1);
+      if (bu) return (t, lt) => bu(lt, s.dur);
+    },
+
+    brollText(s, ctx) {
+      const bu = broll(ctx);
+      const c = col(ctx.root, s.pos === 'low' ? 900 : 330, s.pos === 'low' ? 620 : 1150, 26);
+      let at = 0.2;
+      if (s.kicker) { ctx.add(el('div', 'pill txt', s.kicker, c), { at, kind: 'pop' }); at += 0.15; }
+      s.lines.forEach(l => { ctx.add(el('div', (s.big ? 'h1' : 'h2') + ' txt', l, c), { at, kind: kindIn() }); at += 0.18; });
+      if (s.sub) ctx.add(el('div', 'sub txt', s.sub, c), { at: at + 0.2, kind: 'up', dist: 50 });
+      return (t, lt) => bu(lt, s.dur);
+    },
+
+    truth(s, ctx) {
+      const bu = s.broll ? broll(ctx, true) : null;
+      const c = col(ctx.root, 330, 1150, 40);
+      ctx.add(el('div', 'pill txt', s.kicker || 'Vrai ou faux ?', c), { at: 0.05, kind: 'pop' });
+      ctx.add(el('div', 'h2 txt', `« ${s.statement} »`, c), { at: 0.2, kind: kindIn() });
+      const st = el('div', 'stamp txt ' + (s.verdict === 'VRAI' ? 'v' : 'f'), s.verdict, c);
+      ctx.add(st, { at: 1.15, kind: 'zoom', sfx: 'impact', strength: 0.9 });
+      ctx.add(el('div', 'sub txt', s.detail, c), { at: 1.5, kind: 'up', dist: 50 });
+      return (t, lt) => {
+        if (bu) bu(lt, s.dur);
+        const k = clamp((lt - 1.15) / 0.5);
+        st.style.transform += ` rotate(${lerp(-14, -4, ease.spring(k)).toFixed(2)}deg)`;
+      };
     },
 
     steps(s, ctx) {
@@ -363,6 +411,7 @@
     },
 
     outro(s, ctx) {
+      const bu = s.broll ? broll(ctx, true) : null;
       const c = col(ctx.root, 330, 1180, 34);
       ctx.add(el('div', null, LOGO(230), c), { at: 0.05, kind: 'zoom', sfx: 'impact', until: null });
       ctx.add(el('div', 'h1 txt', s.title || 'Disponible maintenant', c), { at: 0.3, kind: kindIn(), until: null });
@@ -370,6 +419,7 @@
       const b = el('div', 'btn txt', 'Lien en bio', c);
       ctx.add(b, { at: 0.85, kind: 'pop', until: null, strength: 1 });
       return (t, lt) => {
+        if (bu) bu(lt, s.dur);
         // pulsation douce du bouton (sinus, pas lineaire)
         if (lt > 1.6) {
           const k = 1 + 0.035 * Math.sin((lt - 1.6) * 5.2);
