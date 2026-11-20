@@ -111,6 +111,13 @@ def check_url(url, size, tries=12):
     raise RuntimeError(f"lien raw inaccessible : {last}")
 
 
+def tiktok_title(caption):
+    """Titre TikTok obligatoire pour Metricool : la phrase d'accroche, sans emoji, 90 caracteres max."""
+    first = caption.split("\n")[0]
+    clean = "".join(ch for ch in first if ord(ch) < 0x2190 or ch in "’…").strip(" :")
+    return clean[:90].rstrip()
+
+
 def cmd_prepare(a):
     vid = a.id
     mp4 = os.path.join(POSTS, vid + ".mp4")
@@ -149,7 +156,7 @@ def cmd_prepare(a):
             "disableComment": False, "disableDuet": False, "disableStitch": False,
             "privacyOption": "PUBLIC_TO_EVERYONE",
             "commercialContentThirdParty": False, "commercialContentOwnBrand": True,
-            "title": "", "autoAddMusic": False, "isAigc": True,
+            "title": tiktok_title(meta["caption"]), "autoAddMusic": False, "isAigc": True,
         },
     }
     out = {"blogId": METRICOOL_BLOG_ID, "date": when.isoformat(timespec="seconds"), "info": info, "url": url}
