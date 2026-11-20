@@ -501,8 +501,10 @@ def generate_once(fmt_req=None, seed=None):
         text_in = rng.choice(["up", "tilt", "left"])
         sig = f"{fmt}|h{hook_i}|{preset}|{json.dumps(variant, ensure_ascii=False, sort_keys=True)}|c{halos_i}|{text_in}"
         # pas la meme accroche qu'une des 10 dernieres videos (meme format)
-        recent_hooks = {"|".join((k["signature"] or "").split("|")[:2]) for k in known[-10:] if k.get("signature")}
-        if sig not in used and f"{fmt}|h{hook_i}" not in recent_hooks:
+        recent = [k for k in known if k.get("signature")][-20:]
+        recent_hooks = {"|".join(k["signature"].split("|")[:2]) for k in recent}
+        recent_looks = {(k["signature"].split("|")[0], k["signature"].split("|")[2]) for k in recent}
+        if sig not in used and f"{fmt}|h{hook_i}" not in recent_hooks and (fmt, preset) not in recent_looks:
             break
     else:
         raise RuntimeError("impossible de trouver une combinaison inedite")
