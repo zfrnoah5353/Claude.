@@ -150,7 +150,7 @@
       const mk = el('div', 'mock txt', 'Maquette de l’interface', root); mk.style.top = '1528px';
       ctx.add(mk, { at: 0.6, kind: 'fade', silent: true });
       const ft = foot(root); ctx.add(ft, { at: 0.6, kind: 'fade', silent: true });
-      ft.style.top = '1566px'; mk.style.top = '1528px';
+      ft.style.top = '1556px'; mk.style.top = '1522px';
       const ranges = [[0, 5], [0.5, 2], [-0.5, 0.5], [-1, 1]];
       const sls = [...app.querySelectorAll('.sl')];
       const chips = [...app.querySelectorAll('.pr span')];
