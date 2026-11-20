@@ -109,7 +109,7 @@
       const bu = s.broll ? broll(ctx, true) : null;
       const c = col(ctx.root, 330, 1150, 40);
       ctx.add(el('div', 'pill txt', s.kicker || 'Vrai ou faux ?', c), { at: 0.05, kind: 'pop' });
-      ctx.add(el('div', 'h2 txt', `« ${s.statement} »`, c), { at: 0.2, kind: kindIn() });
+      ctx.add(el('div', 'h2 txt', `«\u00a0${s.statement}\u00a0»`, c), { at: 0.2, kind: kindIn() });
       const st = el('div', 'stamp txt ' + (s.verdict === 'VRAI' ? 'v' : 'f'), s.verdict, c);
       ctx.add(st, { at: 1.15, kind: 'zoom', sfx: 'impact', strength: 0.9 });
       ctx.add(el('div', 'sub txt', s.detail, c), { at: 1.5, kind: 'up', dist: 50 });
