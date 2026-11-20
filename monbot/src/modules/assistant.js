@@ -1,15 +1,16 @@
-// 🤖 Assistant IA (Claude Haiku) : répond
+// 🤖 Assistant IA : répond
 //  - en message privé à MonBot,
-//  - dans le salon #🤖・parler-à-claude (créé tout seul s'il n'existe pas),
+//  - dans le salon #🤖・parler-à-monbot (créé tout seul s'il n'existe pas),
 //  - quand on mentionne @MonBot,
 //  - dans les tickets, au membre qui l'a ouvert, jusqu'à ce que le staff prenne le relais.
-// Il faut ANTHROPIC_API_KEY dans les variables d'environnement (sinon il reste muet et le dit).
+// Sans clé : IA gratuite de Pollinations (sans compte). Avec ANTHROPIC_API_KEY : Claude Haiku.
 import { Events, ChannelType } from 'discord.js';
 import Anthropic from '@anthropic-ai/sdk';
 import { getTicket, saveTicket, isTicketStaff } from './tickets.js';
 import { kvGet, kvSet } from '../db.js';
 
-export const SALON_IA = '🤖・parler-à-claude';
+export const SALON_IA = '🤖・parler-à-monbot';
+const ANCIEN_SALON = '🤖・parler-à-claude';
 const MODEL = 'claude-haiku-5-5';
 const PAR_JOUR = 60;          // messages IA par membre et par jour (sauf le propriétaire du serveur)
 const PAUSE_MS = 4000;         // délai minimum entre deux questions d'un même membre
@@ -43,10 +44,19 @@ async function historique(m) {
   }).join('\n');
 }
 
+// IA gratuite, sans compte ni clé (Pollinations)
+async function iaGratuite(texte) {
+  const r = await fetch('https://text.pollinations.ai/openai', {
+    method: 'POST', headers: { 'content-type': 'application/json' }, signal: AbortSignal.timeout(90e3),
+    body: JSON.stringify({ model: 'openai', messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content: texte }] }),
+  });
+  if (!r.ok) throw new Error(`IA gratuite : ${r.status}`);
+  return (await r.json())?.choices?.[0]?.message?.content?.trim();
+}
+
 const nettoie = (m) => m.content.replace(new RegExp(`<@!?${m.client.user.id}>`, 'g'), '@MonBot').trim();
 
 async function repondre(m, contexte) {
-  if (!process.env.ANTHROPIC_API_KEY) return m.reply('🤖 L\'IA n\'est pas encore branchée (il manque la clé ANTHROPIC_API_KEY).').catch(() => {});
   const now = Date.now();
   if (now - (derniers.get(m.author.id) || 0) < PAUSE_MS) return;
   derniers.set(m.author.id, now);
@@ -65,15 +75,21 @@ async function repondre(m, contexte) {
       ...[...m.attachments.values()].map(a => `[pièce jointe : ${a.name}]`),
     ].join('\n');
 
-    ai ??= new Anthropic();
-    const r = await ai.messages.create({
-      model: MODEL, max_tokens: 2000,
-      output_config: { effort: 'low' },
-      system: SYSTEM,
-      messages: [{ role: 'user', content: texte }],
-    });
-    if (r.stop_reason === 'refusal') return m.reply('🤖 Je ne peux pas répondre à ça, désolé.').catch(() => {});
-    let rep = r.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim() || '🤖 …';
+    let rep;
+    if (process.env.ANTHROPIC_API_KEY) {
+      ai ??= new Anthropic();
+      const r = await ai.messages.create({
+        model: MODEL, max_tokens: 2000,
+        output_config: { effort: 'low' },
+        system: SYSTEM,
+        messages: [{ role: 'user', content: texte }],
+      });
+      if (r.stop_reason === 'refusal') return m.reply('🤖 Je ne peux pas répondre à ça, désolé.').catch(() => {});
+      rep = r.content.filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
+    } else {
+      rep = await iaGratuite(texte);
+    }
+    rep ||= '🤖 …';
     // Discord : 2000 caractères max par message
     const morceaux = rep.match(/[\s\S]{1,1990}(?=\n|$)|[\s\S]{1,1990}/g) || [rep];
     let first = true;
@@ -85,7 +101,7 @@ async function repondre(m, contexte) {
     const msg = e instanceof Anthropic.RateLimitError ? 'Trop de questions en même temps, réessaie dans une minute.'
       : e instanceof Anthropic.AuthenticationError ? 'La clé de l\'IA est invalide.'
       : e instanceof Anthropic.APIError ? 'L\'IA ne répond pas pour l\'instant, réessaie plus tard.'
-      : 'Une erreur est survenue.';
+      : 'L\'IA ne répond pas pour l\'instant, réessaie dans une minute.';
     console.error('Assistant IA :', e?.message || e);
     await m.reply(`🤖 ${msg}`).catch(() => {});
   } finally { clearInterval(typing); }
@@ -95,10 +111,12 @@ async function repondre(m, contexte) {
 async function salonIA(guild) {
   await guild.channels.fetch().catch(() => {});
   if (guild.channels.cache.some(c => c.name === SALON_IA)) return;
+  const ancien = guild.channels.cache.find(c => c.name === ANCIEN_SALON);
+  if (ancien) return ancien.edit({ name: SALON_IA, topic: 'Pose tes questions à MonBot : il te répond avec l\'IA. /help pour les commandes.' }).catch(e => console.error('Salon IA :', e.message));
   const general = guild.channels.cache.find(c => c.name === '💬・général');
   await guild.channels.create({
     name: SALON_IA, type: ChannelType.GuildText, parent: general?.parentId ?? null,
-    topic: 'Pose tes questions à MonBot : il te répond avec l\'IA (Claude). /help pour les commandes.',
+    topic: 'Pose tes questions à MonBot : il te répond avec l\'IA. /help pour les commandes.',
     rateLimitPerUser: 5, reason: 'Salon de l\'assistant IA',
   }).then(c => console.log(`✅ Salon ${c.name} créé.`)).catch(e => console.error('Salon IA :', e.message));
 }
