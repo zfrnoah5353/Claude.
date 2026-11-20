@@ -1,0 +1,63 @@
+{
+ "id": "20261120-154747-pov",
+ "created": "2026-11-20T15:51:03+01:00",
+ "format": "pov",
+ "signature": "pov|h2|FPS|{\"broll_line\": \"Un raccourci,\", \"carousel\": [\"FPS\", \"Vibrant\", \"Naturel\"]}|c3|left",
+ "seed": 2037221787,
+ "hook": "POV : ton pote te demande ton réglage",
+ "look": "FPS",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_b.jpg",
+  "scene_a.jpg"
+ ],
+ "plans": [
+  "mk51603_0.mp4",
+  "mk43532_0.mp4",
+  "mk43540_0.mp4"
+ ],
+ "musique": {
+  "tempo": 110,
+  "tonalite": "Sol mineur",
+  "accords": "i-vii-vi-vii",
+  "batterie": "halftime",
+  "charleston": "8",
+  "arpege": "random",
+  "basse": "pulse",
+  "septiemes": true
+ },
+ "caption": "POV : tu découvres Ctrl+Alt+C en pleine partie ⌨️\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #fps #astucepc #setupgaming #valorantfr #windows11 #jeuxvideo",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#fps",
+  "#astucepc",
+  "#setupgaming",
+  "#valorantfr",
+  "#windows11",
+  "#jeuxvideo"
+ ],
+ "file": "posts/20261120-154747-pov.mp4",
+ "controles": {
+  "duree": 18.8,
+  "son_moyen_db": -15.4,
+  "son_crete_db": -0.4,
+  "bandes": [
+   [
+    46.708373015873015,
+    36.54300925925926
+   ],
+   [
+    49.8926455026455,
+    36.36366402116402
+   ],
+   [
+    53.81683862433862,
+    40.253412698412696
+   ]
+  ],
+  "taille_mo": 10.51,
+  "planche": "/home/user/Claude./work/20261120-154747-pov/planche.jpg"
+ },
+ "problemes": []
+}
