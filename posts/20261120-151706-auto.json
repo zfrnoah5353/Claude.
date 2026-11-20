@@ -1,0 +1,58 @@
+{
+ "id": "20261120-151706-auto",
+ "created": "2026-11-20T15:19:25+01:00",
+ "format": "auto",
+ "signature": "auto|h0|Cinématique|{}|c1|tilt",
+ "seed": 2035380348,
+ "hook": "Ton look s’active tout seul",
+ "look": "Cinématique",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_a.jpg",
+  "scene_b.jpg"
+ ],
+ "musique": {
+  "tempo": 125,
+  "tonalite": "Mi mineur",
+  "accords": "i-vi-iii-vii",
+  "batterie": "broken",
+  "charleston": "8",
+  "arpege": "up",
+  "basse": "pulse",
+  "septiemes": false
+ },
+ "caption": "Lance ton jeu, ton look s’applique tout seul 🎮\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #apexlegends #warzone #valorantclips #jeuxvideo #gaming #pcgaming",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#apexlegends",
+  "#warzone",
+  "#valorantclips",
+  "#jeuxvideo",
+  "#gaming",
+  "#pcgaming"
+ ],
+ "file": "posts/20261120-151706-auto.mp4",
+ "controles": {
+  "duree": 19.4,
+  "son_moyen_db": -12.2,
+  "son_crete_db": 0.0,
+  "bandes": [
+   [
+    71.7068716931217,
+    62.148306878306876
+   ],
+   [
+    82.28287698412699,
+    58.04833994708995
+   ],
+   [
+    69.96074735449736,
+    62.4389417989418
+   ]
+  ],
+  "taille_mo": 6.81,
+  "planche": "/home/user/Claude./work/20261120-151706-auto/planche.jpg"
+ },
+ "problemes": []
+}
