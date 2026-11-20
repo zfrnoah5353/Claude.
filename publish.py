@@ -67,7 +67,7 @@ def push():
 
 
 def commit(paths, msg):
-    git("add", "-A", "--", *paths)
+    git("add", "-A", "-f", "--", *paths)
     if git("diff", "--cached", "--name-only"):
         git("commit", "-q", "-m", msg)
     push()
