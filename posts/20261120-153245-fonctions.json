@@ -1,0 +1,63 @@
+{
+ "id": "20261120-153245-fonctions",
+ "created": "2026-11-20T15:35:49+01:00",
+ "format": "fonctions",
+ "signature": "fonctions|h0|FPS|{\"broll_outro\": true, \"order\": [\"Un look par jeu\", \"Raccourcis globaux\", \"Auto en jeu\", \"5 curseurs\", \"5 préréglages\", \"4 optimisations Windows\", \"Icône près de l’horloge\"]}|c0|up",
+ "seed": 2036319072,
+ "hook": "Tout ce que fait ColorTweaks",
+ "look": "FPS",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_a.jpg",
+  "scene_b.jpg"
+ ],
+ "plans": [
+  "mk43526_1.mp4"
+ ],
+ "musique": {
+  "tempo": 118,
+  "tonalite": "Mib mineur",
+  "accords": "vi-vii-i-i",
+  "batterie": "halftime",
+  "charleston": "off",
+  "arpege": "random",
+  "basse": "8",
+  "septiemes": true
+ },
+ "caption": "Une appli gratuite pour booster les couleurs de tes jeux 🎮\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #valorantfr #jeuxvideo #gamer #pcgamer #gamingfr #gaming #valorantclips #windows11",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#valorantfr",
+  "#jeuxvideo",
+  "#gamer",
+  "#pcgamer",
+  "#gamingfr",
+  "#gaming",
+  "#valorantclips",
+  "#windows11"
+ ],
+ "file": "posts/20261120-153245-fonctions.mp4",
+ "controles": {
+  "duree": 19.9,
+  "son_moyen_db": -13.9,
+  "son_crete_db": 0.0,
+  "bandes": [
+   [
+    74.41914021164021,
+    51.42160714285714
+   ],
+   [
+    76.3516865079365,
+    58.993611111111115
+   ],
+   [
+    56.29419312169312,
+    35.73290343915344
+   ]
+  ],
+  "taille_mo": 7.59,
+  "planche": "/home/user/Claude./work/20261120-153245-fonctions/planche.jpg"
+ },
+ "problemes": []
+}
