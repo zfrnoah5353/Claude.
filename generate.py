@@ -259,11 +259,11 @@ CURRENT_LOOK = {}
 
 
 def build_v2(fmt, rng, hook_i):
-    strong = ["Néon", "Vibrant", "FPS"]
+    strong = ["Néon", "Vibrant"]
     rng.shuffle(strong)
-    rest = ["Cinématique", "Naturel"]
+    rest = ["Cinématique", "Naturel", "FPS"]
     rng.shuffle(rest)
-    looks = strong[:1] + rng.sample(strong[1:] + rest, 4)
+    looks = strong[:1] + rng.sample(strong[1:] + rest, 4)  # revelation toujours sur Néon ou Vibrant
     main = looks[0]
     gp = rng.randrange(2)
     hook = {"type": "v2hook", "dur": 1.8, "text": V2_HOOKS[fmt][hook_i], "sub": rng.choice(V2_SUBS), "gp": gp,
