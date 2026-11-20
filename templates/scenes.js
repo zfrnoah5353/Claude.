@@ -90,10 +90,10 @@
       const c = col(root, 300, 220, 10);
       ctx.add(el('div', 'h2 txt', s.title, c), { at: 0.05, kind: kindIn() });
       if (s.sub) ctx.add(el('div', 'sub txt', s.sub, c), { at: 0.2, kind: 'up', dist: 60 });
-      const g = gameplay(root, 110, 560, 860, 420, { preset: s.from });
+      const g = gameplay(root, 150, 520, 780, 380, { preset: s.from });
       ctx.add(g.box, { at: 0.25, kind: 'pop' });
       const app = el('div', 'app', null, root);
-      Object.assign(app.style, { left: '70px', top: '1010px', width: '940px', height: '510px' });
+      Object.assign(app.style, { left: '70px', top: '925px', width: '940px', height: '585px' });
       app.innerHTML = `<div class="side">${['Accueil', 'Panneau couleurs', 'Jeux', 'Profils', 'Performances', 'Raccourcis'].map((n, i) => `<span class="it${i === 1 ? ' on' : ''}">${n}</span>`).join('')}</div>
         <div class="main"><div class="mh"><span>Panneau couleurs</span><span class="tg"><i></i></span></div>
         ${['Saturation', 'Contraste', 'Luminosité', 'Température'].map(n => `<div class="sl"><div><span>${n}</span><span class="v">0</span></div><i><u></u><b></b></i></div>`).join('')}
