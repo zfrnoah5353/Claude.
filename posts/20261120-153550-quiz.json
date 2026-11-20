@@ -1,0 +1,63 @@
+{
+ "id": "20261120-153550-quiz",
+ "created": "2026-11-20T15:39:14+01:00",
+ "format": "quiz",
+ "signature": "quiz|h0|FPS/Naturel/Néon/Vibrant|{\"broll_hook\": true}|c4|up",
+ "seed": 2036504457,
+ "hook": "Quel look est fait pour toi ?",
+ "look": "FPS/Naturel/Néon/Vibrant",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_b.jpg",
+  "scene_a.jpg"
+ ],
+ "plans": [
+  "mk43532_0.mp4"
+ ],
+ "musique": {
+  "tempo": 119,
+  "tonalite": "Do majeur",
+  "accords": "I-V-VI-IV",
+  "batterie": "four",
+  "charleston": "8",
+  "arpege": "up",
+  "basse": "off",
+  "septiemes": true
+ },
+ "caption": "Quel look ColorTweaks est fait pour toi ? Dis ta lettre en commentaire 👇\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #pcgaming #valorantfr #pcgamer #setupgaming #gamingfr #windows11 #tiktokgaming #fps",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#pcgaming",
+  "#valorantfr",
+  "#pcgamer",
+  "#setupgaming",
+  "#gamingfr",
+  "#windows11",
+  "#tiktokgaming",
+  "#fps"
+ ],
+ "file": "posts/20261120-153550-quiz.mp4",
+ "controles": {
+  "duree": 20.8,
+  "son_moyen_db": -13.6,
+  "son_crete_db": 0.0,
+  "bandes": [
+   [
+    49.99845238095238,
+    36.88185185185185
+   ],
+   [
+    76.48772486772486,
+    68.71559523809523
+   ],
+   [
+    76.43642857142858,
+    59.43971560846561
+   ]
+  ],
+  "taille_mo": 10.02,
+  "planche": "/home/user/Claude./work/20261120-153550-quiz/planche.jpg"
+ },
+ "problemes": []
+}
