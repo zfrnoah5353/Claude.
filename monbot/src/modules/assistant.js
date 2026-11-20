@@ -45,13 +45,31 @@ async function historique(m) {
 }
 
 // IA gratuite, sans compte ni clé (Pollinations)
-async function iaGratuite(texte) {
-  const r = await fetch('https://text.pollinations.ai/openai', {
-    method: 'POST', headers: { 'content-type': 'application/json' }, signal: AbortSignal.timeout(90e3),
-    body: JSON.stringify({ model: 'openai', referrer: 'monbot', messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content: texte }] }),
-  });
-  if (!r.ok) throw new Error(`IA gratuite : ${r.status} ${(await r.text().catch(() => '')).slice(0, 300)}`);
-  return (await r.json())?.choices?.[0]?.message?.content?.trim();
+// La version gratuite n'accepte qu'une réponse toutes les 45 s par adresse IP (et l'IP de Render est partagée) :
+// les questions passent une par une, et on attend puis on réessaie quand elle demande de patienter.
+let file = Promise.resolve();
+const attendre = (ms) => new Promise(r => setTimeout(r, ms));
+async function appelGratuit(texte) {
+  for (let essai = 0; essai < 4; essai++) {
+    const r = await fetch('https://text.pollinations.ai/openai', {
+      method: 'POST', headers: { 'content-type': 'application/json' }, signal: AbortSignal.timeout(90e3),
+      body: JSON.stringify({ model: 'openai', referrer: 'monbot', messages: [{ role: 'system', content: SYSTEM }, { role: 'user', content: texte }] }),
+    });
+    if (r.ok) return (await r.json())?.choices?.[0]?.message?.content?.trim();
+    const corps = await r.text().catch(() => '');
+    if (r.status === 402 || r.status === 429) {
+      const s = Number(corps.match(/after (\d+)\s*s/i)?.[1] || r.headers.get('retry-after') || 45);
+      await attendre((Math.min(s, 60) + 1) * 1000);
+      continue;
+    }
+    throw new Error(`IA gratuite : ${r.status} ${corps.slice(0, 300)}`);
+  }
+  throw new Error('IA gratuite : trop de demandes, réessaie plus tard');
+}
+function iaGratuite(texte) {
+  const p = file.then(() => appelGratuit(texte));
+  file = p.catch(() => {});
+  return p;
 }
 
 const nettoie = (m) => m.content.replace(new RegExp(`<@!?${m.client.user.id}>`, 'g'), '@MonBot').trim();
