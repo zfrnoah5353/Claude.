@@ -305,9 +305,10 @@
     "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=-2443059923428619232",
     "date": "2026-11-21T02:20:00+01:00"
    },
-   "status": "programme",
+   "status": "remplace",
    "published_at": "2026-11-21T02:20:00+01:00",
-   "deleted_at": null
+   "deleted_at": null,
+   "remplace_par": "20261120-235146-v2choc"
   },
   {
    "id": "20261120-153834-vraifaux",
@@ -412,9 +413,10 @@
     "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=-567918778367521209",
     "date": "2026-11-21T06:20:00+01:00"
    },
-   "status": "programme",
+   "status": "remplace",
    "published_at": "2026-11-21T06:20:00+01:00",
-   "deleted_at": null
+   "deleted_at": null,
+   "remplace_par": "20261120-235401-v2astuce"
   },
   {
    "id": "20261120-234151-v2pov",
@@ -474,6 +476,36 @@
    },
    "status": "programme",
    "published_at": "2026-11-21T04:20:00+01:00",
+   "deleted_at": null
+  },
+  {
+   "id": "20261120-235146-v2choc",
+   "format": "v2choc",
+   "signature": "v2choc|h1|Vibrant|{\"looks\": [\"Vibrant\", \"Naturel\", \"Néon\", \"FPS\"]}|c1|tilt",
+   "look": "Vibrant",
+   "hook": "Ton VALORANT est trop terne",
+   "musique": {
+    "tempo": 111,
+    "tonalite": "Do majeur",
+    "accords": "I-VI-IV-V",
+    "batterie": "broken",
+    "charleston": "8",
+    "arpege": "down",
+    "basse": "pulse",
+    "septiemes": true
+   },
+   "file": "posts/20261120-235146-v2choc.mp4",
+   "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-235146-v2choc.mp4",
+   "caption": "Avant ou après ? 👇\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #windows11 #gamer #gaming #astucepc #gamingfr #pcgaming #fps",
+   "created": "2026-11-20T23:54:00+01:00",
+   "metricool": {
+    "post_id": "436180788",
+    "uuid": "-2443059923428619232",
+    "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=-2443059923428619232",
+    "date": "2026-11-21T02:20:00+01:00"
+   },
+   "status": "programme",
+   "published_at": "2026-11-21T02:20:00+01:00",
    "deleted_at": null
   }
  ]
