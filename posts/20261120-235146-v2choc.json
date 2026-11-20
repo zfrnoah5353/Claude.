@@ -1,0 +1,62 @@
+{
+ "id": "20261120-235146-v2choc",
+ "created": "2026-11-20T23:54:00+01:00",
+ "format": "v2choc",
+ "signature": "v2choc|h1|Vibrant|{\"looks\": [\"Vibrant\", \"Naturel\", \"Néon\", \"FPS\"]}|c1|tilt",
+ "seed": 2066260382,
+ "hook": "Ton VALORANT est trop terne",
+ "look": "Vibrant",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_a.jpg",
+  "scene_b.jpg"
+ ],
+ "plans": [
+  "mk43526_0.mp4"
+ ],
+ "musique": {
+  "tempo": 111,
+  "tonalite": "Do majeur",
+  "accords": "I-VI-IV-V",
+  "batterie": "broken",
+  "charleston": "8",
+  "arpege": "down",
+  "basse": "pulse",
+  "septiemes": true
+ },
+ "caption": "Avant ou après ? 👇\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #windows11 #gamer #gaming #astucepc #gamingfr #pcgaming #fps",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#windows11",
+  "#gamer",
+  "#gaming",
+  "#astucepc",
+  "#gamingfr",
+  "#pcgaming",
+  "#fps"
+ ],
+ "file": "posts/20261120-235146-v2choc.mp4",
+ "controles": {
+  "duree": 12.2,
+  "son_moyen_db": -13.5,
+  "son_crete_db": -0.2,
+  "bandes": [
+   [
+    133.44058862433863,
+    63.5376917989418
+   ],
+   [
+    151.1386574074074,
+    99.6257671957672
+   ],
+   [
+    70.1358201058201,
+    37.8337962962963
+   ]
+  ],
+  "taille_mo": 5.21,
+  "planche": "/home/user/Claude./work/20261120-235146-v2choc/planche.jpg"
+ },
+ "problemes": []
+}
