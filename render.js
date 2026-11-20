@@ -35,7 +35,7 @@ const path = require('path');
 
   // instants de controle : fin d'entree de chaque scene (tout est affiche)
   const checks = new Set();
-  info.scenes.forEach(([a, b]) => { checks.add(Math.round(Math.min(b - 0.45, a + (b - a) * 0.8) * FPS)); });
+  info.scenes.forEach(([a, b]) => { checks.add(Math.round((a + (b - a) * 0.5) * FPS)); checks.add(Math.round(Math.min(b - 0.45, a + (b - a) * 0.8) * FPS)); });
   const layout = [];
   const keyframes = [];
   const kfDir = path.join(path.dirname(reportPath), 'keyframes');
