@@ -380,9 +380,10 @@
     "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=-5215260014448589337",
     "date": "2026-11-21T00:20:00+01:00"
    },
-   "status": "programme",
+   "status": "remplace",
    "published_at": "2026-11-21T00:20:00+01:00",
-   "deleted_at": null
+   "deleted_at": null,
+   "remplace_par": "20261120-234151-v2pov"
   },
   {
    "id": "20261120-155019-auto",
@@ -412,6 +413,36 @@
    },
    "status": "programme",
    "published_at": "2026-11-21T06:20:00+01:00",
+   "deleted_at": null
+  },
+  {
+   "id": "20261120-234151-v2pov",
+   "format": "v2pov",
+   "signature": "v2pov|h3|Néon|{\"looks\": [\"Néon\", \"FPS\", \"Cinématique\", \"Vibrant\"]}|c1|left",
+   "look": "Néon",
+   "hook": "POV : ton pote voit ton écran",
+   "musique": {
+    "tempo": 125,
+    "tonalite": "Sol mineur",
+    "accords": "i-vi-iii-vii",
+    "batterie": "halftime",
+    "charleston": "8",
+    "arpege": "random",
+    "basse": "off",
+    "septiemes": false
+   },
+   "file": "posts/20261120-234151-v2pov.mp4",
+   "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-234151-v2pov.mp4",
+   "caption": "POV : tu découvres ColorTweaks 😳\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #astucepc #gaming #fps #valoranttips #gamer #pcgamer #pcgaming #windows11",
+   "created": "2026-11-20T23:44:05+01:00",
+   "metricool": {
+    "post_id": "436171577",
+    "uuid": "-5215260014448589337",
+    "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=-5215260014448589337",
+    "date": "2026-11-21T00:20:00+01:00"
+   },
+   "status": "programme",
+   "published_at": "2026-11-21T00:20:00+01:00",
    "deleted_at": null
   }
  ]
