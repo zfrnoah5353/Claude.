@@ -11,8 +11,14 @@ Toute erreur définitive va dans `errors.log` (via `publish.py fail`) et rien n'
 - Si `scipy` manque : `pip install -q scipy numpy`.
 - `git pull --ff-only origin $(git rev-parse --abbrev-ref HEAD)` pour avoir le dernier `history.json` (ignore une erreur réseau).
 
+## 0 ter. Publications refusées par TikTok
+Appelle `mcp__Metricool_Social_Media_Management__getScheduledPosts` (brandId 7583648, Europe/Paris, de maintenant - 6 h à
+maintenant + 1 h). Pour chaque post dont `providers[0].status` vaut `ERROR` (par ex. « too many posts via OpenAPI ») :
+reprogramme-le avec `updateScheduledPost` à maintenant + 60 min (contenu identique), note la ligne dans `errors.log`
+et mets à jour sa date dans `history.json`.
+
 ## 0 bis. Combien de vidéos
-`python3 publish.py plan` → `a_faire`. Si `a_faire` vaut 0 (des vidéos sont déjà programmées pour les 2 prochaines
+`python3 publish.py plan` → `a_faire` (0 aussi si `limite_tiktok` : déjà 12 publications sur 24 h). Si `a_faire` vaut 0 (des vidéos sont déjà programmées pour les 2 prochaines
 heures), fais seulement le nettoyage (étape 1) et termine en le disant en une ligne. Sinon produis `a_faire` vidéo(s)
 .
 

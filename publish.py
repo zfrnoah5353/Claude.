@@ -256,8 +256,18 @@ def cmd_plan(a):
         if t - timedelta(minutes=10) <= d < t + timedelta(minutes=90):
             soon += 1
     target = 1  # 6 passages par jour, une video chacun
+    # limite TikTok : trop de publications via l'API en 24 h glissantes => blocage (erreur 403)
+    last24 = 0
+    for p in h["posts"]:
+        if p.get("status") == "programme" and p.get("published_at"):
+            d = datetime.fromisoformat(p["published_at"])
+            if t - timedelta(hours=24) <= d <= t + timedelta(minutes=90):
+                last24 += 1
     need = max(0, target - soon)
-    print(json.dumps({"heure": t.strftime("%H:%M"), "objectif": target, "deja_programmees": soon, "a_faire": need}))
+    if last24 >= 12:
+        need = 0
+    print(json.dumps({"heure": t.strftime("%H:%M"), "objectif": target, "deja_programmees": soon, "sur_24h": last24,
+                      "a_faire": need, "limite_tiktok": last24 >= 12}))
 
 
 def cmd_status(a):
