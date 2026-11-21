@@ -7,7 +7,7 @@
 // sinon l'IA gratuite de Pollinations (sans compte), et Pollinations en secours si Gemini échoue.
 import { Events, ChannelType } from 'discord.js';
 import Anthropic from '@anthropic-ai/sdk';
-import { getTicket, saveTicket, isTicketStaff } from './tickets.js';
+import { getTicket } from './tickets.js';
 import { kvGet, kvSet } from '../db.js';
 import { gemini, geminiActif } from '../gemini.js';
 
@@ -162,14 +162,13 @@ export function setup(client) {
     // Message privé
     if (!m.guild) return repondre(m, 'message privé avec MonBot');
 
-    // Ticket : l'IA aide le membre tant que le staff n'a pas pris le relais
+    // Ticket : l'IA aide celui qui a ouvert le ticket, tant qu'un staff n'a pas
+    // cliqué sur « prendre en charge » (claimedBy). Elle répond donc tout de suite,
+    // même dans un ticket déjà ouvert.
     const t = getTicket(m.channelId);
     if (t && !t.closed) {
-      if (t.claimedBy || t.iaOff) return;
-      // L'IA répond toujours à celui qui a ouvert le ticket (même s'il est staff).
+      if (t.claimedBy) return;
       if (m.author.id === t.owner) return repondre(m, `ticket de support #${m.channel.name}`);
-      // Un AUTRE membre du staff qui écrit = prise en charge humaine : l'IA se tait.
-      if (m.member && isTicketStaff(m.member, t)) { t.iaOff = true; saveTicket(m.channelId, t); return; }
       return;
     }
 
