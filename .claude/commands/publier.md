@@ -2,10 +2,8 @@
 description: Génère, vérifie et publie une vidéo promo ColorTweaks sur TikTok via Metricool, puis nettoie
 ---
 
-Tu publies des vidéos promo TikTok ColorTweaks : **2 vidéos** si l'heure de Paris est entre 17 h et 22 h 59
-(la 2e programmée 60 min après la 1re : `publish.py prepare <id> --delay 60`), sinon **1 vidéo**.
-Pour chaque vidéo, enchaîne les étapes 2 à 7 (la 2e vidéo est générée après l'enregistrement de la 1re
-dans history.json, pour qu'elle soit différente). Travaille dans la racine du dépôt, sans poser de question
+Tu publies UNE vidéo promo TikTok ColorTweaks (style v2 par défaut). Rythme : 6 passages par jour
+(10 h 20, 12 h 20, 14 h 20, 17 h 20, 19 h 20, 21 h 20, heure de Paris), aucun la nuit. Travaille dans la racine du dépôt, sans poser de question
 (mode non interactif). Ne publie jamais une vidéo qui n'a pas passé tous les contrôles.
 Toute erreur définitive va dans `errors.log` (via `publish.py fail`) et rien n'est publié.
 
@@ -16,7 +14,7 @@ Toute erreur définitive va dans `errors.log` (via `publish.py fail`) et rien n'
 ## 0 bis. Combien de vidéos
 `python3 publish.py plan` → `a_faire`. Si `a_faire` vaut 0 (des vidéos sont déjà programmées pour les 2 prochaines
 heures), fais seulement le nettoyage (étape 1) et termine en le disant en une ligne. Sinon produis `a_faire` vidéo(s)
-(cela remplace la règle 2 vidéos / 1 vidéo ci-dessus).
+.
 
 ## 1. Nettoyage
 `python3 publish.py cleanup` (supprime du dépôt les vidéos publiées il y a plus de 48 h).
@@ -55,4 +53,4 @@ est normale : garde l'id renvoyé par createScheduledPost.
 `python3 publish.py record <id> --post-id <id Metricool> --uuid <uuid> --planner-url <plannerUrl> --date <date>`
 
 ## 8. Compte rendu
-Termine par 3 lignes par vidéo : format et accroche, heure de publication prévue, lien `plannerUrl`.
+Termine par 3 lignes : format et accroche, heure de publication prévue, lien `plannerUrl`.

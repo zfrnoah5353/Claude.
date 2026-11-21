@@ -253,9 +253,9 @@ def cmd_plan(a):
         if p.get("status") != "programme":
             continue
         d = datetime.fromisoformat(p["published_at"])
-        if t - timedelta(minutes=10) <= d < t + timedelta(hours=2):
+        if t - timedelta(minutes=10) <= d < t + timedelta(minutes=90):
             soon += 1
-    target = 2 if 17 <= t.hour <= 22 else 1
+    target = 1  # 6 passages par jour, une video chacun
     need = max(0, target - soon)
     print(json.dumps({"heure": t.strftime("%H:%M"), "objectif": target, "deja_programmees": soon, "a_faire": need}))
 
