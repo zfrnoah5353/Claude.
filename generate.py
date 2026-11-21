@@ -205,11 +205,31 @@ def gameplay_sources(rng, workdir, need_seconds=12):
     pool = [("clip", c) for c in clips] + [("still", s) for s in stills]
     if not pool:
         return []
-    # source principale : un clip anime 3 fois sur 4 quand il y en a
-    if clips and rng.random() < 0.75:
-        first = ("clip", rng.choice(clips))
-    else:
-        first = ("still", rng.choice(stills)) if stills else ("clip", rng.choice(clips))
+    # rotation des jeux : le jeu principal change a chaque video (pas celui des 2 dernieres)
+    by_game = {}
+    for c in clips:
+        by_game.setdefault(meta.get(os.path.basename(c), {}).get("game", "jeu"), []).append(("clip", c))
+    if stills:
+        by_game.setdefault("VALORANT", []).extend(("still", s) for s in stills)
+    recent = []
+    for mp2 in sorted(glob.glob(os.path.join(POSTS, "*.json")), key=os.path.getmtime)[::-1]:
+        if mp2.endswith(".metricool.json"):
+            continue
+        try:
+            with open(mp2, encoding="utf-8") as f:
+                j = json.load(f)
+            g0 = j.get("jeux_principal") or (j.get("jeux") or ["VALORANT"])[0]
+            if g0:
+                recent.append(g0)
+        except Exception:  # noqa
+            pass
+        if len(recent) >= 2:
+            break
+    games_ok = [g for g in by_game if g not in recent] or list(by_game)
+    # les clips animes passent avant les captures fixes quand c'est possible
+    animated = [g for g in games_ok if any(k == "clip" for k, _ in by_game[g])]
+    main_game = rng.choice(animated if animated and rng.random() < 0.8 else games_ok)
+    first = rng.choice(by_game[main_game])
     rest = [x for x in pool if x != first]
     chosen = [first] + ([rng.choice(rest)] if rest else [])
     srcs = []
@@ -652,7 +672,7 @@ def generate_once(fmt_req=None, seed=None):
         "id": vid, "created": datetime.now(TZ).isoformat(timespec="seconds"), "format": fmt, "signature": sig,
         "seed": seed, "hook": (V2_HOOKS[fmt][hook_i].replace("[", "").replace("]", "") if fmt.startswith("v2") else
                  " ".join(html.unescape(l).replace('<span class="hl">', "").replace("</span>", "") for l in HOOKS[fmt][hook_i][0])),
-        "look": preset, "filtre_reproduit": filt, "gameplay": [g["name"] for g in gp], "jeux": games, "plans": [b["name"] for b in br], "musique": minfo,
+        "look": preset, "filtre_reproduit": filt, "gameplay": [g["name"] for g in gp], "jeux": games, "jeux_principal": gp[0]["game"] if gp else None, "plans": [b["name"] for b in br], "musique": minfo,
         "caption": caption, "hashtags": tags, "file": f"posts/{vid}.mp4", "controles": checks, "problemes": problems,
     }
     with open(os.path.join(POSTS, vid + ".json"), "w", encoding="utf-8") as f:
