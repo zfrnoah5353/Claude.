@@ -193,29 +193,47 @@ def write_error(stage, msg):
 
 # ---------------------------------------------------------------- gameplay
 def gameplay_sources(rng, workdir, need_seconds=12):
-    """Clips de assets/clips (decoupes en images) sinon captures fixes assets/samples."""
+    """Melange de sources de jeu : clips libres (assets/clips, credits dans SOURCES.json) et captures
+    VALORANT du site (assets/samples). Retourne 2 sources : la principale d'abord."""
+    meta = {}
+    mp = os.path.join(ROOT, "assets", "clips", "SOURCES.json")
+    if os.path.exists(mp):
+        with open(mp, encoding="utf-8") as f:
+            meta = json.load(f)
     clips = sorted(glob.glob(os.path.join(ROOT, "assets", "clips", "*.mp4")))
+    stills = sorted(glob.glob(os.path.join(ROOT, "assets", "samples", "*.jpg")))
+    pool = [("clip", c) for c in clips] + [("still", s) for s in stills]
+    if not pool:
+        return []
+    # source principale : un clip anime 3 fois sur 4 quand il y en a
+    if clips and rng.random() < 0.75:
+        first = ("clip", rng.choice(clips))
+    else:
+        first = ("still", rng.choice(stills)) if stills else ("clip", rng.choice(clips))
+    rest = [x for x in pool if x != first]
+    chosen = [first] + ([rng.choice(rest)] if rest else [])
     srcs = []
-    if clips:
-        chosen = rng.sample(clips, min(3, len(clips)))
-        for k, c in enumerate(chosen):
+    for k, (kind, path) in enumerate(chosen):
+        name = os.path.basename(path)
+        info = meta.get(name, {})
+        game = info.get("game", "VALORANT" if kind == "still" else "jeu")
+        credit = info.get("credit")
+        if kind == "clip":
             dur = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration",
-                                                 "-of", "csv=p=0", c]).decode().strip() or 0)
+                                                 "-of", "csv=p=0", path]).decode().strip() or 0)
             seg = min(need_seconds, max(1.0, dur - 0.2))
             start = rng.uniform(0, max(0.0, dur - seg - 0.1))
             d = os.path.join(workdir, f"clip{k}")
             os.makedirs(d, exist_ok=True)
-            subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{start:.2f}", "-t", f"{seg:.2f}", "-i", c,
+            subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{start:.2f}", "-t", f"{seg:.2f}", "-i", path,
                             "-vf", "fps=30,scale=1280:-2:flags=lanczos", "-q:v", "3", os.path.join(d, "f_%05d.jpg")],
                            check=True)
             n = len(glob.glob(os.path.join(d, "f_*.jpg")))
             if n:
                 srcs.append({"kind": "clip", "dir": "file://" + d, "fps": 30, "count": n, "start": 0,
-                             "name": os.path.basename(c)})
-    if not srcs:
-        stills = sorted(glob.glob(os.path.join(ROOT, "assets", "samples", "*.jpg")))
-        rng.shuffle(stills)
-        srcs = [{"kind": "still", "src": "file://" + s, "name": os.path.basename(s)} for s in stills]
+                             "name": name, "game": game, "credit": credit})
+        else:
+            srcs.append({"kind": "still", "src": "file://" + path, "name": name, "game": game, "credit": None})
     return srcs
 
 
@@ -265,7 +283,7 @@ def build_v2(fmt, rng, hook_i):
     rng.shuffle(rest)
     looks = strong[:1] + rng.sample(strong[1:] + rest, 4)  # revelation toujours sur Néon ou Vibrant
     main = looks[0]
-    gp = rng.randrange(2)
+    gp = 0  # source principale (clip anime si disponible) pour l accroche et la revelation
     hook = {"type": "v2hook", "dur": 1.8, "text": V2_HOOKS[fmt][hook_i], "sub": rng.choice(V2_SUBS), "gp": gp,
             "top": rng.choice([300, 330, 360])}
     reveal = {"type": "v2reveal", "dur": 3.2, "preset": main, "gp": gp,
@@ -571,6 +589,12 @@ def generate_once(fmt_req=None, seed=None):
     os.makedirs(POSTS, exist_ok=True)
     gp = gameplay_sources(srng, workdir)
     gp_kind = gp[0]["kind"] if gp else None
+    games = sorted({g["game"] for g in gp})
+    if gp and gp[0]["game"] != "VALORANT":
+        for sc in scenes:
+            for key in ("text", "sub"):
+                if isinstance(sc.get(key), str):
+                    sc[key] = sc[key].replace("VALORANT", "jeu")
     n_br = sum(1 for sc in scenes if sc.get("broll") or sc["type"] in ("brollText", "v2line"))
     br = broll_sources(srng, workdir, n_br) if n_br else []
     style = {"textIn": text_in}
@@ -611,11 +635,17 @@ def generate_once(fmt_req=None, seed=None):
     # 4) controles
     problems, checks = verify(out, report, workdir)
     caption, cap_hook, tags = caption_for(fmt, srng, filt, gp_kind, fmt in ("auto", "jeux", "vraifaux"))
+    if "VALORANT" not in games:
+        caption = caption.replace("#valorantclips ", "").replace("#valoranttips ", "").replace("#valorantfr ", "").replace("#valorant ", "#fps ")
+    credits = [g["credit"] for g in gp if g.get("credit")]
+    if credits:
+        parts = caption.rsplit("\n\n", 1)
+        caption = parts[0] + "\nImages de jeu : " + " ; ".join(dict.fromkeys(credits)) + "\n\n" + parts[1]
     meta = {
         "id": vid, "created": datetime.now(TZ).isoformat(timespec="seconds"), "format": fmt, "signature": sig,
         "seed": seed, "hook": (V2_HOOKS[fmt][hook_i].replace("[", "").replace("]", "") if fmt.startswith("v2") else
                  " ".join(html.unescape(l).replace('<span class="hl">', "").replace("</span>", "") for l in HOOKS[fmt][hook_i][0])),
-        "look": preset, "filtre_reproduit": filt, "gameplay": [g["name"] for g in gp], "plans": [b["name"] for b in br], "musique": minfo,
+        "look": preset, "filtre_reproduit": filt, "gameplay": [g["name"] for g in gp], "jeux": games, "plans": [b["name"] for b in br], "musique": minfo,
         "caption": caption, "hashtags": tags, "file": f"posts/{vid}.mp4", "controles": checks, "problemes": problems,
     }
     with open(os.path.join(POSTS, vid + ".json"), "w", encoding="utf-8") as f:

@@ -70,6 +70,7 @@
     return `translate(${(Math.sin(d * 90) * k).toFixed(1)}px,${(Math.cos(d * 77) * k).toFixed(1)}px)`;
   }
   const BR = CFG.broll || [];
+  const credOf = list => { const c = [...new Set(list.filter(x => x && x.credit).map(x => x.credit))]; return c.length ? FOOT + ' · Jeu : ' + c.join(' ; ') : FOOT; };
   const GP = (CFG.gameplay && CFG.gameplay.sources) || [];
 
   const V2 = {
@@ -98,7 +99,7 @@
       const la = el('div', 'v2tag', 'AVANT', ctx.root); la.style.left = '40px';
       const lb = el('div', 'v2tag on', 'APRÈS', ctx.root); lb.style.right = '40px';
       const cap = caption(ctx.root, s.text, 'mid', 1320);
-      const foot = el('div', 'v2foot txt', FOOT, ctx.root);
+      const foot = el('div', 'v2foot txt', credOf([src]), ctx.root);
       const flash = el('div', 'v2flash', null, ctx.root);
       ev(ctx.t0, 'impact', 1.2);
       ev(ctx.t0 + 1.5, 'riser', 0.6);
@@ -130,7 +131,7 @@
         const cap = caption(ctx.root, s.numbered ? `${i + 1}. [${p}]` : `[${p}]`, 'huge', 1150);
         return { g, cap, p };
       });
-      const foot = el('div', 'v2foot txt', FOOT, ctx.root);
+      const foot = el('div', 'v2foot txt', credOf(s.presets.map((p, i) => GP[(s.gp + i) % GP.length])), ctx.root);
       const flash = el('div', 'v2flash', null, ctx.root);
       layers.forEach((l, i) => ev(ctx.t0 + i * seg, i ? 'click' : 'pop', 1));
       return (t, lt) => {
