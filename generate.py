@@ -636,7 +636,14 @@ def generate_once(fmt_req=None, seed=None):
     problems, checks = verify(out, report, workdir)
     caption, cap_hook, tags = caption_for(fmt, srng, filt, gp_kind, fmt in ("auto", "jeux", "vraifaux"))
     if "VALORANT" not in games:
-        caption = caption.replace("#valorantclips ", "").replace("#valoranttips ", "").replace("#valorantfr ", "").replace("#valorant ", "#fps ")
+        head, tagline = caption.rsplit("\n\n", 1)
+        tags = [t for t in tagline.split() if "valorant" not in t]
+        for extra in ["#fps", "#gaming", "#gamer", "#jeuxvideo", "#gamingfr", "#pcgamer", "#pcgaming", "#windows11"]:
+            if len(tags) >= 9:
+                break
+            if extra not in tags:
+                tags.append(extra)
+        caption = head + "\n\n" + " ".join(tags)
     credits = [g["credit"] for g in gp if g.get("credit")]
     if credits:
         parts = caption.rsplit("\n\n", 1)
