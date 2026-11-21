@@ -1,0 +1,66 @@
+{
+ "id": "20261121-192057-v2question",
+ "created": "2026-11-21T19:22:58+01:00",
+ "format": "v2question",
+ "signature": "v2question|h0|Vibrant/Naturel/FPS|{\"looks\": [\"Vibrant\", \"Naturel\", \"FPS\", \"Néon\"]}|c2|tilt",
+ "seed": 2136411186,
+ "hook": "Lequel tu prends ? 1, 2 ou 3",
+ "look": "Vibrant/Naturel/FPS",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_a.jpg",
+  "redeclipse_2.mp4"
+ ],
+ "jeux": [
+  "Red Eclipse",
+  "VALORANT"
+ ],
+ "jeux_principal": "VALORANT",
+ "plans": [],
+ "musique": {
+  "tempo": 101,
+  "tonalite": "Fa# majeur",
+  "accords": "I-V-VI-IV",
+  "batterie": "halftime",
+  "charleston": "off",
+  "arpege": "random",
+  "basse": "pulse",
+  "septiemes": false
+ },
+ "caption": "1, 2 ou 3 ? Réponds en commentaire 👇\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\nImages de jeu : Red Eclipse, vidéo de Premitre (CC BY 3.0, Wikimedia Commons)\n\n#colortweaks #valorant #tiktokgaming #astucepc #pcgaming #windows11 #valorantfr #gamer #gaming #valoranttips",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#tiktokgaming",
+  "#astucepc",
+  "#pcgaming",
+  "#windows11",
+  "#valorantfr",
+  "#gamer",
+  "#gaming",
+  "#valoranttips"
+ ],
+ "file": "posts/20261121-192057-v2question.mp4",
+ "controles": {
+  "duree": 11.0,
+  "son_moyen_db": -16.2,
+  "son_crete_db": -0.0,
+  "bandes": [
+   [
+    133.43866402116402,
+    63.541765873015876
+   ],
+   [
+    181.41277116402117,
+    140.8821693121693
+   ],
+   [
+    70.12988095238096,
+    37.82121693121693
+   ]
+  ],
+  "taille_mo": 6.34,
+  "planche": "/home/user/Claude./work/20261121-192057-v2question/planche.jpg"
+ },
+ "problemes": []
+}
