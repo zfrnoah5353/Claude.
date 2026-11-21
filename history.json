@@ -657,6 +657,36 @@
    "status": "programme",
    "published_at": "2026-11-21T12:27:00+01:00",
    "deleted_at": null
+  },
+  {
+   "id": "20261121-140929-v2astuce",
+   "format": "v2astuce",
+   "signature": "v2astuce|h3|Néon|{\"looks\": [\"Néon\", \"Vibrant\", \"FPS\", \"Naturel\"]}|c3|up",
+   "look": "Néon",
+   "hook": "Même jeu, autres couleurs",
+   "musique": {
+    "tempo": 109,
+    "tonalite": "Fa# majeur",
+    "accords": "VI-IV-I-V",
+    "batterie": "halftime",
+    "charleston": "8",
+    "arpege": "updown",
+    "basse": "pulse",
+    "septiemes": true
+   },
+   "file": "posts/20261121-140929-v2astuce.mp4",
+   "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261121-140929-v2astuce.mp4",
+   "caption": "Un filtre gratuit pour tes jeux 🎨\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\nImages de jeu : Red Eclipse, vidéo de Premitre (CC BY 3.0, Wikimedia Commons)\n\n#colortweaks #pcgaming #astucepc #setupgaming #gaming #fps #gamer #jeuxvideo #gamingfr",
+   "created": "2026-11-21T14:12:25+01:00",
+   "metricool": {
+    "post_id": "436665429",
+    "uuid": "3519966249212200146",
+    "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=3519966249212200146",
+    "date": "2026-11-21T14:26:00+01:00"
+   },
+   "status": "programme",
+   "published_at": "2026-11-21T14:26:00+01:00",
+   "deleted_at": null
   }
  ]
 }
