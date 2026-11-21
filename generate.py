@@ -278,7 +278,7 @@ def build_v2(fmt, rng, hook_i):
     elif fmt == "v2pov":
         scenes = [hook, reveal, line, cuts, cta]
     elif fmt == "v2question":
-        cuts = {**cuts, "presets": looks[:3], "dur": 3.6}
+        cuts = {**cuts, "presets": looks[:3], "dur": 3.6, "numbered": True}
         scenes = [hook, cuts, {**reveal, "preset": looks[0], "text": "Moi je prends [" + looks[0] + "]"}, cta]
         main = "/".join(looks[:3])
     else:

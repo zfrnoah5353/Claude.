@@ -127,7 +127,7 @@
       const seg = s.dur / s.presets.length;
       const layers = s.presets.map((p, i) => {
         const g = fullGameplay(ctx.root, GP[(s.gp + i) % GP.length], p);
-        const cap = caption(ctx.root, `[${p}]`, 'huge', 1150);
+        const cap = caption(ctx.root, s.numbered ? `${i + 1}. [${p}]` : `[${p}]`, 'huge', 1150);
         return { g, cap, p };
       });
       const foot = el('div', 'v2foot txt', FOOT, ctx.root);
