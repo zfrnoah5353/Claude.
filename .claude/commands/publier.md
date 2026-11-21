@@ -13,7 +13,7 @@ Toute erreur définitive va dans `errors.log` (via `publish.py fail`) et rien n'
 
 ## 0 ter. Publications refusées par TikTok
 Appelle `mcp__Metricool_Social_Media_Management__getScheduledPosts` (brandId 7583648, Europe/Paris, de maintenant - 6 h à
-maintenant + 1 h). Pour chaque post dont `providers[0].status` vaut `ERROR` (par ex. « too many posts via OpenAPI ») :
+maintenant + 1 h). Pour chaque post dont `providers[0].status` vaut `ERROR` et qui n'est pas déjà marqué `echec` dans `history.json` (par ex. « too many posts via OpenAPI ») :
 reprogramme-le avec `updateScheduledPost` à maintenant + 60 min (contenu identique), note la ligne dans `errors.log`
 et mets à jour sa date dans `history.json`.
 
