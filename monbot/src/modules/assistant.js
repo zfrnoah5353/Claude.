@@ -166,8 +166,10 @@ export function setup(client) {
     const t = getTicket(m.channelId);
     if (t && !t.closed) {
       if (t.claimedBy || t.iaOff) return;
-      if (m.member && isTicketStaff(m.member, t)) { t.iaOff = true; saveTicket(m.channelId, t); return; }
+      // L'IA répond toujours à celui qui a ouvert le ticket (même s'il est staff).
       if (m.author.id === t.owner) return repondre(m, `ticket de support #${m.channel.name}`);
+      // Un AUTRE membre du staff qui écrit = prise en charge humaine : l'IA se tait.
+      if (m.member && isTicketStaff(m.member, t)) { t.iaOff = true; saveTicket(m.channelId, t); return; }
       return;
     }
 
