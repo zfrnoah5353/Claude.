@@ -624,9 +624,10 @@
     "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=1253197690106955329",
     "date": "2026-11-21T10:26:00+01:00"
    },
-   "status": "programme",
+   "status": "echec",
    "published_at": "2026-11-21T10:26:00+01:00",
-   "deleted_at": null
+   "deleted_at": null,
+   "erreur": "TikTok 403 : trop de publications via API en 24 h (non publiee)"
   },
   {
    "id": "20261121-122051-v2question",
@@ -654,9 +655,10 @@
     "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=7141850198549873879",
     "date": "2026-11-21T12:27:00+01:00"
    },
-   "status": "programme",
+   "status": "echec",
    "published_at": "2026-11-21T12:27:00+01:00",
-   "deleted_at": null
+   "deleted_at": null,
+   "erreur": "TikTok 403 : trop de publications via API en 24 h (non publiee)"
   },
   {
    "id": "20261121-140929-v2astuce",
