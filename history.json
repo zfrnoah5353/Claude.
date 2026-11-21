@@ -567,6 +567,36 @@
    "status": "programme",
    "published_at": "2026-11-21T07:29:00+01:00",
    "deleted_at": null
+  },
+  {
+   "id": "20261121-092113-v2choc",
+   "format": "v2choc",
+   "signature": "v2choc|h3|Néon|{\"looks\": [\"Néon\", \"FPS\", \"Vibrant\", \"Naturel\"]}|c4|tilt",
+   "look": "Néon",
+   "hook": "Ton écran mérite mieux",
+   "musique": {
+    "tempo": 113,
+    "tonalite": "Fa majeur",
+    "accords": "I-VI-IV-V",
+    "batterie": "broken",
+    "charleston": "8",
+    "arpege": "updown",
+    "basse": "pulse",
+    "septiemes": true
+   },
+   "file": "posts/20261121-092113-v2choc.mp4",
+   "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261121-092113-v2choc.mp4",
+   "caption": "Ton jeu peut être bien plus vivant 🎨\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #gaming #gamer #astucepc #gamingfr #valoranttips #valorantclips #jeuxvideo",
+   "created": "2026-11-21T09:23:27+01:00",
+   "metricool": {
+    "post_id": "436478164",
+    "uuid": "-7405870711974837211",
+    "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=-7405870711974837211",
+    "date": "2026-11-21T09:27:00+01:00"
+   },
+   "status": "programme",
+   "published_at": "2026-11-21T09:27:00+01:00",
+   "deleted_at": null
   }
  ]
 }
