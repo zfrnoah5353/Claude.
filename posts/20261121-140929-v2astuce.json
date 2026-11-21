@@ -1,0 +1,65 @@
+{
+ "id": "20261121-140929-v2astuce",
+ "created": "2026-11-21T14:12:25+01:00",
+ "format": "v2astuce",
+ "signature": "v2astuce|h3|Néon|{\"looks\": [\"Néon\", \"Vibrant\", \"FPS\", \"Naturel\"]}|c3|up",
+ "seed": 2117723492,
+ "hook": "Même jeu, autres couleurs",
+ "look": "Néon",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "redeclipse_3.mp4",
+  "redeclipse_4.mp4"
+ ],
+ "jeux": [
+  "Red Eclipse"
+ ],
+ "plans": [
+  "mk51603_0.mp4"
+ ],
+ "musique": {
+  "tempo": 109,
+  "tonalite": "Fa# majeur",
+  "accords": "VI-IV-I-V",
+  "batterie": "halftime",
+  "charleston": "8",
+  "arpege": "updown",
+  "basse": "pulse",
+  "septiemes": true
+ },
+ "caption": "Un filtre gratuit pour tes jeux 🎨\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\nImages de jeu : Red Eclipse, vidéo de Premitre (CC BY 3.0, Wikimedia Commons)\n\n#colortweaks #pcgaming #astucepc #setupgaming #gaming #fps #gamer #jeuxvideo #gamingfr",
+ "hashtags": [
+  "#colortweaks",
+  "#pcgaming",
+  "#astucepc",
+  "#setupgaming",
+  "#gaming",
+  "#fps",
+  "#gamer",
+  "#jeuxvideo",
+  "#gamingfr"
+ ],
+ "file": "posts/20261121-140929-v2astuce.mp4",
+ "controles": {
+  "duree": 12.2,
+  "son_moyen_db": -14.9,
+  "son_crete_db": -0.5,
+  "bandes": [
+   [
+    66.76225529100529,
+    35.23704365079365
+   ],
+   [
+    54.464794973544976,
+    39.137824074074075
+   ],
+   [
+    45.5439417989418,
+    39.828287037037036
+   ]
+  ],
+  "taille_mo": 13.74,
+  "planche": "/home/user/Claude./work/20261121-140929-v2astuce/planche.jpg"
+ },
+ "problemes": []
+}

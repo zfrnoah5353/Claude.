@@ -1,0 +1,61 @@
+{
+ "id": "20261121-072309-v2question",
+ "created": "2026-11-21T07:25:12+01:00",
+ "format": "v2question",
+ "signature": "v2question|h3|Vibrant/Néon/FPS|{\"looks\": [\"Vibrant\", \"Néon\", \"FPS\", \"Cinématique\"]}|c2|tilt",
+ "seed": 2093343722,
+ "hook": "1, 2 ou 3 ? Dis-le en com",
+ "look": "Vibrant/Néon/FPS",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_a.jpg",
+  "scene_b.jpg"
+ ],
+ "plans": [],
+ "musique": {
+  "tempo": 102,
+  "tonalite": "Sol majeur",
+  "accords": "I-V-VI-IV",
+  "batterie": "four",
+  "charleston": "16",
+  "arpege": "up",
+  "basse": "pulse",
+  "septiemes": false
+ },
+ "caption": "1, 2 ou 3 ? Réponds en commentaire 👇\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #gamer #valoranttips #pcgaming #windows11 #valorantclips #tiktokgaming #fps #valorantfr",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#gamer",
+  "#valoranttips",
+  "#pcgaming",
+  "#windows11",
+  "#valorantclips",
+  "#tiktokgaming",
+  "#fps",
+  "#valorantfr"
+ ],
+ "file": "posts/20261121-072309-v2question.mp4",
+ "controles": {
+  "duree": 11.0,
+  "son_moyen_db": -13.7,
+  "son_crete_db": -0.8,
+  "bandes": [
+   [
+    136.55809523809523,
+    91.27089947089947
+   ],
+   [
+    184.08703042328042,
+    158.04534391534392
+   ],
+   [
+    72.33916666666667,
+    50.350297619047616
+   ]
+  ],
+  "taille_mo": 4.27,
+  "planche": "/home/user/Claude./work/20261121-072309-v2question/planche.jpg"
+ },
+ "problemes": []
+}

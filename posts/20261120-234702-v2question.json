@@ -1,0 +1,59 @@
+{
+ "id": "20261120-234702-v2question",
+ "created": "2026-11-20T23:49:02+01:00",
+ "format": "v2question",
+ "signature": "v2question|h2|Néon/FPS/Naturel|{\"looks\": [\"Néon\", \"FPS\", \"Naturel\", \"Cinématique\"]}|c1|tilt",
+ "seed": 2065976703,
+ "hook": "Ton look préféré ?",
+ "look": "Néon/FPS/Naturel",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_b.jpg",
+  "scene_a.jpg"
+ ],
+ "plans": [],
+ "musique": {
+  "tempo": 117,
+  "tonalite": "Ré majeur",
+  "accords": "I-III-IV-V",
+  "batterie": "four",
+  "charleston": "16",
+  "arpege": "updown",
+  "basse": "8",
+  "septiemes": true
+ },
+ "caption": "Lequel tu gardes ? 👇\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #pcgaming #astucepc #gamer #windows11 #pcgamer #valoranttips",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#pcgaming",
+  "#astucepc",
+  "#gamer",
+  "#windows11",
+  "#pcgamer",
+  "#valoranttips"
+ ],
+ "file": "posts/20261120-234702-v2question.mp4",
+ "controles": {
+  "duree": 11.0,
+  "son_moyen_db": -12.2,
+  "son_crete_db": -0.4,
+  "bandes": [
+   [
+    133.43853835978837,
+    63.54992724867725
+   ],
+   [
+    181.53088624338625,
+    147.79130952380953
+   ],
+   [
+    70.36714285714285,
+    43.085152116402114
+   ]
+  ],
+  "taille_mo": 4.45,
+  "planche": "/home/user/Claude./work/20261120-234702-v2question/planche.jpg"
+ },
+ "problemes": []
+}

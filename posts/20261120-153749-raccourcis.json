@@ -1,0 +1,62 @@
+{
+ "id": "20261120-153749-raccourcis",
+ "created": "2026-11-20T15:40:55+01:00",
+ "format": "raccourcis",
+ "signature": "raccourcis|h0|Néon|{\"broll_hook\": true, \"cycle\": [\"Cinématique\", \"FPS\", \"Néon\", \"Naturel\", \"Vibrant\"]}|c3|tilt",
+ "seed": 2036623268,
+ "hook": "Un raccourci et tout change",
+ "look": "Néon",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_a.jpg",
+  "scene_b.jpg"
+ ],
+ "plans": [
+  "mk51605_1.mp4"
+ ],
+ "musique": {
+  "tempo": 113,
+  "tonalite": "Sol mineur",
+  "accords": "vi-vii-i-i",
+  "batterie": "four",
+  "charleston": "16",
+  "arpege": "updown",
+  "basse": "pulse",
+  "septiemes": true
+ },
+ "caption": "Ctrl+Alt+C pour activer, Ctrl+Alt+N pour changer de look ⌨️\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #gamingfr #valorantfr #setupgaming #valoranttips #windows11 #fps #gaming",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#gamingfr",
+  "#valorantfr",
+  "#setupgaming",
+  "#valoranttips",
+  "#windows11",
+  "#fps",
+  "#gaming"
+ ],
+ "file": "posts/20261120-153749-raccourcis.mp4",
+ "controles": {
+  "duree": 18.7,
+  "son_moyen_db": -14.2,
+  "son_crete_db": -0.1,
+  "bandes": [
+   [
+    49.85777777777778,
+    30.85822751322751
+   ],
+   [
+    56.50136904761905,
+    73.18010582010582
+   ],
+   [
+    72.80132936507937,
+    58.78478174603175
+   ]
+  ],
+  "taille_mo": 8.53,
+  "planche": "/home/user/Claude./work/20261120-153749-raccourcis/planche.jpg"
+ },
+ "problemes": []
+}

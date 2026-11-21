@@ -1,0 +1,62 @@
+{
+ "id": "20261121-092113-v2choc",
+ "created": "2026-11-21T09:23:27+01:00",
+ "format": "v2choc",
+ "signature": "v2choc|h3|Néon|{\"looks\": [\"Néon\", \"FPS\", \"Vibrant\", \"Naturel\"]}|c4|tilt",
+ "seed": 2100427629,
+ "hook": "Ton écran mérite mieux",
+ "look": "Néon",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_b.jpg",
+  "scene_a.jpg"
+ ],
+ "plans": [
+  "mk51616_0.mp4"
+ ],
+ "musique": {
+  "tempo": 113,
+  "tonalite": "Fa majeur",
+  "accords": "I-VI-IV-V",
+  "batterie": "broken",
+  "charleston": "8",
+  "arpege": "updown",
+  "basse": "pulse",
+  "septiemes": true
+ },
+ "caption": "Ton jeu peut être bien plus vivant 🎨\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #gaming #gamer #astucepc #gamingfr #valoranttips #valorantclips #jeuxvideo",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#gaming",
+  "#gamer",
+  "#astucepc",
+  "#gamingfr",
+  "#valoranttips",
+  "#valorantclips",
+  "#jeuxvideo"
+ ],
+ "file": "posts/20261121-092113-v2choc.mp4",
+ "controles": {
+  "duree": 12.2,
+  "son_moyen_db": -12.8,
+  "son_crete_db": 0.0,
+  "bandes": [
+   [
+    136.55628968253967,
+    91.27948412698413
+   ],
+   [
+    154.7599537037037,
+    114.13892195767195
+   ],
+   [
+    72.87443121693121,
+    53.379100529100526
+   ]
+  ],
+  "taille_mo": 5.4,
+  "planche": "/home/user/Claude./work/20261121-092113-v2choc/planche.jpg"
+ },
+ "problemes": []
+}

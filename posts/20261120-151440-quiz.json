@@ -1,0 +1,60 @@
+{
+ "id": "20261120-151440-quiz",
+ "created": "2026-11-20T15:17:05+01:00",
+ "format": "quiz",
+ "signature": "quiz|h0|Cinématique/Néon/FPS/Vibrant|{}|c1|tilt",
+ "seed": 2035234512,
+ "hook": "Quel look est fait pour toi ?",
+ "look": "Cinématique/Néon/FPS/Vibrant",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_a.jpg",
+  "scene_b.jpg"
+ ],
+ "musique": {
+  "tempo": 120,
+  "tonalite": "Si majeur",
+  "accords": "I-IV-V-IV",
+  "batterie": "four",
+  "charleston": "off",
+  "arpege": "up",
+  "basse": "off",
+  "septiemes": true
+ },
+ "caption": "A, B, C ou D ? Ton style de jeu choisit ton look 🎨\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #tiktokgaming #jeuxvideo #gamingfr #pcgamer #astucepc #valoranttips #valorantfr #pcgaming",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#tiktokgaming",
+  "#jeuxvideo",
+  "#gamingfr",
+  "#pcgamer",
+  "#astucepc",
+  "#valoranttips",
+  "#valorantfr",
+  "#pcgaming"
+ ],
+ "file": "posts/20261120-151440-quiz.mp4",
+ "controles": {
+  "duree": 20.8,
+  "son_moyen_db": -13.5,
+  "son_crete_db": -0.5,
+  "bandes": [
+   [
+    67.75580687830688,
+    56.73653439153439
+   ],
+   [
+    81.97113756613757,
+    64.07792989417989
+   ],
+   [
+    75.06030423280423,
+    59.827771164021165
+   ]
+  ],
+  "taille_mo": 8.79,
+  "planche": "/home/user/Claude./work/20261120-151440-quiz/planche.jpg"
+ },
+ "problemes": []
+}

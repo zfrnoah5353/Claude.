@@ -1,0 +1,41 @@
+{
+ "blogId": "7583648",
+ "date": "2026-11-20T22:20:00+01:00",
+ "info": {
+  "autoPublish": true,
+  "draft": false,
+  "descendants": [],
+  "firstCommentText": "",
+  "hasNotReadNotes": false,
+  "media": [
+   "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-153834-vraifaux.mp4"
+  ],
+  "mediaAltText": [],
+  "providers": [
+   {
+    "network": "tiktok"
+   }
+  ],
+  "publicationDate": {
+   "dateTime": "2026-11-20T22:20:00",
+   "timezone": "Europe/Paris"
+  },
+  "shortener": false,
+  "smartLinkData": {
+   "ids": []
+  },
+  "text": "On répond aux questions qu’on nous pose le plus 👇\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n\n#colortweaks #valorant #fortnite #warzone #setupgaming #valoranttips #windows11 #pcgaming",
+  "tiktokData": {
+   "disableComment": false,
+   "disableDuet": false,
+   "disableStitch": false,
+   "privacyOption": "PUBLIC_TO_EVERYONE",
+   "commercialContentThirdParty": false,
+   "commercialContentOwnBrand": true,
+   "title": "On répond aux questions qu’on nous pose le plus",
+   "autoAddMusic": false,
+   "isAigc": true
+  }
+ },
+ "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-153834-vraifaux.mp4"
+}
