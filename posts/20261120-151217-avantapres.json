@@ -1,0 +1,58 @@
+{
+ "id": "20261120-151217-avantapres",
+ "created": "2026-11-20T15:14:39+01:00",
+ "format": "avantapres",
+ "signature": "avantapres|h1|Cinématique|{\"carousel\": [\"Cinématique\", \"Vibrant\", \"Néon\", \"FPS\"]}|c2|tilt",
+ "seed": 2035091361,
+ "hook": "Avant / après sur VALORANT",
+ "look": "Cinématique",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_b.jpg",
+  "scene_a.jpg"
+ ],
+ "musique": {
+  "tempo": 128,
+  "tonalite": "Lab majeur",
+  "accords": "I-III-IV-V",
+  "batterie": "four",
+  "charleston": "16",
+  "arpege": "updown",
+  "basse": "pulse",
+  "septiemes": false
+ },
+ "caption": "Même partie, autres couleurs : avant / après avec ColorTweaks 🎨\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #gamer #astucepc #pcgamer #valoranttips #gaming #pcgaming",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#gamer",
+  "#astucepc",
+  "#pcgamer",
+  "#valoranttips",
+  "#gaming",
+  "#pcgaming"
+ ],
+ "file": "posts/20261120-151217-avantapres.mp4",
+ "controles": {
+  "duree": 20.7,
+  "son_moyen_db": -13.4,
+  "son_crete_db": -0.0,
+  "bandes": [
+   [
+    68.70863756613757,
+    79.82998677248678
+   ],
+   [
+    61.80304894179894,
+    77.6432738095238
+   ],
+   [
+    72.88464947089948,
+    81.95387566137566
+   ]
+  ],
+  "taille_mo": 8.22,
+  "planche": "/home/user/Claude./work/20261120-151217-avantapres/planche.jpg"
+ },
+ "problemes": []
+}

@@ -1,0 +1,41 @@
+{
+ "blogId": "7583648",
+ "date": "2026-11-20T20:20:00+01:00",
+ "info": {
+  "autoPublish": true,
+  "draft": false,
+  "descendants": [],
+  "firstCommentText": "",
+  "hasNotReadNotes": false,
+  "media": [
+   "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-153453-tuto.mp4"
+  ],
+  "mediaAltText": [],
+  "providers": [
+   {
+    "network": "tiktok"
+   }
+  ],
+  "publicationDate": {
+   "dateTime": "2026-11-20T20:20:00",
+   "timezone": "Europe/Paris"
+  },
+  "shortener": false,
+  "smartLinkData": {
+   "ids": []
+  },
+  "text": "Installer ColorTweaks prend une minute, voilà comment 👇\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #gamer #jeuxvideo #valorantclips #valoranttips #gamingfr #pcgaming",
+  "tiktokData": {
+   "disableComment": false,
+   "disableDuet": false,
+   "disableStitch": false,
+   "privacyOption": "PUBLIC_TO_EVERYONE",
+   "commercialContentThirdParty": false,
+   "commercialContentOwnBrand": true,
+   "title": "Installer ColorTweaks prend une minute, voilà comment",
+   "autoAddMusic": false,
+   "isAigc": true
+  }
+ },
+ "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261120-153453-tuto.mp4"
+}

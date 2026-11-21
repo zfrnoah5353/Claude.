@@ -1,0 +1,60 @@
+{
+ "id": "20261121-122051-v2question",
+ "created": "2026-11-21T12:22:54+01:00",
+ "format": "v2question",
+ "signature": "v2question|h1|Néon/Naturel/FPS|{\"looks\": [\"Néon\", \"Naturel\", \"FPS\", \"Cinématique\"]}|c3|tilt",
+ "seed": 2111205079,
+ "hook": "Tu choisis lequel ?",
+ "look": "Néon/Naturel/FPS",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_a.jpg",
+  "scene_b.jpg"
+ ],
+ "plans": [],
+ "musique": {
+  "tempo": 125,
+  "tonalite": "Ré mineur",
+  "accords": "i-vi-iv-v",
+  "batterie": "broken",
+  "charleston": "16",
+  "arpege": "down",
+  "basse": "off",
+  "septiemes": false
+ },
+ "caption": "Ton look préféré en com 👇\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #gamingfr #pcgaming #valorantfr #fps #gamer #gaming #windows11",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#gamingfr",
+  "#pcgaming",
+  "#valorantfr",
+  "#fps",
+  "#gamer",
+  "#gaming",
+  "#windows11"
+ ],
+ "file": "posts/20261121-122051-v2question.mp4",
+ "controles": {
+  "duree": 11.0,
+  "son_moyen_db": -12.9,
+  "son_crete_db": -0.9,
+  "bandes": [
+   [
+    136.55780423280424,
+    91.27191137566138
+   ],
+   [
+    185.20462962962964,
+    161.65052248677247
+   ],
+   [
+    72.87184523809523,
+    53.36185185185185
+   ]
+  ],
+  "taille_mo": 4.38,
+  "planche": "/home/user/Claude./work/20261121-122051-v2question/planche.jpg"
+ },
+ "problemes": []
+}

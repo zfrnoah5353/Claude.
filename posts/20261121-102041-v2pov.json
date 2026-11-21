@@ -1,0 +1,63 @@
+{
+ "id": "20261121-102041-v2pov",
+ "created": "2026-11-21T10:22:49+01:00",
+ "format": "v2pov",
+ "signature": "v2pov|h2|Vibrant|{\"looks\": [\"Vibrant\", \"FPS\", \"Cinématique\", \"Naturel\"]}|c3|up",
+ "seed": 2103995292,
+ "hook": "POV : ton écran se réveille",
+ "look": "Vibrant",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_a.jpg",
+  "scene_b.jpg"
+ ],
+ "plans": [
+  "mk51609_0.mp4"
+ ],
+ "musique": {
+  "tempo": 102,
+  "tonalite": "Do# majeur",
+  "accords": "IV-V-I-VI",
+  "batterie": "halftime",
+  "charleston": "off",
+  "arpege": "updown",
+  "basse": "pulse",
+  "septiemes": true
+ },
+ "caption": "POV : ton écran passe en mode Vibrant ⚡\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #gamer #valorantfr #pcgamer #setupgaming #jeuxvideo #pcgaming #gamingfr #gaming",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#gamer",
+  "#valorantfr",
+  "#pcgamer",
+  "#setupgaming",
+  "#jeuxvideo",
+  "#pcgaming",
+  "#gamingfr",
+  "#gaming"
+ ],
+ "file": "posts/20261121-102041-v2pov.mp4",
+ "controles": {
+  "duree": 12.2,
+  "son_moyen_db": -15.9,
+  "son_crete_db": -0.8,
+  "bandes": [
+   [
+    133.43942460317461,
+    63.54422619047619
+   ],
+   [
+    57.36142195767196,
+    35.765099206349205
+   ],
+   [
+    70.1358201058201,
+    37.837030423280424
+   ]
+  ],
+  "taille_mo": 5.12,
+  "planche": "/home/user/Claude./work/20261121-102041-v2pov/planche.jpg"
+ },
+ "problemes": []
+}

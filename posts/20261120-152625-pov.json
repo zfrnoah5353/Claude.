@@ -1,0 +1,63 @@
+{
+ "id": "20261120-152625-pov",
+ "created": "2026-11-20T15:29:08+01:00",
+ "format": "pov",
+ "signature": "pov|h1|Néon|{\"broll_line\": \"Ton setup\", \"carousel\": [\"Néon\", \"Vibrant\", \"Cinématique\"]}|c1|tilt",
+ "seed": 2035939066,
+ "hook": "POV : tu découvres Ctrl+Alt+C",
+ "look": "Néon",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_b.jpg",
+  "scene_a.jpg"
+ ],
+ "plans": [
+  "mk43532_0.mp4",
+  "mk43526_1.mp4"
+ ],
+ "musique": {
+  "tempo": 100,
+  "tonalite": "Mi mineur",
+  "accords": "i-vii-vi-vii",
+  "batterie": "halftime",
+  "charleston": "8",
+  "arpege": "updown",
+  "basse": "8",
+  "septiemes": true
+ },
+ "caption": "POV : tes couleurs passent de fades à vivantes en un raccourci 🎮\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #setupgaming #windows11 #gamingfr #astucepc #fps #pcgaming #valorantclips",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#setupgaming",
+  "#windows11",
+  "#gamingfr",
+  "#astucepc",
+  "#fps",
+  "#pcgaming",
+  "#valorantclips"
+ ],
+ "file": "posts/20261120-152625-pov.mp4",
+ "controles": {
+  "duree": 18.8,
+  "son_moyen_db": -14.3,
+  "son_crete_db": -0.6,
+  "bandes": [
+   [
+    50.010906084656085,
+    36.87291005291005
+   ],
+   [
+    50.600648148148146,
+    30.693756613756612
+   ],
+   [
+    79.79632936507936,
+    61.47313492063492
+   ]
+  ],
+  "taille_mo": 9.29,
+  "planche": "/home/user/Claude./work/20261120-152625-pov/planche.jpg"
+ },
+ "problemes": []
+}

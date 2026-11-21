@@ -1,0 +1,63 @@
+{
+ "id": "20261120-235401-v2astuce",
+ "created": "2026-11-20T23:56:09+01:00",
+ "format": "v2astuce",
+ "signature": "v2astuce|h0|Vibrant|{\"looks\": [\"Vibrant\", \"FPS\", \"Naturel\", \"Cinématique\"]}|c3|up",
+ "seed": 2066395043,
+ "hook": "Astuce Windows 11 pour tes jeux",
+ "look": "Vibrant",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_a.jpg",
+  "scene_b.jpg"
+ ],
+ "plans": [
+  "mk43532_0.mp4"
+ ],
+ "musique": {
+  "tempo": 99,
+  "tonalite": "Mi majeur",
+  "accords": "VI-IV-I-V",
+  "batterie": "halftime",
+  "charleston": "off",
+  "arpege": "down",
+  "basse": "8",
+  "septiemes": true
+ },
+ "caption": "L’astuce Windows 11 pour des couleurs plus vives 🎮\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #pcgaming #valorantclips #fps #astucepc #pcgamer #gamingfr #gaming #setupgaming",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#pcgaming",
+  "#valorantclips",
+  "#fps",
+  "#astucepc",
+  "#pcgamer",
+  "#gamingfr",
+  "#gaming",
+  "#setupgaming"
+ ],
+ "file": "posts/20261120-235401-v2astuce.mp4",
+ "controles": {
+  "duree": 12.2,
+  "son_moyen_db": -15.4,
+  "son_crete_db": -1.0,
+  "bandes": [
+   [
+    133.42725529100528,
+    63.49106481481481
+   ],
+   [
+    55.15136904761905,
+    38.5010582010582
+   ],
+   [
+    70.1358201058201,
+    37.83588624338624
+   ]
+  ],
+  "taille_mo": 5.31,
+  "planche": "/home/user/Claude./work/20261120-235401-v2astuce/planche.jpg"
+ },
+ "problemes": []
+}

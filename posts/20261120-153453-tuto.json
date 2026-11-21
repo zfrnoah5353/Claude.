@@ -1,0 +1,62 @@
+{
+ "id": "20261120-153453-tuto",
+ "created": "2026-11-20T15:38:33+01:00",
+ "format": "tuto",
+ "signature": "tuto|h2|Naturel|{\"broll_hook\": true, \"broll_outro\": true}|c1|left",
+ "seed": 2036447664,
+ "hook": "Comment installer ColorTweaks ?",
+ "look": "Naturel",
+ "filtre_reproduit": true,
+ "gameplay": [
+  "scene_a.jpg",
+  "scene_b.jpg"
+ ],
+ "plans": [
+  "mk51612_0.mp4",
+  "mk51613_1.mp4"
+ ],
+ "musique": {
+  "tempo": 103,
+  "tonalite": "Sib majeur",
+  "accords": "VI-IV-I-V",
+  "batterie": "broken",
+  "charleston": "8",
+  "arpege": "up",
+  "basse": "8",
+  "septiemes": false
+ },
+ "caption": "Installer ColorTweaks prend une minute, voilà comment 👇\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #gamer #jeuxvideo #valorantclips #valoranttips #gamingfr #pcgaming",
+ "hashtags": [
+  "#colortweaks",
+  "#valorant",
+  "#gamer",
+  "#jeuxvideo",
+  "#valorantclips",
+  "#valoranttips",
+  "#gamingfr",
+  "#pcgaming"
+ ],
+ "file": "posts/20261120-153453-tuto.mp4",
+ "controles": {
+  "duree": 20.8,
+  "son_moyen_db": -13.9,
+  "son_crete_db": -0.8,
+  "bandes": [
+   [
+    50.40010582010582,
+    30.520654761904762
+   ],
+   [
+    78.59512566137566,
+    65.58731481481482
+   ],
+   [
+    55.699113756613755,
+    36.1480753968254
+   ]
+  ],
+  "taille_mo": 9.05,
+  "planche": "/home/user/Claude./work/20261120-153453-tuto/planche.jpg"
+ },
+ "problemes": []
+}
