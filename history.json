@@ -597,6 +597,36 @@
    "status": "programme",
    "published_at": "2026-11-21T09:27:00+01:00",
    "deleted_at": null
+  },
+  {
+   "id": "20261121-102041-v2pov",
+   "format": "v2pov",
+   "signature": "v2pov|h2|Vibrant|{\"looks\": [\"Vibrant\", \"FPS\", \"Cinématique\", \"Naturel\"]}|c3|up",
+   "look": "Vibrant",
+   "hook": "POV : ton écran se réveille",
+   "musique": {
+    "tempo": 102,
+    "tonalite": "Do# majeur",
+    "accords": "IV-V-I-VI",
+    "batterie": "halftime",
+    "charleston": "off",
+    "arpege": "updown",
+    "basse": "pulse",
+    "septiemes": true
+   },
+   "file": "posts/20261121-102041-v2pov.mp4",
+   "url": "https://raw.githubusercontent.com/zfrnoah5353/Claude./refs/heads/claude/colortweaks-tiktok-agent-kyj3p8/posts/20261121-102041-v2pov.mp4",
+   "caption": "POV : ton écran passe en mode Vibrant ⚡\n\n⬇️ Lien en bio pour le télécharger : gratuit, Windows 11.\n*Rendu du filtre reproduit au montage : la capture Windows n’enregistre pas le filtre.\n\n#colortweaks #valorant #gamer #valorantfr #pcgamer #setupgaming #jeuxvideo #pcgaming #gamingfr #gaming",
+   "created": "2026-11-21T10:22:49+01:00",
+   "metricool": {
+    "post_id": "436511050",
+    "uuid": "1253197690106955329",
+    "planner_url": "https://app.metricool.com/planner/calendar?blogId=7583648&openWithPostUuid=1253197690106955329",
+    "date": "2026-11-21T10:26:00+01:00"
+   },
+   "status": "programme",
+   "published_at": "2026-11-21T10:26:00+01:00",
+   "deleted_at": null
   }
  ]
 }
