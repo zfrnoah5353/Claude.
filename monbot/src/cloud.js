@@ -1,6 +1,6 @@
 // Démarrage en ligne (Render, offre gratuite) : voir src/sauvegarde.js pour la sauvegarde de la base.
 import { existsSync } from 'node:fs';
-import { restaurer, sauvegarder } from './sauvegarde.js';
+import { restaurer, sauvegarder, prevenirArret } from './sauvegarde.js';
 
 const DB_PATH = process.env.DB_PATH || 'data.db';
 // Render donne le port à utiliser dans PORT : le panel l'écoute.
@@ -29,8 +29,12 @@ setTimeout(() => tick('démarrage'), 2 * 60e3);
 
 // Render prévient avant d'arrêter le service (mise à jour, redémarrage) : dernière sauvegarde.
 for (const sig of ['SIGTERM', 'SIGINT']) process.once(sig, async () => {
-  console.log('Arrêt demandé : dernière sauvegarde…');
-  await Promise.race([tick('arrêt'), new Promise(r => setTimeout(r, 20e3))]);
+  console.log('Arrêt demandé : MP + dernière sauvegarde…');
+  const [mp] = await Promise.race([
+    Promise.allSettled([prevenirArret(sig), tick('arrêt')]),
+    new Promise(r => setTimeout(() => r([{ status: 'timeout' }]), 22e3)),
+  ]);
+  console.log('Arrêt : MP owner →', mp?.status === 'fulfilled' ? 'envoyé' : (mp?.reason?.message || mp?.status));
   process.exit(0);
 });
 

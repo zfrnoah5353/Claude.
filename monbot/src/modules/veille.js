@@ -61,13 +61,4 @@ export function setup(client) {
     }
   });
 
-  // Arrêt propre (Render envoie SIGTERM lors d'une mise à jour, d'un redémarrage ou d'un arrêt) :
-  // on prévient l'owner en MP. La sauvegarde finale est gérée par cloud.js.
-  let fait = false;
-  const onStop = async (sig) => {
-    if (fait) return; fait = true;
-    battre();
-    await mpOwner(`⚠️ **MonBot va se couper** (${sig}).\nC'est généralement une mise à jour ou un redémarrage. Je te préviens ici dès qu'il est de retour.`).catch(() => {});
-  };
-  for (const s of ['SIGTERM', 'SIGINT']) process.once(s, () => onStop(s));
 }

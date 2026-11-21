@@ -22,6 +22,18 @@ async function discord(path, init = {}) {
   throw new Error('Discord : trop de limites de débit');
 }
 
+// MP à l'owner quand le bot s'arrête (appelé depuis cloud.js, qui attend la fin avant de quitter).
+export async function prevenirArret(sig) {
+  const [g] = await discord('/users/@me/guilds');
+  if (!g) return;
+  const guild = await discord(`/guilds/${g.id}`);
+  const dm = await discord('/users/@me/channels', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ recipient_id: guild.owner_id }) });
+  await discord(`/channels/${dm.id}/messages`, {
+    method: 'POST', headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ content: `⚠️ **MonBot va se couper** (${sig}).\nC'est généralement une mise à jour ou un redémarrage. Je te préviens dès qu'il est de retour.` }),
+  });
+}
+
 // Le salon de sauvegarde, caché à tout le monde sauf au bot (créé s'il n'existe pas).
 let salon = null;
 async function getSalon(create) {
