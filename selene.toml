@@ -1,0 +1,7 @@
+std = "roblox+testez"
+exclude = ["tests/*"]
+
+[lints]
+global_usage = "deny"
+unused_variable = "warn"
+shadowing = "warn"

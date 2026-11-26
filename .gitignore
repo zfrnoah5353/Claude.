@@ -1,0 +1,21 @@
+# Roblox build artifacts (the shipped build in dist/ is kept on purpose)
+*.rbxl
+*.rbxlx
+*.rbxl.lock
+*.rbxlx.lock
+!dist/AnimeRNG.rbxl
+
+# Wally
+Packages/
+ServerPackages/
+DevPackages/
+wally.lock
+
+# Toolchain
+sourcemap.json
+roblox.yml
+roblox.toml
+
+# OS
+.DS_Store
+Thumbs.db
