@@ -13,6 +13,9 @@ function RateLimit.allow(player: Player, key: string, ratePerSec: number, burst:
 	local now = os.clock()
 	local playerBuckets = buckets[player]
 	if not playerBuckets then
+		if player.Parent == nil then
+			return false -- left already: never recreate an uncleaned entry
+		end
 		playerBuckets = {}
 		buckets[player] = playerBuckets
 	end

@@ -33,11 +33,7 @@ export type CharacterDef = {
 
 export type UpgradeId = "luck" | "speed" | "income"
 
-export type Upgrades = {
-	luck: number,
-	speed: number,
-	income: number,
-}
+export type Upgrades = { [UpgradeId]: number }
 
 -- Full state the client renders. Sent on join and after structural changes.
 export type StateSnapshot = {
@@ -63,6 +59,7 @@ export type RollResult = {
 }
 
 export type Announcement = {
+	userId: number,
 	playerName: string,
 	characterId: string,
 }

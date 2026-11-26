@@ -6,6 +6,8 @@ local ProfileSchema = {}
 
 ProfileSchema.CURRENT_VERSION = 1
 
+export type UpgradeId = "luck" | "speed" | "income"
+
 export type Profile = {
 	version: number,
 	coins: number,
@@ -15,7 +17,7 @@ export type Profile = {
 	inventory: { [string]: number },
 	equipped: { string },
 	discovered: { [string]: boolean },
-	upgrades: { luck: number, speed: number, income: number },
+	upgrades: { [UpgradeId]: number },
 }
 
 function ProfileSchema.default(): Profile

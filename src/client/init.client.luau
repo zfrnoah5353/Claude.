@@ -10,12 +10,15 @@ end
 
 local Controllers = script:WaitForChild("Controllers")
 
-local loaded: { [string]: any } = {}
-for _, child in Controllers:GetChildren() do
-	if child:IsA("ModuleScript") then
-		loaded[child.Name] = require(child) :: any
-	end
-end
+local loaded: { any } = {
+	require(Controllers:WaitForChild("StateController")),
+	require(Controllers:WaitForChild("HudController")),
+	require(Controllers:WaitForChild("RollController")),
+	require(Controllers:WaitForChild("InventoryController")),
+	require(Controllers:WaitForChild("IndexController")),
+	require(Controllers:WaitForChild("ShopController")),
+	require(Controllers:WaitForChild("CheatController")),
+}
 
 for _, controller in loaded do
 	if typeof(controller.init) == "function" then

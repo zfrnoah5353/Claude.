@@ -5,7 +5,7 @@
 local Players = game:GetService("Players")
 
 export type Session = {
-	lastRollAt: number,
+	nextRollAt: number, -- earliest server time the next roll is accepted
 	luckOverride: number?, -- set only by gated cheat commands
 }
 
@@ -16,7 +16,11 @@ local SessionState = {}
 function SessionState.get(player: Player): Session
 	local session = sessions[player]
 	if not session then
-		session = { lastRollAt = -math.huge, luckOverride = nil }
+		if player.Parent == nil then
+			-- Already left: don't recreate an entry that would never be cleaned.
+			return { nextRollAt = math.huge, luckOverride = nil }
+		end
+		session = { nextRollAt = 0, luckOverride = nil }
 		sessions[player] = session
 	end
 	return session

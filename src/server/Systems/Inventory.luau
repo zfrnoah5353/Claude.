@@ -25,6 +25,8 @@ local AURA_NAME = "RNGAura"
 local Inventory = {}
 
 local playerMaids: { [Player]: Maid.Maid } = {}
+-- Best character currently shown per player (avoids rebuilding replicated instances).
+local shownDisplay: { [Player]: string } = {}
 
 local function bestEquipped(profile: PlayerData.Profile): Types.CharacterDef?
 	local best: Types.CharacterDef? = nil
@@ -37,13 +39,20 @@ local function bestEquipped(profile: PlayerData.Profile): Types.CharacterDef?
 	return best
 end
 
--- Overhead name tag + aura. Pure presentation, rebuilt from server state.
-local function refreshDisplay(player: Player)
+-- Overhead name tag + aura. Pure presentation, rebuilt from server state only
+-- when the displayed character actually changes (or `force` after a respawn).
+local function refreshDisplay(player: Player, force: boolean?)
 	local profile = PlayerData.get(player)
 	local character = player.Character
 	if not profile or not character then
 		return
 	end
+	local best = bestEquipped(profile)
+	local key = if best then best.id else ""
+	if not force and shownDisplay[player] == key then
+		return
+	end
+	shownDisplay[player] = key
 	local head = character:FindFirstChild("Head")
 	local root = character:FindFirstChild("HumanoidRootPart")
 	if not head or not head:IsA("BasePart") or not root or not root:IsA("BasePart") then
@@ -59,7 +68,7 @@ local function refreshDisplay(player: Player)
 		oldAura:Destroy()
 	end
 
-	local def = bestEquipped(profile)
+	local def = best
 	if not def then
 		return
 	end
@@ -223,15 +232,15 @@ local function onPlayerLoaded(player: Player)
 	maid:add(player.CharacterAdded:Connect(function(character: Model)
 		character:WaitForChild("Head", 10)
 		character:WaitForChild("HumanoidRootPart", 10)
-		refreshDisplay(player)
+		refreshDisplay(player, true)
 	end))
 	if player.Character then
-		refreshDisplay(player)
+		refreshDisplay(player, true)
 	end
 end
 
 function Inventory.refreshDisplay(player: Player)
-	refreshDisplay(player)
+	refreshDisplay(player, true)
 end
 
 function Inventory.init()
@@ -243,6 +252,7 @@ function Inventory.init()
 
 	PlayerData.Loaded:Connect(onPlayerLoaded)
 	Players.PlayerRemoving:Connect(function(player: Player)
+		shownDisplay[player] = nil
 		local maid = playerMaids[player]
 		if maid then
 			maid:clean()

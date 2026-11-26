@@ -183,7 +183,18 @@ function InventoryController.init()
 		cards[def.id] = buildCard(panel.content, def)
 	end
 
-	StateController.Changed:Connect(render)
+	-- Only render while the panel is visible (snapshots arrive often during auto-roll).
+	StateController.Changed:Connect(function(state: Types.StateSnapshot)
+		if Panels.isOpen("Inventory") then
+			render(state)
+		end
+	end)
+	panel.onOpen = function()
+		local state = StateController.get()
+		if state then
+			render(state)
+		end
+	end
 end
 
 return InventoryController

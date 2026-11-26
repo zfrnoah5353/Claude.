@@ -25,6 +25,8 @@ local JOB_ID = if game.JobId ~= "" then game.JobId else "studio-" .. HttpService
 local LOCK_ATTEMPTS = 5
 local LOCK_RETRY_SECONDS = 3
 local SHUTDOWN_TIMEOUT = if IS_STUDIO then 5 else 25
+local AUTOSAVE_ATTEMPTS = 3
+local RELEASE_ATTEMPTS = 5
 
 local PlayerData = {}
 
@@ -143,15 +145,20 @@ local function claim(player: Player): (ClaimResult, Profile?)
 	return "locked", nil
 end
 
-local function save(player: Player, profile: Profile, release: boolean): boolean
+type SaveResult = "ok" | "failed" | "lostLock"
+
+local function save(player: Player, profile: Profile, release: boolean): SaveResult
 	if memoryOnly or not store then
-		return true
+		return "ok"
 	end
 	local dataStore = store :: DataStore
-	local ok = withRetry(3, function()
+	local lostLock = false
+	local ok = withRetry(if release then RELEASE_ATTEMPTS else AUTOSAVE_ATTEMPTS, function()
 		dataStore:UpdateAsync(keyFor(player), function(old: any): any
+			lostLock = false
 			if lockIsForeignAndFresh(old) then
 				-- Another server owns this profile now; never overwrite it.
+				lostLock = true
 				return nil
 			end
 			return {
@@ -160,7 +167,15 @@ local function save(player: Player, profile: Profile, release: boolean): boolean
 			}
 		end)
 	end)
-	return ok
+	if not ok then
+		warn(`[PlayerData] save failed for {player.UserId}`)
+		return "failed"
+	end
+	if lostLock then
+		warn(`[PlayerData] {player.UserId}: session lock held by another server, save skipped`)
+		return "lostLock"
+	end
+	return "ok"
 end
 
 local function onPlayerAdded(player: Player)
@@ -211,8 +226,14 @@ end
 
 local function autosave(player: Player, profile: Profile)
 	savingNow[player] = true
-	save(player, profile, false)
+	local result = save(player, profile, false)
 	savingNow[player] = nil
+	if result == "lostLock" and profiles[player] == profile then
+		-- Nothing from this session can persist any more: stop it cleanly.
+		profiles[player] = nil
+		nextSaveAt[player] = nil
+		player:Kick("Ta partie a été ouverte sur un autre serveur.")
+	end
 end
 
 function PlayerData.get(player: Player): Profile?
@@ -239,8 +260,12 @@ function PlayerData.reset(player: Player): boolean
 end
 
 function PlayerData.init()
+	-- Studio uses its own store, so a playtest can never touch a live session lock.
+	local storeName = if IS_STUDIO
+		then Config.DATASTORE_NAME .. "_Studio"
+		else Config.DATASTORE_NAME
 	local ok, result = pcall(function()
-		return DataStoreService:GetDataStore(Config.DATASTORE_NAME)
+		return DataStoreService:GetDataStore(storeName)
 	end)
 	if ok then
 		store = result

@@ -43,6 +43,7 @@ local flash: Frame
 
 local rolling = false
 local autoOn = false
+local autoGeneration = 0 -- each auto loop exits when this changes
 local lastRollAt = -math.huge
 local revealToken = 0
 
@@ -196,13 +197,13 @@ local function doRoll()
 	setRollEnabled(true)
 end
 
-local function autoLoop()
-	while autoOn do
+local function autoLoop(generation: number)
+	while autoOn and generation == autoGeneration do
 		local remaining = lastRollAt + rollCooldown() - os.clock()
 		if remaining > 0 then
 			task.wait(remaining)
 		end
-		if autoOn and not rolling then
+		if autoOn and generation == autoGeneration and not rolling then
 			doRoll()
 		end
 		RunService.Heartbeat:Wait()
@@ -211,10 +212,11 @@ end
 
 local function setAuto(on: boolean)
 	autoOn = on
+	autoGeneration += 1
 	autoButton.Text = if on then "AUTO\nON" else "AUTO\nOFF"
 	Ui.setEnabled(autoButton, true, if on then Ui.Theme.good else Ui.Theme.card)
 	if on then
-		task.spawn(autoLoop)
+		task.spawn(autoLoop, autoGeneration)
 	end
 end
 

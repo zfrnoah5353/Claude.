@@ -16,8 +16,9 @@ local PlayerData = require(script.Parent.PlayerData)
 local StateSync = require(script.Parent.StateSync)
 local Inventory = require(script.Parent.Inventory)
 
--- Small tolerance for network jitter on the cooldown (never more than 10 %).
-local COOLDOWN_TOLERANCE = 0.9
+-- Network jitter tolerance. Rolls are scheduled (next = max(next, now) + cooldown),
+-- so jitter is absorbed without raising the average rate above 1 / cooldown.
+local JITTER_SECONDS = 0.15
 
 local random = Random.new()
 local function rng(): number
@@ -56,8 +57,11 @@ function Rolling.roll(player: Player): Types.RollResult?
 	Inventory.grant(player, def.id, 1)
 
 	if def.oneIn >= Config.ANNOUNCE_MIN_ONE_IN then
-		local announcement: Types.Announcement =
-			{ playerName = player.DisplayName, characterId = def.id }
+		local announcement: Types.Announcement = {
+			userId = player.UserId,
+			playerName = player.DisplayName,
+			characterId = def.id,
+		}
 		ServerNet.fireAll("Announce", announcement)
 	end
 
@@ -74,10 +78,10 @@ local function onRoll(player: Player): Types.RollResult?
 	local session = SessionState.get(player)
 	local now = os.clock()
 	local cooldown = EconomyLogic.rollCooldown(profile.upgrades.speed)
-	if now - session.lastRollAt < cooldown * COOLDOWN_TOLERANCE then
+	if now < session.nextRollAt - JITTER_SECONDS then
 		return nil
 	end
-	session.lastRollAt = now
+	session.nextRollAt = math.max(session.nextRollAt, now) + cooldown
 	return Rolling.roll(player)
 end
 

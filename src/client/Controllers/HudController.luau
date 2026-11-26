@@ -187,7 +187,7 @@ function HudController.init()
 		end
 		local rarity = Rarities[def.rarity]
 		local color = if def.rarity == "Secret" then Ui.Theme.text else rarity.color
-		local isMe = announcement.playerName == Players.LocalPlayer.DisplayName
+		local isMe = announcement.userId == Players.LocalPlayer.UserId
 		local safeName =
 			announcement.playerName:gsub("&", "&amp;"):gsub("<", "&lt;"):gsub(">", "&gt;")
 		HudController.toast(
