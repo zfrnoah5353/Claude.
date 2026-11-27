@@ -1,0 +1,6 @@
+{
+  "providers": [
+    { "type": "ttf", "file": "skylyrics:abril.ttf", "size": 11.0, "oversample": 6.0, "shift": [0, 1] },
+    { "type": "reference", "id": "minecraft:default" }
+  ]
+}

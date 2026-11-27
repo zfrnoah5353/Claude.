@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "skylyrics",
+  "version": "${version}",
+  "name": "SkyLyrics",
+  "description": "Paroles Spotify synchronisées en 3D dans le ciel, barre de paroles en haut de l'écran, styles, polices et ciels personnalisés. Touche K pour le menu.",
+  "authors": ["SkyLyrics"],
+  "license": "MIT",
+  "icon": "assets/skylyrics/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": ["com.skylyrics.SkyLyrics"]
+  },
+  "mixins": ["skylyrics.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.17.0",
+    "fabric-api": "*",
+    "minecraft": "~1.21.11",
+    "java": ">=21"
+  }
+}

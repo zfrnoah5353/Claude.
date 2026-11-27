@@ -1,0 +1,8 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.skylyrics.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": ["SkyRendererMixin", "FogRendererMixin"],
+  "injectors": { "defaultRequire": 1 }
+}
