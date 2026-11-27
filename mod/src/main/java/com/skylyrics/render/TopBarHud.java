@@ -1,5 +1,6 @@
 package com.skylyrics.render;
 
+import com.skylyrics.Clock;
 import com.skylyrics.Config;
 import com.skylyrics.lyrics.Lyrics;
 import com.skylyrics.lyrics.LyricsEngine;
@@ -125,7 +126,7 @@ public final class TopBarHud {
 
 		// Égaliseur
 		int ex = clipR + 5, eBase = y + h - 4;
-		double time = System.nanoTime() / 1e9;
+		double time = Clock.nanos() / 1e9;
 		for (int i = 0; i < 4; i++) {
 			float v = engine.isPlaying() ? (float) (0.5 + 0.5 * Math.sin(time * 7 + i * 1.7)) : 0.2f;
 			int bh = 2 + Mth.floor(v * 6);

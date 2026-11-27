@@ -1,5 +1,6 @@
 package com.skylyrics.lyrics;
 
+import com.skylyrics.Clock;
 import com.skylyrics.Config;
 import com.skylyrics.SkyLyrics;
 import com.skylyrics.media.MediaSource;
@@ -39,12 +40,12 @@ public final class LyricsEngine {
 
 	// Horloge locale lissée : position (ms) au moment anchorNanos
 	private volatile long anchorPos;
-	private volatile long anchorNanos = System.nanoTime();
+	private volatile long anchorNanos = Clock.nanos();
 	private volatile boolean playing;
 	private volatile String trackKey = "";
 
 	// Démo
-	private long demoStart = System.nanoTime();
+	private long demoStart = Clock.nanos();
 	private static final Lyrics DEMO = buildDemo();
 
 	public void start() {
@@ -64,7 +65,7 @@ public final class LyricsEngine {
 	}
 
 	private void onMedia(MediaState s) {
-		long now = System.nanoTime();
+		long now = Clock.nanos();
 		if (!s.active()) {
 			media = s;
 			playing = false;
@@ -137,7 +138,7 @@ public final class LyricsEngine {
 	}
 
 	public void restartDemo() {
-		demoStart = System.nanoTime();
+		demoStart = Clock.nanos();
 	}
 
 	public MediaState media() {
@@ -161,9 +162,9 @@ public final class LyricsEngine {
 	public long positionMs() {
 		if (demo()) {
 			long total = DEMO.lines.get(DEMO.lines.size() - 1).endMs() + 2000;
-			return ((System.nanoTime() - demoStart) / 1_000_000L) % total;
+			return ((Clock.nanos() - demoStart) / 1_000_000L) % total;
 		}
-		return rawPosition(System.nanoTime()) + Config.get().offsetMs;
+		return rawPosition(Clock.nanos()) + Config.get().offsetMs;
 	}
 
 	public boolean isPlaying() {

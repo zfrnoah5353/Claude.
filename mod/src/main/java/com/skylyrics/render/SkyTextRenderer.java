@@ -1,5 +1,6 @@
 package com.skylyrics.render;
 
+import com.skylyrics.Clock;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.skylyrics.Config;
 import com.skylyrics.lyrics.Lyrics;
@@ -63,7 +64,7 @@ public final class SkyTextRenderer {
 		}
 
 		Camera camera = mc.gameRenderer.getMainCamera();
-		long now = System.nanoTime();
+		long now = Clock.nanos();
 		Lyrics lyrics = engine.lyrics();
 		long t = engine.positionMs();
 		int idx = lyrics == null ? -1 : lyrics.lineAt(t);

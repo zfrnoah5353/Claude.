@@ -11,6 +11,10 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContex
 public class SkyLyricsClientTest implements FabricClientGameTest {
 	@Override
 	public void runTest(ClientGameTestContext ctx) {
+		if (System.getenv("SKYLYRICS_VIDEO") != null) {
+			VideoRecorder.record(ctx);
+			return;
+		}
 		try (TestSingleplayerContext sp = ctx.worldBuilder().create()) {
 			sp.getClientWorld().waitForChunksRender();
 			setup(ctx, "sunset", "lavender", Config.Display.SKY, 1500);
