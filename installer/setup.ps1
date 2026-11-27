@@ -222,10 +222,17 @@ $info = @"
 -----------------------------------------------------
   VOIR ET CONTRÔLER LE PC
 -----------------------------------------------------
+  Sur téléphone : installe l'appli "RustDesk" (Play Store
+  ou App Store), tape l'ID ci-dessus puis le mot de passe.
   Sur un autre PC Windows : lance Telecommande.exe
   (avec allumage.cfg à côté) puis choisis "Contrôler".
-  Sur téléphone : installe l'appli "RustDesk", tape
-  l'ID ci-dessus puis le mot de passe.
+
+  ALLUMER DEPUIS LE TÉLÉPHONE : appli "Wake On LAN"
+  (Android) ou "Mocha WOL" (iPhone), ajoute le PC avec :
+     Adresse MAC : $Mac
+     Adresse     : $IpPublique  (ou ton nom DynDNS)
+     Port        : 9
+  (à la maison, l'appli trouve le PC toute seule)
 
 -----------------------------------------------------
   ALLUMER LE PC À DISTANCE - À FAIRE UNE FOIS
@@ -257,7 +264,7 @@ Write-Host "   TERMINÉ !" -ForegroundColor Green
 Write-Host "   ID : $RdId    Mot de passe : $Password" -ForegroundColor Green
 Write-Host "  ==============================================" -ForegroundColor Green
 Write-Host ""
-Info "Étape suivante : copie Telecommande.exe + allumage.cfg sur l'autre appareil."
+Info "Étape suivante : sur ton téléphone, installe RustDesk + une appli Wake On LAN (infos dans le fichier qui s ouvre)."
 Info "N'oublie pas le réglage BIOS (voir le fichier d'infos qui s'ouvre)."
 
 Start-Process notepad.exe -ArgumentList "`"$infoPath`""
