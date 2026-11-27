@@ -32,6 +32,8 @@ final class VideoRecorder {
 				new Scene(4, "midnight", "ice", Config.Display.SKY, "SKIES"),
 		};
 		try (TestSingleplayerContext sp = ctx.worldBuilder().create()) {
+			ctx.getInput().resizeWindow(SIZE, SIZE);
+			ctx.waitTicks(5);
 			sp.getClientWorld().waitForChunksRender();
 			ctx.runOnClient(mc -> {
 				Clock.source = () -> virtualNanos;
@@ -77,7 +79,7 @@ final class VideoRecorder {
 							mc.player.xRotO = fp;
 						}
 					});
-					ctx.takeScreenshot(TestScreenshotOptions.of(String.format("f%05d", frame)).disableCounterPrefix().withSize(SIZE, SIZE).withDestinationDir(out));
+					ctx.takeScreenshot(TestScreenshotOptions.of(String.format("f%05d", frame)).disableCounterPrefix().withDestinationDir(out));
 				}
 			}
 			ctx.runOnClient(mc -> mc.setScreen(null));
