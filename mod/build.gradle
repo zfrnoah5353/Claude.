@@ -17,3 +17,13 @@ processResources {
 }
 tasks.withType(JavaCompile).configureEach { it.options.release = 21 }
 java { withSourcesJar(); sourceCompatibility = JavaVersion.VERSION_21; targetCompatibility = JavaVersion.VERSION_21 }
+
+fabricApi {
+    configureTests {
+        createSourceSet = true
+        modId = "skylyrics-test"
+        enableGameTests = false
+        enableClientGameTests = true
+        eula = true
+    }
+}
