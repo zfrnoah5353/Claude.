@@ -150,9 +150,10 @@ public final class SkyTextRenderer {
 				}
 			}
 			float r = RANDOM.nextFloat();
-			tilt = r < 0.35f ? (RANDOM.nextFloat() - 0.5f) * 0.08f
-					: (RANDOM.nextBoolean() ? -1 : 1) * (0.12f + RANDOM.nextFloat() * 0.34f);
-			bend = (RANDOM.nextFloat() - 0.5f) * 2f * 0.0018f;
+			boolean multi = rows.size() > 1;
+			if (multi || r < 0.35f) tilt = (RANDOM.nextFloat() - 0.5f) * 0.1f;
+			else tilt = (RANDOM.nextBoolean() ? -1 : 1) * (0.12f + RANDOM.nextFloat() * 0.34f);
+			bend = (RANDOM.nextFloat() - 0.5f) * 2f * (multi ? 0.0007f : 0.0018f);
 			float camYaw = camera.yRot() * Mth.DEG_TO_RAD;
 			float camPitch = -camera.xRot() * Mth.DEG_TO_RAD; // positif = vers le haut
 			if (Config.get().display == Config.Display.FLOAT) {
@@ -210,8 +211,9 @@ public final class SkyTextRenderer {
 				float y = x0 * st + y0 * ct;
 				y += bend * x * x;
 				float roll = tilt + (float) Math.atan(2 * bend * x);
-				float yaw = anchorYaw + x * k / D;      // vers la droite = yaw croissant dans Minecraft
 				float pitch = anchorPitch - y * k / D;  // y vers le bas
+				// plus on regarde haut, plus un degré de yaw est "court" : on compense pour garder l'espacement
+				float yaw = anchorYaw + x * k / (D * Math.max(0.35f, Mth.cos(pitch))); // vers la droite = yaw croissant
 
 				float cp = Mth.cos(pitch);
 				float dx = -Mth.sin(yaw) * cp, dy = Mth.sin(pitch), dz = Mth.cos(yaw) * cp;
@@ -220,7 +222,7 @@ public final class SkyTextRenderer {
 				pose.translate(dx * D, dy * D, dz * D);
 				// Fait face au joueur (même orientation qu'une caméra qui regarderait ce point)
 				pose.mulPose(new Quaternionf().rotationYXZ((float) Math.PI - yaw, pitch, 0f));
-				pose.mulPose(new Quaternionf().rotationZ(roll));
+				pose.mulPose(new Quaternionf().rotationZ(-roll));
 				float s = (0.55f + 0.45f * easeBack(p)) * k;
 				pose.scale(s, -s, s);
 
