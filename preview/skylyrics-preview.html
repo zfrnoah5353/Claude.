@@ -113,7 +113,10 @@ kbd { font: 600 10px/1 var(--f-ui); background: rgba(255,255,255,.12); border: 1
 .caret { color: var(--ink-faint); font-size: 12px; }
 
 /* ---------- Menu K ---------- */
-.menu-wrap[hidden] { display: none; }
+.menu-wrap[hidden], .video-wrap[hidden] { display: none; }
+.video-wrap { position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; background: rgba(8,5,16,.6); padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.video-box { width: min(560px, 100%); background: var(--panel-solid); border: 1px solid var(--line); border-radius: 16px; padding: 14px; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+.video-box video { display: block; width: 100%; max-width: 100%; aspect-ratio: 1 / 1; border-radius: 10px; background: #000; }
 .menu-wrap { position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; background: rgba(8,5,16,.35); padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
 .menu {
   width: min(780px, 100%); height: min(520px, 100%); display: grid; grid-template-columns: 170px 1fr;
@@ -204,8 +207,16 @@ textarea { width: 100%; min-height: 110px; resize: vertical; background: rgba(0,
 </div>
 
 <div class="corner br">
+  <button class="btn" id="videoBtn" type="button">▶ Vidéo en jeu</button>
   <button class="btn" id="playBtn" type="button">❚❚ Pause</button>
   <button class="btn primary" id="menuBtn" type="button">Menu <kbd>K</kbd></button>
+</div>
+
+<div class="video-wrap" id="videoWrap" hidden>
+  <div class="video-box" role="dialog" aria-label="Vidéo du mod dans le vrai jeu">
+    <div class="menu-head"><div><h3 style="margin:0;font:700 16px/1.2 var(--f-head)">Le mod dans le vrai Minecraft 1.21.11</h3><p class="lead" style="margin:4px 0 10px;color:var(--ink-faint);font-size:12px">Enregistré image par image dans le jeu, avec la démo intégrée au mod.</p></div><button class="x" id="videoClose" type="button" aria-label="Fermer">×</button></div>
+    <video id="ingameVideo" src="skylyrics-ingame.mp4" controls playsinline muted loop preload="metadata"></video>
+  </div>
 </div>
 
 <div class="menu-wrap" id="menuWrap" hidden>
@@ -623,7 +634,7 @@ canvas.addEventListener("pointerup", endDrag); canvas.addEventListener("pointerc
 window.addEventListener("keydown", e => {
   if (e.target && (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT")) return;
   if (e.key === "k" || e.key === "K") toggleMenu();
-  else if (e.key === "Escape") toggleMenu(false);
+  else if (e.key === "Escape") { toggleMenu(false); showVideo(false); }
   else if (e.key === " ") { e.preventDefault(); setPlaying(!playing); }
 });
 
@@ -677,6 +688,11 @@ const wrap = document.getElementById("menuWrap"), content = document.getElementB
 let menuOpen = false, currentTab = "lyrics";
 function toggleMenu(force) { menuOpen = force === undefined ? !menuOpen : force; wrap.hidden = !menuOpen; if (menuOpen) showTab(currentTab); }
 document.getElementById("menuBtn").addEventListener("click", () => toggleMenu(true));
+const videoWrap = document.getElementById("videoWrap"), ingame = document.getElementById("ingameVideo");
+function showVideo(on) { videoWrap.hidden = !on; if (on) { toggleMenu(false); ingame.currentTime = 0; const p = ingame.play(); if (p && p.catch) p.catch(() => {}); } else ingame.pause(); }
+document.getElementById("videoBtn").addEventListener("click", () => showVideo(true));
+document.getElementById("videoClose").addEventListener("click", () => showVideo(false));
+videoWrap.addEventListener("click", e => { if (e.target === videoWrap) showVideo(false); });
 document.getElementById("playBtn").addEventListener("click", () => setPlaying(!playing));
 wrap.addEventListener("click", e => { if (e.target === wrap) toggleMenu(false); });
 document.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => showTab(b.dataset.tab)));
