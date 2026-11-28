@@ -194,7 +194,7 @@ public final class SkyTextRenderer {
 			float riseDie = dieAt == 0 ? 0 : (now - dieAt) / 1e6f * 0.05f / 10f;
 
 			for (WordFx w : words) {
-				long appear = cfg.animation == Config.Animation.LINE ? line.startMs() : w.word.startMs();
+				long appear = (cfg.animation == Config.Animation.LINE ? line.startMs() : w.word.startMs()) - 160;
 				float p = Mth.clamp((t - appear) / 320f, 0f, 1f);
 				if (p <= 0f) continue;
 				String txt = w.word.text();

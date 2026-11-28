@@ -46,10 +46,6 @@ while ($true) {
             $tl = $session.GetTimelineProperties()
             $pb = $session.GetPlaybackInfo()
             $playing = ([string]$pb.PlaybackStatus) -eq 'Playing'
-            $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-            $pos = [double]$tl.Position.TotalMilliseconds
-            $updated = $tl.LastUpdatedTime.ToUnixTimeMilliseconds()
-            if ($playing -and $updated -gt 0 -and $updated -le $now) { $pos += ($now - $updated) }
             $key = "$($props.Artist)|$($props.Title)"
             if ($key -ne $lastKey) {
                 $lastKey = $key
@@ -66,6 +62,12 @@ while ($true) {
                     } catch { $lastArt = '' }
                 }
             }
+            # Position calculée au dernier moment (la pochette peut prendre du temps à lire)
+            $tl = $session.GetTimelineProperties()
+            $now = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+            $pos = [double]$tl.Position.TotalMilliseconds
+            $updated = $tl.LastUpdatedTime.ToUnixTimeMilliseconds()
+            if ($playing -and $updated -gt 0 -and $updated -le $now) { $pos += ($now - $updated) }
             Emit ([ordered]@{
                 active  = $true
                 app     = [string]$session.SourceAppUserModelId
@@ -81,5 +83,5 @@ while ($true) {
     } catch {
         Emit @{ active = $false; error = [string]$_.Exception.Message }
     }
-    Start-Sleep -Milliseconds 350
+    Start-Sleep -Milliseconds 250
 }

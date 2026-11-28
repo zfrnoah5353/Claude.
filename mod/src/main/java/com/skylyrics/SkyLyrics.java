@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -25,6 +26,8 @@ public final class SkyLyrics implements ClientModInitializer {
 	private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(MOD_ID, "main"));
 	public static KeyMapping MENU_KEY;
 	public static KeyMapping TOGGLE_KEY;
+	public static KeyMapping EARLIER_KEY;
+	public static KeyMapping LATER_KEY;
 
 	@Override
 	public void onInitializeClient() {
@@ -33,7 +36,19 @@ public final class SkyLyrics implements ClientModInitializer {
 		MENU_KEY = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.skylyrics.menu", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K, CATEGORY));
 		TOGGLE_KEY = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.skylyrics.toggle", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, CATEGORY));
 
+		EARLIER_KEY = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.skylyrics.earlier", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_EQUAL, CATEGORY));
+		LATER_KEY = KeyBindingHelper.registerKeyBinding(new KeyMapping("key.skylyrics.later", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_MINUS, CATEGORY));
+
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			int step = 0;
+			while (EARLIER_KEY.consumeClick()) step += 100;
+			while (LATER_KEY.consumeClick()) step -= 100;
+			if (step != 0) {
+				Config.get().offsetMs += step;
+				Config.save();
+				int o = Config.get().offsetMs;
+				client.gui.setOverlayMessage(Component.literal("SkyLyrics · synchro : " + (o > 0 ? "+" : "") + o + " ms  (" + (o >= 0 ? "paroles avancées" : "paroles retardées") + ")"), false);
+			}
 			while (MENU_KEY.consumeClick()) {
 				if (client.screen == null) client.setScreen(new SkyLyricsScreen());
 			}

@@ -84,12 +84,12 @@ public final class LyricsEngine {
 		long estimate = rawPosition(now);
 		boolean playChanged = s.playing() != playing;
 		// Re-synchronise si l'écart est notable (seek, pause, dérive) ; sinon on garde l'horloge locale fluide.
-		if (playChanged || Math.abs(estimate - s.positionMs()) > 700) {
+		if (playChanged || Math.abs(estimate - s.positionMs()) > 400) {
 			anchorPos = s.positionMs();
 			anchorNanos = now;
 		} else if (s.playing()) {
 			// petite correction douce
-			long corrected = estimate + (s.positionMs() - estimate) / 8;
+			long corrected = estimate + (s.positionMs() - estimate) / 3;
 			anchorPos = corrected;
 			anchorNanos = now;
 		}

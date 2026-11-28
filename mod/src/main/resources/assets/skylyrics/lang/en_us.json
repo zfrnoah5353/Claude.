@@ -1,5 +1,7 @@
 {
   "key.category.skylyrics.main": "SkyLyrics",
   "key.skylyrics.menu": "Open SkyLyrics menu",
-  "key.skylyrics.toggle": "Show / hide lyrics"
+  "key.skylyrics.toggle": "Show / hide lyrics",
+  "key.skylyrics.earlier": "Lyrics earlier (+100 ms)",
+  "key.skylyrics.later": "Lyrics later (-100 ms)"
 }
